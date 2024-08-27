@@ -1,12 +1,15 @@
 console.log("import template running");
+
 let systemId = window.location.pathname.startsWith('/pek') ? 'PEKGZ' : 'SEKGZ';
 let date = new Date().toISOString().slice(0, 8).replace(/-/g, '');
 console.log(systemId, date);
+
+
 (async function () {
     await sleep(200);
     let qProjectNo = document.getElementById('qProjectNo')
     qProjectNo.value = systemId + date;
-    qProjectNo.addEventListener('input', function () { 
+    qProjectNo.addEventListener('input', function () {
         // 项目编号
         let input = qProjectNo.value.replace(/[^0-9A-Z]/g, '');
         qProjectNo.value = input
@@ -15,8 +18,7 @@ console.log(systemId, date);
         if (!startDate) return;
         document.getElementsByClassName('textbox-value')[14].value = startDate[0];
         document.getElementsByClassName('textbox-value')[15].value = startDate[1];
-})
-    
+    })
 })();
 
 function checkDate(dateText) {
@@ -45,7 +47,7 @@ function parseDate(dateText) {
         return [`${year}-01-01`, `${year}-12-31`];
     }
     if (day.length < 2) {
-       return [`${year}-${month}-01`, `${year}-${month}-31`];
+        return [`${year}-${month}-01`, `${year}-${month}-31`];
     }
     return [`${year}-${month}-${day}`, `${year}-${month}-${day}`];
 }
