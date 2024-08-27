@@ -17,6 +17,7 @@
         "message.min.css"
       ],
       "js": [
+        "import_template.js",
         "hotkey.js",
         "message.min.mjs"
       ]
