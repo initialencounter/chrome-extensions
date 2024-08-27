@@ -2,7 +2,7 @@ console.log("customSaveFunction running");
 
 // auto open document
 (async function () {
-    await sleep(1000);
+    // await sleep(1000);
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
     const pid = urlParams.get('projectId');
