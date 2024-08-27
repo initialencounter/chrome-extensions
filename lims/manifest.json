@@ -1,0 +1,34 @@
+{
+  "manifest_version": 3,
+  "name": "lims",
+  "version": "1.0",
+  "description": "tools for own use",
+  "icons": {
+    "48": "icons/lims.png"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*/sek/inspect*",
+        "https://*/pek/inspect*"
+      ],
+      "all_frames": true,
+      "css": [
+        "message.min.css"
+      ],
+      "js": [
+        "hotkey.js",
+        "message.min.mjs"
+      ]
+    },
+    {
+      "matches": [
+        "https://*/inspect/query/main"
+      ],
+      "all_frames": true,
+      "js": [
+        "query.js"
+      ]
+    }
+  ]
+}
