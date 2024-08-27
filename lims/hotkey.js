@@ -2,6 +2,9 @@ console.log("customSaveFunction running");
 
 // auto open document
 (async function () {
+    if (window.location.href.includes('from=query')) {
+        return;
+    }
     // await sleep(1000);
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
