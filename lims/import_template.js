@@ -10,8 +10,7 @@ console.log(systemId, date);
         // 项目编号
         let input = qProjectNo.value.replace(/[^0-9A-Z]/g, '');
         qProjectNo.value = input
-        const startDate = parseDate(input);
-        console.log(startDate,"startDate");
+        const startDate = checkDate(parseDate(input));
         // 检验日期
         if (!startDate) return;
         document.getElementsByClassName('textbox-value')[14].value = startDate[0];
@@ -20,7 +19,22 @@ console.log(systemId, date);
     
 })();
 
+function checkDate(dateText) {
+    const [year, month, day] = dateText.split('-');
+    if (year.length < 4 || Number(year) < 2020) {
+        return false;
+    }
+    if (isNaN(Number(month)) || Number(month) < 1 || Number(month) > 12) {
+        return false;
+    }
+    if (isNaN(Number(day)) || Number(day) < 1 || Number(day) > 31) {
+        return false;
+    }
+    return true;
+}
+
 function parseDate(dateText) {
+    dateText = dateText.replace(/[^0-9]/g, '');
     if (dateText.length < 9) {
         return "";
     }
