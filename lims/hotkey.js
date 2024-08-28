@@ -91,3 +91,6 @@ function importDocument() {
         console.log('Button not found');
     }
 }
+
+// TODO
+// 点击 itemCName 时复制项目名称，快捷键：双击slt
