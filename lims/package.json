@@ -1,0 +1,48 @@
+{
+  "name": "lims",
+  "version": "1.0.0",
+  "description": "- 下载 lims 文件夹内所有文件。",
+  "main": "hotkey.js",
+  "scripts": {
+    "dev": "webpack --watch --mode development",
+    "build": "webpack --mode production",
+    "zip": "7z a -tzip ./%npm_package_name%-%npm_package_version%.zip -r dist/*",
+    "lint": "eslint src/ts/*.ts",
+    "format": "prettier --write src/ts/*.ts"
+  },
+  "keywords": [],
+  "license": "AGPL-3.0",
+  "author": {
+    "name": "initencounter",
+    "email": "2911583893@qq.com",
+    "url": "https://github.com/initialencounter"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/initialencounter/chrome-extensions.git"
+  },
+  "bugs": {
+    "url": "https://github.com/initialencounter/chrome-extensions/issues"
+  },
+  "homepage": "https://github.com/initialencounter/chrome-extensions/blob/master/lims/readme.md#使用方法",
+  "devDependencies": {
+    "@types/chrome": "^0.0.270",
+    "@typescript-eslint/eslint-plugin": "^8.3.0",
+    "@typescript-eslint/parser": "^8.3.0",
+    "clean-webpack-plugin": "^4.0.0",
+    "copy-webpack-plugin": "^12.0.2",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "eslint-plugin-promise": "^7.1.0",
+    "eslint-plugin-react": "^7.35.0",
+    "prettier": "^3.3.3",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.5.4",
+    "webpack": "^5.94.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.0.4"
+  }
+}

@@ -4,7 +4,7 @@
   "version": "1.0",
   "description": "tools for own use",
   "icons": {
-    "48": "icons/lims.png"
+    "48": "assets/icons/lims.png"
   },
   "content_scripts": [
     {
@@ -14,13 +14,13 @@
       ],
       "all_frames": true,
       "css": [
-        "message.min.css"
+        "assets/message.min.css"
       ],
       "js": [
-        "utils.js",
-        "import_template.js",
-        "hotkey.js",
-        "message.min.mjs"
+        "js/utils.js",
+        "js/import_template.js",
+        "js/hotkey.js",
+        "assets/message.min.mjs"
       ]
     },
     {
@@ -29,8 +29,8 @@
       ],
       "all_frames": true,
       "js": [
-        "utils.js",
-        "query.js"
+        "js/utils.js",
+        "js/query.js"
       ]
     }
   ]

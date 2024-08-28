@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+      "target": "ES2015",
+      "module": "ES2015",
+      "typeRoots": ["./node_modules/@types"],
+      "outDir": "./dist/js/"
+    },
+    "buildOptions": {},
+    "include": ["./src/ts/*.ts"],
+    "exclude": ["node_modules", "**/*.spec.ts"]
+  }
