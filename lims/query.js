@@ -1,6 +1,4 @@
 console.log("检验单查询脚本运行中...");
-// TODO
-// 1. 自动更改systemId
 
 (async function () {
     await sleep(500);
@@ -27,6 +25,14 @@ console.log("检验单查询脚本运行中...");
 
 async function handleQueryBtnClick() {
     let projectNo = await getClipboardText();
+    let systemId = '';
+    if (projectNo.indexOf('SEKGZ') !== -1) {
+        systemId = 'sek';
+    }
+    if (projectNo.indexOf('PEKGZ') !== -1) {
+        systemId = 'pek';
+    }
+    document.getElementsByClassName('textbox-value')[0].value = systemId;
     document.getElementsByClassName('textbox-value')[2].value = projectNo;
     document.removeEventListener('click', handleQueryBtnClick);
 }
