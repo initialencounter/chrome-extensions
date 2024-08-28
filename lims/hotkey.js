@@ -1,9 +1,14 @@
 console.log("快捷键脚本运行中...");
 
 let changed = false;
+let originalTitle;
+
 // auto open document
 (async function () {
     await sleep(200);
+    // 将项目编号设置为标题
+    document.title = document.getElementById('projectNo').innerHTML;
+    originalTitle = document.title;
     // 复制报告编号
     document.getElementById('projectNo').parentElement.addEventListener('click', setProjectNoToClipText);
     // 复制项目名称
@@ -11,7 +16,7 @@ let changed = false;
     // 监听改动
     watchInput();
     // 保存时重置改动状态
-    document.getElementById('saveBtn0').addEventListener('click', function () { changed = false; });
+    watchSaveBtn();
     // 阻止关闭
     preventClose();
     // // 搜索模式不打开资料
@@ -125,9 +130,17 @@ function watchInput() {
     let table = document.getElementById('batteryInspectForm').children[3]
     table.addEventListener('change', function (event) {
         changed = true;
+        document.title = `* ${originalTitle}`;
         console.log('Changed tag name:', event.target.tagName);
         console.log('Changed value:', event.target.value);
     })
+}
+
+function watchSaveBtn() {
+    document.getElementById('saveBtn0').addEventListener('click', function () {
+        changed = false;
+        document.title = originalTitle;
+    });
 }
 
 function preventClose() {
