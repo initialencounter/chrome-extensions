@@ -17,6 +17,7 @@
         "message.min.css"
       ],
       "js": [
+        "utils.js",
         "import_template.js",
         "hotkey.js",
         "message.min.mjs"
@@ -28,6 +29,7 @@
       ],
       "all_frames": true,
       "js": [
+        "utils.js",
         "query.js"
       ]
     }
