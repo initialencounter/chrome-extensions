@@ -4,10 +4,9 @@ console.log("快捷键脚本运行中...");
 (async function () {
     await sleep(200);
     // 复制报告编号
-    let projectNoSpan = document.getElementById('projectNo').parentElement;
-    projectNoSpan.addEventListener('click', function () {
-        setProjectNoToClipText()
-    });
+    document.getElementById('projectNo').parentElement.addEventListener('click', setProjectNoToClipText);
+    // 复制项目名称
+    document.getElementById('itemCName').parentElement.addEventListener('click', copyProjectName);
     // // 搜索模式不打开资料
     // if (window.location.href.includes('from=query')) {
     //     return;
@@ -33,26 +32,42 @@ console.log("快捷键脚本运行中...");
 let ctrlPressCount = 0;
 let lastCtrlPressTime = 0;
 
+let cPressCount = 0;
+let lastCPressTime = 0;
+
 // 监听 Ctrl 键的弹起事件
 document.addEventListener('keyup', function (event) {
-    if (event.key !== 'Control') {
-        return;
+    if (event.key === 'Control') {
+        // 双击 Ctrl 键的检测
+        const currentTime = new Date().getTime();
+        // 检查两次 Ctrl 按键的时间间隔
+        if (currentTime - lastCtrlPressTime < 500) { // 500毫秒内双击认为是双击
+            ctrlPressCount++;
+        } else {
+            ctrlPressCount = 1; // 超过时间间隔，重置计数
+        }
+        lastCtrlPressTime = currentTime;
+        // 当双击 Ctrl 键时触发的事件
+        if (ctrlPressCount === 2) {
+            setProjectNoToClipText();
+            // 触发一次双击事件后重置计数
+            ctrlPressCount = 0;
+        }
     }
-    // 双击 Ctrl 键的检测
-    const currentTime = new Date().getTime();
-    // 检查两次 Ctrl 按键的时间间隔
-    if (currentTime - lastCtrlPressTime < 500) { // 500毫秒内双击认为是双击
-        ctrlPressCount++;
-    } else {
-        ctrlPressCount = 1; // 超过时间间隔，重置计数
+    if (event.key === 'c') {
+        const currentTime = new Date().getTime();
+        if (currentTime - lastCPressTime < 500) {
+            cPressCount++;
+        } else {
+            cPressCount = 1;
+        }
+        lastCPressTime = currentTime;
+        if (cPressCount === 2 && event.ctrlKey) {
+            copyProjectName();
+            cPressCount = 0;
+        }
     }
-    lastCtrlPressTime = currentTime;
-    // 当双击 Ctrl 键时触发的事件
-    if (ctrlPressCount === 2) {
-        setProjectNoToClipText();
-        // 触发一次双击事件后重置计数
-        ctrlPressCount = 0;
-    }
+    
 });
 
 // 监听 Ctrl + S 的按下事件
@@ -92,5 +107,10 @@ function importDocument() {
     }
 }
 
-// TODO
-// 点击 itemCName 时复制项目名称，快捷键：双击slt
+function copyProjectName() {
+    const projectNameSpan = document.getElementById('itemCName');
+    const projectName = projectNameSpan.value;
+    console.log(projectName);
+    navigator.clipboard.writeText(projectName);
+    Qmsg['success']('已复制项目名称');
+}
