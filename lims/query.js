@@ -1,5 +1,9 @@
 console.log("query patch running");
 
+// TODO
+// 1. 当剪切板存在项目编号时，自动填充项目编号
+// 2. 自动更改systemId
+
 (async function () {
     await sleep(500);
     // 物品种类

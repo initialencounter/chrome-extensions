@@ -8,26 +8,26 @@ console.log("customSaveFunction running");
     projectNoSpan.addEventListener('click', function () {
         setProjectNoToClipText()
     });
-    // 搜索模式不打开资料
-    if (window.location.href.includes('from=query')) {
-        return;
-    }
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString);
-    const pid = urlParams.get('projectId');
-    const host = window.location.host;
-    const url = `https://${host}/document?pid=${pid}`;
-    const link = document.createElement('a');
-    link.href = url;
+    // // 搜索模式不打开资料
+    // if (window.location.href.includes('from=query')) {
+    //     return;
+    // }
+    // const queryString = window.location.search;
+    // const urlParams = new URLSearchParams(queryString);
+    // const pid = urlParams.get('projectId');
+    // const host = window.location.host;
+    // const url = `https://${host}/document?pid=${pid}`;
+    // const link = document.createElement('a');
+    // link.href = url;
 
-    const event = new MouseEvent('click', {
-        ctrlKey: true,
-        bubbles: true,
-        cancelable: true
-    });
+    // const event = new MouseEvent('click', {
+    //     ctrlKey: true,
+    //     bubbles: true,
+    //     cancelable: true
+    // });
 
-    // 将事件派发到 a 标签
-    link.dispatchEvent(event);
+    // // 将事件派发到 a 标签
+    // link.dispatchEvent(event);
 })();
 
 let ctrlPressCount = 0;
