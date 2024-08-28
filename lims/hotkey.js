@@ -1,5 +1,6 @@
 console.log("快捷键脚本运行中...");
 
+let changed = false;
 // auto open document
 (async function () {
     await sleep(200);
@@ -7,6 +8,12 @@ console.log("快捷键脚本运行中...");
     document.getElementById('projectNo').parentElement.addEventListener('click', setProjectNoToClipText);
     // 复制项目名称
     document.getElementById('itemCName').parentElement.addEventListener('click', copyProjectName);
+    // 监听改动
+    watchInput();
+    // 保存时重置改动状态
+    document.getElementById('saveBtn0').addEventListener('click', function () { changed = false; });
+    // 阻止关闭
+    preventClose();
     // // 搜索模式不打开资料
     // if (window.location.href.includes('from=query')) {
     //     return;
@@ -67,7 +74,6 @@ document.addEventListener('keyup', function (event) {
             cPressCount = 0;
         }
     }
-    
 });
 
 // 监听 Ctrl + S 的按下事件
@@ -113,4 +119,25 @@ function copyProjectName() {
     console.log(projectName);
     navigator.clipboard.writeText(projectName);
     Qmsg['success']('已复制项目名称');
+}
+
+function watchInput() {
+    let table = document.getElementById('batteryInspectForm').children[3]
+    table.addEventListener('change', function (event) {
+        changed = true;
+        console.log('Changed tag name:', event.target.tagName);
+        console.log('Changed value:', event.target.value);
+    })
+}
+
+function preventClose() {
+    window.addEventListener('beforeunload', function (event) {
+        if (!changed) {
+            return;
+        }
+        const message = '您确定要离开此页面吗？未保存的更改可能会丢失。（ctrl+s 即可保存）';
+        event.preventDefault(); // 一些浏览器可能需要这一行
+        event.returnValue = message; // 标准的浏览器要求设置这个属性
+        return message; // 对于一些旧版浏览器
+    });
 }
