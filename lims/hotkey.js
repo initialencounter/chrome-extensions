@@ -2,10 +2,16 @@ console.log("customSaveFunction running");
 
 // auto open document
 (async function () {
+    await sleep(200);
+    // 复制报告编号
+    let projectNoSpan = document.getElementById('projectNo').parentElement;
+    projectNoSpan.addEventListener('click', function () {
+        setProjectNoToClipText()
+    });
+    // 搜索模式不打开资料
     if (window.location.href.includes('from=query')) {
         return;
     }
-    await sleep(200);
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
     const pid = urlParams.get('projectId');
@@ -22,12 +28,6 @@ console.log("customSaveFunction running");
 
     // 将事件派发到 a 标签
     link.dispatchEvent(event);
-
-    // 复制报告编号
-    let projectNoSpan = document.getElementById('projectNo')
-    projectNoSpan.addEventListener('click', function () {
-        setProjectNoToClipText()
-    })
 })();
 
 let ctrlPressCount = 0;
@@ -90,15 +90,4 @@ function importDocument() {
     } else {
         console.log('Button not found');
     }
-}
-
-async function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms))
-}
-
-function setProjectNoToClipText() {
-    const projectNoSpan = document.getElementById('projectNo')
-    const projectNo = projectNoSpan.innerText;
-    navigator.clipboard.writeText(projectNo);
-    Qmsg['success']('已复制项目编号');
 }
