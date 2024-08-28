@@ -3,7 +3,7 @@ console.log("query patch running");
 (async function () {
     await sleep(500);
     // 物品种类
-    document.getElementsByClassName('textbox-value')[1].value = ""
+    document.getElementsByClassName('textbox-value')[1].value = "battery";
     // 项目编号
     const projectNo_hide = document.getElementsByClassName('textbox-value')[2];
     let lastInput = projectNo_hide;
@@ -14,7 +14,9 @@ console.log("query patch running");
         }
         projectNo_hide.value = projectNo_hide.value.replace(/[^0-9A-Z]/g, '');
         lastInput = projectNo_hide.value;
+        console.log(parseDate(lastInput));
         const startDate = checkDate(parseDate(lastInput));
+        console.log(startDate);
         // 检验日期
         if (!startDate) continue;
         document.getElementsByClassName('textbox-value')[14].value = startDate[0];
@@ -23,27 +25,31 @@ console.log("query patch running");
 })();
 
 function checkDate(dateText) {
-    const [year, month, day] = dateText.split('-');
-    if (year.length < 4 || Number(year) < 2020) {
-        return false;
+    for (const text of dateText) {
+        if (!text) return false;
+        const [year, month, day] = text.split('-');
+        if (year.length < 4 || Number(year) < 2020) {
+            return false;
+        }
+        if (isNaN(Number(month)) || Number(month) < 1 || Number(month) > 12) {
+            return false;
+        }
+        if (isNaN(Number(day)) || Number(day) < 1 || Number(day) > 31) {
+            return false;
+        }
     }
-    if (isNaN(Number(month)) || Number(month) < 1 || Number(month) > 12) {
-        return false;
-    }
-    if (isNaN(Number(day)) || Number(day) < 1 || Number(day) > 31) {
-        return false;
-    }
-    return true;
+
+    return dateText;
 }
 
 function parseDate(dateText) {
     dateText = dateText.replace(/[^0-9]/g, '');
     if (dateText.length < 9) {
-        return "";
+        return ["",""];
     }
-    let year = dateText.slice(5, 9);
-    let month = dateText.slice(9, 11);
-    let day = dateText.slice(11, 13);
+    let year = dateText.slice(0, 4);
+    let month = dateText.slice(4, 6);
+    let day = dateText.slice(6, 8);
     if (month.length < 2) {
         return [`${year}-01-01`, `${year}-12-31`];
     }
