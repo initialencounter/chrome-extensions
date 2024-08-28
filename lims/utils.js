@@ -19,7 +19,7 @@ function checkDate(dateText) {
 function parseDate(dateText) {
     dateText = dateText.replace(/[^0-9]/g, '');
     if (dateText.length < 9) {
-        return ["",""];
+        return ["", ""];
     }
     let year = dateText.slice(0, 4);
     let month = dateText.slice(4, 6);
@@ -42,4 +42,28 @@ function setProjectNoToClipText() {
     const projectNo = projectNoSpan.innerText;
     navigator.clipboard.writeText(projectNo);
     Qmsg['success']('已复制项目编号');
+}
+
+async function getClipboardText() {
+    try {
+        return await navigator.clipboard.readText();
+    } catch (err) {
+        return '';
+    }
+}
+
+function checkProjectNo(projectNo) {
+    if (projectNo.indexOf(systemId) == -1) {
+        return false;
+    }
+    if (!parseDate(projectNo)[0]) {
+        return false;
+    }
+    return true;
+}
+
+function getMonthsAgoProjectNo() {
+    const currentDate = new Date();
+    currentDate.setMonth(currentDate.getMonth() - 1);
+    return systemId + currentDate.toISOString().slice(0, 7).replace('-', '');
 }

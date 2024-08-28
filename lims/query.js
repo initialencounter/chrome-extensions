@@ -1,11 +1,10 @@
-console.log("query patch running");
-
+console.log("检验单查询脚本运行中...");
 // TODO
-// 1. 当剪切板存在项目编号时，自动填充项目编号
-// 2. 自动更改systemId
+// 1. 自动更改systemId
 
 (async function () {
     await sleep(500);
+    document.addEventListener('click', handleQueryBtnClick);
     // 物品种类
     document.getElementsByClassName('textbox-value')[1].value = "battery";
     // 项目编号
@@ -18,12 +17,16 @@ console.log("query patch running");
         }
         projectNo_hide.value = projectNo_hide.value.replace(/[^0-9A-Z]/g, '');
         lastInput = projectNo_hide.value;
-        console.log(parseDate(lastInput));
         const startDate = checkDate(parseDate(lastInput));
-        console.log(startDate);
         // 检验日期
         if (!startDate) continue;
         document.getElementsByClassName('textbox-value')[14].value = startDate[0];
         document.getElementsByClassName('textbox-value')[15].value = startDate[1];
     }
 })();
+
+async function handleQueryBtnClick() {
+    let projectNo = await getClipboardText();
+    document.getElementsByClassName('textbox-value')[2].value = projectNo;
+    document.removeEventListener('click', handleQueryBtnClick);
+}

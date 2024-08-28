@@ -1,4 +1,4 @@
-console.log("customSaveFunction running");
+console.log("快捷键脚本运行中...");
 
 // auto open document
 (async function () {
