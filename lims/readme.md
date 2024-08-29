@@ -13,7 +13,7 @@
 - 浏览器地址输入 `chrome://extensions`。
 - 打开开发人员模式。
 - 加载解压缩的拓展。
-  ![加载拓展](./assets/image.png)
+  ![加载拓展](https://github.com/initialencounter/chrome-extensions/blob/master/lims/assets/image.png?raw=true)
 
 - 选择解压后得到的 dist 文件夹。
 
