@@ -16,6 +16,7 @@
       "css": [
         "assets/message.min.css"
       ],
+      "type": "module",
       "js": [
         "js/utils.js",
         "js/import_template.js",
@@ -28,6 +29,7 @@
         "https://*/inspect/query/main"
       ],
       "all_frames": true,
+      "type": "module",
       "js": [
         "js/utils.js",
         "js/query.js"

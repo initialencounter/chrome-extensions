@@ -1,11 +1,17 @@
 {
-    "compilerOptions": {
-      "target": "ES2015",
-      "module": "ES2015",
-      "typeRoots": ["./node_modules/@types"],
-      "outDir": "./dist/js/"
+  "compilerOptions": {
+    "target": "ES2015",
+    "module": "ES2015",
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
     },
-    "buildOptions": {},
-    "include": ["./src/ts/*.ts"],
-    "exclude": ["node_modules", "**/*.spec.ts"]
-  }
+    "outDir": "./dist"
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"]
+}
