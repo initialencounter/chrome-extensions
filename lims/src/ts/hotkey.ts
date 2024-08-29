@@ -1,5 +1,3 @@
-import { setProjectNoToClipText, sleep } from './utils'
-
 console.log('快捷键脚本运行中...')
 
 let changed = false
@@ -9,26 +7,35 @@ let originalTitle: string
 ;(async function () {
   await sleep(200)
   // 将项目编号设置为标题
-  document.title = document.getElementById('projectNo').innerHTML
-  originalTitle = document.title
-  // 复制报告编号
-  document
-    .getElementById('projectNo')
-    .parentElement.addEventListener('click', setProjectNoToClipText)
+  const projectNoElement = document.getElementById('projectNo')
+  if (projectNoElement) {
+    document.title = projectNoElement.innerHTML
+    originalTitle = document.title
+    // 复制报告编号
+    if (projectNoElement.parentElement) {
+      projectNoElement.parentElement.addEventListener(
+        'click',
+        setProjectNoToClipText
+      )
+    }
+  }
+
   // 复制项目名称
-  document
-    .getElementById('itemCName')
-    .parentElement.addEventListener('click', copyProjectName)
+  const itemCNameElement = document.getElementById('itemCName')
+  if (itemCNameElement && itemCNameElement.parentElement) {
+    itemCNameElement.parentElement.addEventListener('click', copyProjectName)
+  }
+
   // 监听改动
   watchInput()
   // 保存时重置改动状态
   watchSaveBtn()
   // 阻止关闭
   preventClose()
-  // // 搜索模式不打开资料
-  // if (window.location.href.includes('from=query')) {
-  //     return
-  // }
+  // 导入检验单
+  if (!window.location.href.includes('from=query')) {
+    importTemplate()
+  }
   // const queryString = window.location.search
   // const urlParams = new URLSearchParams(queryString)
   // const pid = urlParams.get('projectId')
@@ -139,26 +146,32 @@ function copyProjectName() {
 }
 
 function watchInput() {
-  const table = document.getElementById('batteryInspectForm').children[3]
-  table.addEventListener('change', function (event: Event) {
-    const target = event.target as HTMLElement
-    if (target) console.log('Changed tag name:', target.tagName)
-    if (
-      target instanceof HTMLInputElement ||
-      target instanceof HTMLSelectElement ||
-      target instanceof HTMLTextAreaElement
-    )
-      console.log('Changed value:', target.value)
-    changed = true
-    document.title = `* ${originalTitle}`
-  })
+  const table = document.getElementById('batteryInspectForm')
+  if (table) {
+    const children = table.children
+    if (children.length >= 4) {
+      const target = children[3] as HTMLElement
+      if (target) console.log('Changed tag name:', target.tagName)
+      if (
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLSelectElement ||
+        target instanceof HTMLTextAreaElement
+      )
+        console.log('Changed value:', target.value)
+      changed = true
+      document.title = `* ${originalTitle}`
+    }
+  }
 }
 
 function watchSaveBtn() {
-  document.getElementById('saveBtn0').addEventListener('click', function () {
-    changed = false
-    document.title = originalTitle
-  })
+  const saveBtn = document.getElementById('saveBtn0')
+  if (saveBtn) {
+    saveBtn.addEventListener('click', function () {
+      changed = false
+      document.title = originalTitle
+    })
+  }
 }
 
 function preventClose() {
@@ -172,4 +185,35 @@ function preventClose() {
     event.returnValue = message // 标准的浏览器要求设置这个属性
     return message // 对于一些旧版浏览器
   })
+}
+
+async function importTemplate() {
+  console.log('导入模板脚本运行中...')
+  await sleep(200)
+  const qProjectNo = document.getElementById('qProjectNo') as HTMLInputElement
+  const importBtn = document.getElementById('importBtn0')
+  if (importBtn) {
+    importBtn.addEventListener('click', handleImportBtnClick)
+  }
+  qProjectNo.value = getMonthsAgoProjectNo()
+  qProjectNo.addEventListener('input', function () {
+    // 项目编号
+    const input = qProjectNo.value.replace(/[^0-9A-Z]/g, '')
+    qProjectNo.value = input
+  })
+}
+
+async function handleImportBtnClick() {
+  const importBtn = document.getElementById('importBtn0')
+  const projectNo = await getClipboardText()
+  if (!checkProjectNo(projectNo)) {
+    if (importBtn) {
+      importBtn.removeEventListener('click', handleImportBtnClick)
+    }
+    return
+  }
+  ;(document.getElementById('qProjectNo') as HTMLInputElement).value = projectNo
+  if (importBtn) {
+    importBtn.removeEventListener('click', handleImportBtnClick)
+  }
 }

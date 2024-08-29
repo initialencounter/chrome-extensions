@@ -1,5 +1,3 @@
-import { getClipboardText, parseDate, checkDate, sleep } from './utils'
-
 console.log('检验单查询脚本运行中...')
 ;(async function () {
   await sleep(500)

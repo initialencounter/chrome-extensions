@@ -1,5 +1,13 @@
 const systemId = window.location.pathname.startsWith('/pek') ? 'PEKGZ' : 'SEKGZ'
-
+if (!window) {
+  checkDate([])
+  parseDate('')
+  sleep(0)
+  setProjectNoToClipText()
+  getClipboardText()
+  checkProjectNo('')
+  getMonthsAgoProjectNo()
+}
 function checkDate(dateText: string[]) {
   for (const text of dateText) {
     if (!text) return false
@@ -18,7 +26,7 @@ function checkDate(dateText: string[]) {
   return dateText
 }
 
-function parseDate(dateText) {
+function parseDate(dateText: string) {
   dateText = dateText.replace(/[^0-9]/g, '')
   if (dateText.length < 9) {
     return ['', '']
@@ -41,8 +49,8 @@ async function sleep(ms: number) {
 
 function setProjectNoToClipText() {
   const projectNoSpan = document.getElementById('projectNo')
-  const projectNo = projectNoSpan.innerText
-  navigator.clipboard.writeText(projectNo)
+  const projectNo = projectNoSpan?.innerText // Add null check here
+  navigator.clipboard.writeText(projectNo ?? '')
   // @ts-expect-error: use Qmsg from assets
   Qmsg['success']('已复制项目编号')
 }
@@ -55,7 +63,7 @@ async function getClipboardText() {
   }
 }
 
-function checkProjectNo(projectNo) {
+function checkProjectNo(projectNo: string) {
   if (projectNo.indexOf(systemId) == -1) {
     return false
   }
@@ -69,14 +77,4 @@ function getMonthsAgoProjectNo() {
   const currentDate = new Date()
   currentDate.setMonth(currentDate.getMonth() - 1)
   return systemId + currentDate.toISOString().slice(0, 7).replace('-', '')
-}
-
-export {
-  checkDate,
-  parseDate,
-  sleep,
-  setProjectNoToClipText,
-  getClipboardText,
-  checkProjectNo,
-  getMonthsAgoProjectNo
 }
