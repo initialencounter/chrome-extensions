@@ -19,6 +19,7 @@
       "js": [
         "js/utils.js",
         "js/hotkey.js",
+        "js/pek2sek.js",
         "assets/message.min.mjs"
       ]
     },

@@ -10,6 +10,7 @@ export default defineConfig({
         utils: resolve(__dirname, 'src/ts/utils.ts'),
         query: resolve(__dirname, 'src/ts/query.ts'),
         hotkey: resolve(__dirname, 'src/ts/hotkey.ts'),
+        pek2sek: resolve(__dirname, 'src/ts/pek2sek.ts'),
       },
       output: {
         entryFileNames: 'js/[name].js',
