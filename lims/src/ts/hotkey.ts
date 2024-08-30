@@ -146,22 +146,19 @@ function copyProjectName() {
 }
 
 function watchInput() {
-  const table = document.getElementById('batteryInspectForm')
-  if (table) {
-    const children = table.children
-    if (children.length >= 4) {
-      const target = children[3] as HTMLElement
-      if (target) console.log('Changed tag name:', target.tagName)
-      if (
-        target instanceof HTMLInputElement ||
-        target instanceof HTMLSelectElement ||
-        target instanceof HTMLTextAreaElement
-      )
-        console.log('Changed value:', target.value)
+  const table = document.getElementById('batteryInspectForm')?.children[3]
+  table?.addEventListener('change', function (event: Event) {
+    const target = event.target as HTMLElement
+    if (target) console.log('Changed tag name:', target.tagName)
+    if (
+      target instanceof HTMLInputElement ||
+      target instanceof HTMLSelectElement
+    ) {
+      console.log('Changed value:', target.value)
       changed = true
       document.title = `* ${originalTitle}`
     }
-  }
+  })
 }
 
 function watchSaveBtn() {
