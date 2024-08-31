@@ -4,30 +4,20 @@ const systemIdLowercase = window.location.pathname.startsWith('/pek')
 const host = window.location.host
 ;(async () => {
   await sleep(200)
-  console.log('FakeFakeFakeFakeFakeFakeFake')
-  document
-    .getElementById('FakeFakeFakeFakeFakeFakeFake')
-    ?.parentElement?.addEventListener('click', async function () {
-      const targetProjectNo = await getClipboardText()
-      if (!targetProjectNo) return
-      if (!checkReverseProjectNo(targetProjectNo)) {
-        // @ts-expect-error: use Qmsg from assets
-        Qmsg['error']('获取的项目编号不符合规范')
-        return
-      }
-      const targetDate = await getDataByProjectNo(targetProjectNo)
-      if (!targetDate) return
-      console.log(targetDate, 'targetDate')
-      const currentProjectId = getCurrentProjectId()
-      if (currentProjectId === null) return
-      console.log(currentProjectId, 'currentProjectId')
-      const currentData = await getData(currentProjectId)
-      if (currentData === null) return
-      console.log(JSON.stringify(currentData), 'currentData')
-      const newData = insteadData(currentData, targetDate)
-      console.log(JSON.stringify(newData), 'newData')
-      restDate(newData)
-    })
+  console.log('replaceData is running...')
+  chrome.runtime.onMessage.addListener(async function (message) {
+    if (message !== 'lims_replace_data') return
+    console.log('Message received from background script:', message)
+    // const status = await mainReplaceData()
+    // if (status.ok) {
+    //   // @ts-expect-error: use Qmsg from assets
+    //   Qmsg['success'](status.result)
+    //   location.reload()
+    // } else {
+    //   // @ts-expect-error: use Qmsg from assets
+    //   Qmsg['error'](status.result)
+    // }
+  })
 })()
 
 /**
@@ -402,21 +392,26 @@ const PekKey2SekKey: Record<keyof PekDifData, keyof SekDifData | null> = {
   inspectionItem2Text2: null
 }
 
-function insteadData(
+interface ReplaceStatus {
+  ok: boolean
+  result: string
+}
+
+function replaceData(
   currentData: SekData | PekData,
   targetData: SekData | PekData
 ): SekData | PekData {
   if (systemIdLowercase === 'sek') {
-    return insteadSekFromPek(currentData as SekData, targetData as PekData)
+    return replaceSekFromPek(currentData as SekData, targetData as PekData)
   }
-  return insteadPekFromSek(currentData as PekData, targetData as SekData)
+  return replacePekFromSek(currentData as PekData, targetData as SekData)
 }
 
 /**
  * 使用 SekDate 替换 PekData 中的数据
  * @returns PekData
  */
-function insteadPekFromSek(pekData: PekData, sekData: SekData): PekData {
+function replacePekFromSek(pekData: PekData, sekData: SekData): PekData {
   for (const key of PekDifDataKeys) {
     const sekKey = PekKey2SekKey[key]
     if (sekKey == null) {
@@ -433,7 +428,7 @@ function insteadPekFromSek(pekData: PekData, sekData: SekData): PekData {
  * @returns SekDifData
  */
 
-function insteadSekFromPek(sekData: SekData, pekData: PekData): SekData {
+function replaceSekFromPek(sekData: SekData, pekData: PekData): SekData {
   for (const key of SekDifDataKeys) {
     const pekKey = SekKey2PekKey[key]
     if (pekKey == null) {
@@ -459,22 +454,22 @@ async function getData(projectId: string): Promise<SekData | PekData | null> {
   return await response.json()
 }
 
-function restDate(data: PekData | SekData) {
-  fetch(`https://${host}/rest/${systemIdLowercase}/inspect/battery`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    credentials: 'include', // 包含 cookies
-    body: JSON.stringify(data)
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      console.log('POST 请求成功:', data)
-    })
-    .catch((error) => {
-      console.error('POST 请求失败:', error)
-    })
+async function restDate(data: PekData | SekData): Promise<ReplaceStatus> {
+  const response = await fetch(
+    `https://${host}/rest/${systemIdLowercase}/inspect/battery`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include', // 包含 cookies
+      body: JSON.stringify(data)
+    }
+  )
+  if (!response.ok) {
+    return { ok: false, result: '替换失败' }
+  }
+  return { ok: true, result: '替换成功' }
 }
 
 function getCurrentProjectId() {
@@ -510,4 +505,22 @@ async function checkReverseProjectNo(projectNo: string) {
   const reg = /[S|P]EK\w{2}20[1-3][0-9][0-2][0-9][0-3][0-9]\d{4}/
   if (!reg.test(projectNo)) return false
   return true
+}
+
+async function mainReplaceData(): Promise<ReplaceStatus> {
+  const targetProjectNo = await getClipboardText()
+  if (!targetProjectNo) return { ok: false, result: '剪切板中没有项目编号' }
+  if (!checkReverseProjectNo(targetProjectNo)) {
+    return { ok: false, result: '项目编号格式错误' }
+  }
+  const targetDate = await getDataByProjectNo(targetProjectNo)
+  if (!targetDate) return { ok: false, result: '未找到对应的项目编号' }
+  const currentProjectId = getCurrentProjectId()
+  if (currentProjectId === null)
+    return { ok: false, result: '未找到当前项目编号' }
+  const currentData = await getData(currentProjectId)
+  if (currentData === null)
+    return { ok: false, result: '未找到当前项目编号的数据' }
+  const newData = replaceData(currentData, targetDate)
+  return await restDate(newData)
 }
