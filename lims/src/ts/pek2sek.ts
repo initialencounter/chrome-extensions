@@ -9,6 +9,12 @@ const host = window.location.host
     .getElementById('FakeFakeFakeFakeFakeFakeFake')
     ?.parentElement?.addEventListener('click', async function () {
       const targetProjectNo = await getClipboardText()
+      if (!targetProjectNo) return
+      if (!checkReverseProjectNo(targetProjectNo)) {
+        // @ts-expect-error: use Qmsg from assets
+        Qmsg['error']('获取的项目编号不符合规范')
+        return
+      }
       const targetDate = await getDataByProjectNo(targetProjectNo)
       if (!targetDate) return
       console.log(targetDate, 'targetDate')
@@ -496,4 +502,12 @@ async function getDataByProjectNo(
   }
   const data = await response.json()
   return data['rows'][0]
+}
+
+async function checkReverseProjectNo(projectNo: string) {
+  if (!projectNo.startsWith(systemIdLowercase === 'sek' ? 'PEK' : 'SEK'))
+    return false
+  const reg = /[S|P]EK\w{2}20[1-3][0-9][0-2][0-9][0-3][0-9]\d{4}/
+  if (!reg.test(projectNo)) return false
+  return true
 }
