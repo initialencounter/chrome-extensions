@@ -23,7 +23,7 @@ let originalTitle: string
   // 复制项目名称
   const itemCNameElement = document.getElementById('itemCName')
   if (itemCNameElement && itemCNameElement.parentElement) {
-    itemCNameElement.parentElement.addEventListener('click', copyProjectName)
+    itemCNameElement.parentElement.addEventListener('dblclick', copyProjectName)
   }
 
   // 监听改动
