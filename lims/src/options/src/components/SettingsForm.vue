@@ -104,16 +104,7 @@ const metaData = { ...Config['dict'] }
 const isDev = import.meta.env.DEV
 if (!isDev) {
   chrome.storage.sync.get(
-    [
-      'enabledReplace',
-      'enableCopyProjectNo',
-      'enableCopyProjectName',
-      'enablePreventCloseBeforeSave',
-      'enableSaveHotKey',
-      'enableImportHotKey',
-      'enableSetImportProjectNo',
-      'enableSetQueryProjectNo'
-    ],
+    Object.keys(ruleForm.value),
     (data) => {
       ruleForm.value = new Config(data as Config)
     }
