@@ -2,13 +2,16 @@
   "name": "lims",
   "version": "1.0.0",
   "description": "- 下载 lims 文件夹内所有文件。",
-  "main": "hotkey.js",
+  "private": true,
+  "workspaces": [
+    "src/options"
+  ],
   "scripts": {
-    "dev": "webpack --watch --mode development",
+    "dev": "cd C:/Users/29115/dev/chrome/chrome-extensions/lims/src/options && vite",
     "build": "vite build --emptyOutDir",
     "zip": "7z a -tzip ./%npm_package_name%-%npm_package_version%.zip -r dist/*",
     "lint": "eslint src/ts/*.ts",
-    "format": "prettier --write src/ts/*.ts"
+    "format": "prettier --write src/*/*.ts"
   },
   "license": "AGPL-3.0",
   "author": {
@@ -25,19 +28,31 @@
   },
   "homepage": "https://github.com/initialencounter/chrome-extensions/blob/master/lims/readme.md#使用方法",
   "devDependencies": {
-    "@types/node": "^22.5.1",
+    "@tsconfig/node20": "^20.1.4",
     "@types/chrome": "^0.0.270",
+    "@types/node": "^22.5.1",
     "@typescript-eslint/eslint-plugin": "^8.3.0",
     "@typescript-eslint/parser": "^8.3.0",
+    "@vitejs/plugin-vue": "^5.0.5",
+    "@vue/tsconfig": "^0.5.1",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-n": "^17.10.2",
     "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-promise": "^7.1.0",
     "eslint-plugin-react": "^7.35.0",
+    "npm-run-all2": "^6.2.0",
     "prettier": "^3.3.3",
+    "sass-embedded": "^1.77.8",
     "typescript": "^5.5.4",
-    "vite": "^5.4.2"
+    "vite": "^5.4.2",
+    "vue-tsc": "^2.0.21"
   },
-  "packageManager": "yarn@1.22.22"
+  "packageManager": "yarn@1.22.22",
+  "dependencies": {
+    "@intlify/core-base": "^9.14.0",
+    "element-plus": "^2.8.1",
+    "schemastery": "^3.14.6",
+    "vue": "^3.4.38"
+  }
 }

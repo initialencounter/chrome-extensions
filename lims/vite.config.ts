@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
+import vue from '@vitejs/plugin-vue';
 
 export default defineConfig({
   root: 'src',
@@ -12,6 +13,7 @@ export default defineConfig({
         hotkey: resolve(__dirname, 'src/content-script/hotkey.ts'),
         pek2sek: resolve(__dirname, 'src/content-script/pek2sek.ts'),
         background: resolve(__dirname, 'src/background/index.ts'),
+        options: resolve(__dirname, 'src/options/index.html'),
       },
       output: {
         entryFileNames: 'js/[name].js',
@@ -25,5 +27,7 @@ export default defineConfig({
     },
     extensions: ['.ts', '.js'],
   },
-  plugins: [],
+  plugins: [
+    vue(),
+  ],
 });

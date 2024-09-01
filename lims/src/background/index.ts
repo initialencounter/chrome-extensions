@@ -85,3 +85,7 @@ async function sendMessageToActiveTab(message: string) {
   if (!tab.id) return
   await chrome.tabs.sendMessage(tab.id, message)
 }
+
+chrome.storage.sync.get('favoriteColor', function (data) {
+  console.log('favoriteColor currently is ' + data.favoriteColor)
+})

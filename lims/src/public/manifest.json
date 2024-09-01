@@ -10,6 +10,7 @@
     "storage",
     "contextMenus"
   ],
+  "options_page": "options/index.html",
   "background": {
     "service_worker": "js/background.js",
     "type": "module"
