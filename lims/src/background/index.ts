@@ -30,14 +30,20 @@ function genericOnClick(info: chrome.contextMenus.OnClickData) {
       console.log('Standard context menu item clicked.')
   }
 }
-chrome.runtime.onInstalled.addListener(function () {
+
+chrome.runtime.onInstalled.addListener(async function () {
+  let enabledReplace = false
+  chrome.storage.sync.get('enabledReplace', function (data) {
+    enabledReplace = data.enabledReplace
+  })
+  await backgroundSleep(500)
   const menus: ExtendedCreateProperties = {
     title: 'LIMS',
     id: 'lims',
     child: [
       {
         title: '替换数据',
-        enabled: false,
+        enabled: enabledReplace,
         id: 'lims_replace_data'
       },
       {
@@ -86,6 +92,6 @@ async function sendMessageToActiveTab(message: string) {
   await chrome.tabs.sendMessage(tab.id, message)
 }
 
-chrome.storage.sync.get('favoriteColor', function (data) {
-  console.log('favoriteColor currently is ' + data.favoriteColor)
-})
+async function backgroundSleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}

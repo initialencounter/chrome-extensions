@@ -1,4 +1,39 @@
 const systemId = window.location.pathname.startsWith('/pek') ? 'PEKGZ' : 'SEKGZ'
+let localConfig: Config = {
+  enabledReplace: false,
+  enableCopyProjectNo: false,
+  enableCopyProjectName: false,
+  enablePreventCloseBeforeSave: false,
+  enableSaveHotKey: false,
+  enableImportHotKey: false,
+  enableSetImportProjectNo: false,
+  enableSetQueryProjectNo: false
+}
+
+interface Config {
+  enabledReplace: boolean
+  enableCopyProjectNo: boolean
+  enableCopyProjectName: boolean
+  enablePreventCloseBeforeSave: boolean
+  enableSaveHotKey: boolean
+  enableImportHotKey: boolean
+  enableSetImportProjectNo: boolean
+  enableSetQueryProjectNo: boolean
+}
+
+const configKeys: Array<keyof Config> = [
+  'enabledReplace',
+  'enableCopyProjectNo',
+  'enableCopyProjectName',
+  'enablePreventCloseBeforeSave',
+  'enableSaveHotKey',
+  'enableImportHotKey',
+  'enableSetImportProjectNo',
+  'enableSetQueryProjectNo'
+]
+chrome.storage.sync.get(configKeys, function (data) {
+  localConfig = data as Config
+})
 if (!window) {
   checkDate([])
   parseDate('')
@@ -7,6 +42,7 @@ if (!window) {
   getClipboardText()
   checkProjectNo('')
   getMonthsAgoProjectNo()
+  console.log(configKeys, localConfig)
 }
 function checkDate(dateText: string[]) {
   for (const text of dateText) {

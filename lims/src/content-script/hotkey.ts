@@ -3,39 +3,108 @@ console.log('快捷键脚本运行中...')
 let changed = false
 let originalTitle: string
 
-  // auto open document
+let ctrlPressCount = 0
+let lastCtrlPressTime = 0
+let cPressCount = 0
+let lastCPressTime = 0
+
+// auto open document
 ;(async function () {
-  await sleep(200)
+  await sleep(500)
   // 将项目编号设置为标题
-  const projectNoElement = document.getElementById('projectNo')
-  if (projectNoElement) {
-    document.title = projectNoElement.innerHTML
-    originalTitle = document.title
-    // 复制报告编号
-    if (projectNoElement.parentElement) {
-      projectNoElement.parentElement.addEventListener(
-        'click',
-        setProjectNoToClipText
-      )
+  if (localConfig.enableCopyProjectNo) {
+    const projectNoElement = document.getElementById('projectNo')
+    if (projectNoElement) {
+      document.title = projectNoElement.innerHTML
+      originalTitle = document.title
+      // 复制报告编号
+      if (projectNoElement.parentElement) {
+        projectNoElement.parentElement.addEventListener(
+          'click',
+          setProjectNoToClipText
+        )
+      }
     }
   }
 
   // 复制项目名称
-  const itemCNameElement = document.getElementById('itemCName')
-  if (itemCNameElement && itemCNameElement.parentElement) {
-    itemCNameElement.parentElement.addEventListener('dblclick', copyProjectName)
+  if (localConfig.enableCopyProjectName) {
+    const itemCNameElement = document.getElementById('itemCName')
+    if (itemCNameElement && itemCNameElement.parentElement) {
+      itemCNameElement.parentElement.addEventListener(
+        'dblclick',
+        copyProjectName
+      )
+    }
+  }
+  // 监听改动
+  if (localConfig.enablePreventCloseBeforeSave) {
+    watchInput()
+    // 保存时重置改动状态
+    watchSaveBtn()
+    // 阻止关闭
+    preventClose()
   }
 
-  // 监听改动
-  watchInput()
-  // 保存时重置改动状态
-  watchSaveBtn()
-  // 阻止关闭
-  preventClose()
   // 导入检验单
-  if (!window.location.href.includes('from=query')) {
-    importTemplate()
+  if (localConfig.enableImportHotKey) {
+    if (!window.location.href.includes('from=query')) {
+      importTemplate()
+    }
   }
+
+  // 监听 Ctrl 键的弹起事件
+  document.addEventListener('keyup', function (event) {
+    if (event.key === 'Control' && localConfig.enableCopyProjectNo) {
+      // 双击 Ctrl 键的检测
+      const currentTime = new Date().getTime()
+      // 检查两次 Ctrl 按键的时间间隔
+      if (currentTime - lastCtrlPressTime < 500) {
+        // 500毫秒内双击认为是双击
+        ctrlPressCount++
+      } else {
+        ctrlPressCount = 1 // 超过时间间隔，重置计数
+      }
+      lastCtrlPressTime = currentTime
+      // 当双击 Ctrl 键时触发的事件
+      if (ctrlPressCount === 2) {
+        setProjectNoToClipText()
+        // 触发一次双击事件后重置计数
+        ctrlPressCount = 0
+      }
+    }
+    if (event.key === 'c' && localConfig.enableCopyProjectName) {
+      const currentTime = new Date().getTime()
+      if (currentTime - lastCPressTime < 500) {
+        cPressCount++
+      } else {
+        cPressCount = 1
+      }
+      lastCPressTime = currentTime
+      if (cPressCount === 2 && event.ctrlKey) {
+        copyProjectName()
+        cPressCount = 0
+      }
+    }
+  })
+  if (localConfig.enableSaveHotKey) {
+    // 监听 Ctrl + S 的按下事件
+    document.addEventListener('keydown', function (event) {
+      if (!event.ctrlKey) {
+        return
+      }
+      // 检查是否按下了Ctrl+S
+      if (event.key === 's') {
+        event.preventDefault() // 阻止默认的保存行为
+        myCustomSaveFunction()
+      }
+      if (event.key === 'd') {
+        event.preventDefault() // 阻止默认的保存行为
+        importDocument()
+      }
+    })
+  }
+
   // const queryString = window.location.search
   // const urlParams = new URLSearchParams(queryString)
   // const pid = urlParams.get('projectId')
@@ -53,63 +122,6 @@ let originalTitle: string
   // // 将事件派发到 a 标签
   // link.dispatchEvent(event)
 })()
-
-let ctrlPressCount = 0
-let lastCtrlPressTime = 0
-
-let cPressCount = 0
-let lastCPressTime = 0
-
-// 监听 Ctrl 键的弹起事件
-document.addEventListener('keyup', function (event) {
-  if (event.key === 'Control') {
-    // 双击 Ctrl 键的检测
-    const currentTime = new Date().getTime()
-    // 检查两次 Ctrl 按键的时间间隔
-    if (currentTime - lastCtrlPressTime < 500) {
-      // 500毫秒内双击认为是双击
-      ctrlPressCount++
-    } else {
-      ctrlPressCount = 1 // 超过时间间隔，重置计数
-    }
-    lastCtrlPressTime = currentTime
-    // 当双击 Ctrl 键时触发的事件
-    if (ctrlPressCount === 2) {
-      setProjectNoToClipText()
-      // 触发一次双击事件后重置计数
-      ctrlPressCount = 0
-    }
-  }
-  if (event.key === 'c') {
-    const currentTime = new Date().getTime()
-    if (currentTime - lastCPressTime < 500) {
-      cPressCount++
-    } else {
-      cPressCount = 1
-    }
-    lastCPressTime = currentTime
-    if (cPressCount === 2 && event.ctrlKey) {
-      copyProjectName()
-      cPressCount = 0
-    }
-  }
-})
-
-// 监听 Ctrl + S 的按下事件
-document.addEventListener('keydown', function (event) {
-  if (!event.ctrlKey) {
-    return
-  }
-  // 检查是否按下了Ctrl+S
-  if (event.key === 's') {
-    event.preventDefault() // 阻止默认的保存行为
-    myCustomSaveFunction()
-  }
-  if (event.key === 'd') {
-    event.preventDefault() // 阻止默认的保存行为
-    importDocument()
-  }
-})
 
 function myCustomSaveFunction() {
   const button = document.getElementById('saveBtn0')

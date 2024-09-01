@@ -3,20 +3,24 @@ const systemIdLowercase = window.location.pathname.startsWith('/pek')
   : 'sek'
 const host = window.location.host
 ;(async () => {
-  await sleep(200)
+  await sleep(500)
+  if (!localConfig.enabledReplace) {
+    console.log('未启用替换数据功能，退出脚本')
+    return
+  }
   console.log('replaceData is running...')
   chrome.runtime.onMessage.addListener(async function (message) {
     if (message !== 'lims_replace_data') return
     console.log('Message received from background script:', message)
-    // const status = await mainReplaceData()
-    // if (status.ok) {
-    //   // @ts-expect-error: use Qmsg from assets
-    //   Qmsg['success'](status.result)
-    //   location.reload()
-    // } else {
-    //   // @ts-expect-error: use Qmsg from assets
-    //   Qmsg['error'](status.result)
-    // }
+    const status = await mainReplaceData()
+    if (status.ok) {
+      // @ts-expect-error: use Qmsg from assets
+      Qmsg['success'](status.result)
+      location.reload()
+    } else {
+      // @ts-expect-error: use Qmsg from assets
+      Qmsg['error'](status.result)
+    }
   })
 })()
 

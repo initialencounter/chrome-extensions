@@ -18,7 +18,7 @@
 </template>
 
 <script lang="ts" setup>
-import { type ComponentSize, ElMessage, type FormInstance } from 'element-plus'
+import { ElMessage, type FormInstance } from 'element-plus'
 import { ref } from 'vue'
 import Schema from 'schemastery'
 import SwitchItem from './Switch.vue'

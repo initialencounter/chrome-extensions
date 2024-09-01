@@ -1,6 +1,10 @@
-console.log('检验单查询脚本运行中...')
 ;(async function () {
   await sleep(500)
+  if (!localConfig.enableSetQueryProjectNo) {
+    console.log('未启用设置查询项目编号，退出脚本')
+    return
+  }
+  console.log('检验单查询脚本运行中...')
   document.addEventListener('click', handleQueryBtnClick)
   // 物品种类
   ;(
