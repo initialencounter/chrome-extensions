@@ -52,6 +52,12 @@ let lastCPressTime = 0
       importTemplate()
     }
   }
+  // 导入检验单时设置分类
+  if (localConfig.enableSetImportClassification) {
+    if (!window.location.href.includes('from=query')) {
+      importClassification()
+    }
+  }
 
   // 监听 Ctrl 键的弹起事件
   document.addEventListener('keyup', function (event) {
@@ -225,4 +231,109 @@ async function handleImportBtnClick() {
   if (importBtn) {
     importBtn.removeEventListener('click', handleImportBtnClick)
   }
+}
+
+async function importClassification() {
+  console.log('导入分类脚本运行中...')
+  await sleep(200)
+  const importBtn = document.getElementById('importBtn0')
+  if (importBtn) {
+    importBtn.addEventListener('click', classification)
+  }
+}
+
+function classification() {
+  const projectNameSpan = document.getElementById(
+    'itemCName'
+  ) as HTMLInputElement
+  if (!projectNameSpan) {
+    return
+  }
+  setQItemCName1Text(projectNameSpan.value)
+  setUnNo(projectNameSpan.value)
+  const importBtn = document.getElementById('importBtn0')
+  if (importBtn) {
+    importBtn.removeEventListener('click', classification)
+  }
+}
+function setQItemCName1Text(projectName: string) {
+  const searchInput = document.getElementById('qItemCName1') as HTMLInputElement
+  if (!searchInput) {
+    return
+  }
+  if (!projectName) {
+    return
+  }
+  let text = ''
+  if (projectName.includes('包装')) {
+    text = '包装'
+  }
+  if (projectName.includes('内置')) {
+    text = '内置'
+  }
+  if (projectName.includes('充电盒')) {
+    text = '充电盒'
+  }
+  if (projectName.includes('充电仓')) {
+    text = '充电仓'
+  }
+  searchInput.value = text
+}
+
+function setUnNo(projectName: string) {
+  const UnNoInputItem = document.getElementById('qUnNo') as HTMLInputElement
+  if (!UnNoInputItem) {
+    return
+  }
+  if (!projectName) {
+    return
+  }
+  if (projectName.includes('电子烟')) {
+    return
+  }
+  if (projectName.includes('车')) {
+    UnNoInputItem.value = '3171'
+    return
+  }
+  const isDangerous = isDangerousGoods(projectName)
+  if (!isDangerous) {
+    return
+  }
+  let UnNo = ''
+  let isLiIonBattery = isLiIon(projectName)
+  console.log('isLiIonBattery:', isLiIonBattery)
+  if (isLiIonBattery) {
+    UnNo = '3481'
+  }
+  if (
+    !projectName.includes('(') &&
+    !projectName.includes('（') &&
+    isLiIonBattery
+  ) {
+    UnNo = '3480'
+  }
+  UnNoInputItem.value = UnNo
+}
+
+function isDangerousGoods(projectName: string) {
+  const matches = [...projectName.matchAll(/\s(\d+\.{0,1}\d+)[Ww]h/g)]
+  const results = matches.map((match) => match[1]) // 只获取捕获组
+  if (results.length) {
+    const wattHour = Number(results[0])
+    if (wattHour > 100) {
+      return true
+    }
+    if (projectName.includes('芯') && wattHour > 20) {
+      return true
+    }
+  }
+  return false
+}
+
+function isLiIon(projectName: string) {
+  let metalBattery = ['纽扣', '锂金属', 'CR2032', 'CR2025']
+  if (metalBattery.some((item) => projectName.includes(item))) {
+    return false
+  }
+  return true
 }

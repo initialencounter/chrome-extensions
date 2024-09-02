@@ -32,6 +32,7 @@ interface Config {
   enableImportHotKey: boolean
   enableSetImportProjectNo: boolean
   enableSetQueryProjectNo: boolean
+  enableSetImportClassification: boolean
 }
 
 const Config: Schema<Config> = Schema.object({
@@ -74,7 +75,11 @@ const Config: Schema<Config> = Schema.object({
     .description(
       `设置查询项目编号 （在查询窗口中，自动填充项目编号）`
     )
-    .default(true)
+    .default(true),
+  enableSetImportClassification: Schema.boolean()
+    .description(
+      `设置导入分类 （在导入窗口中，自动填充分类）`
+    ).default(true),
 })
 
 const saveConfig = () => {

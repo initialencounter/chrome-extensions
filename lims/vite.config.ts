@@ -14,6 +14,7 @@ export default defineConfig({
         pek2sek: resolve(__dirname, 'src/content-script/pek2sek.ts'),
         background: resolve(__dirname, 'src/background/index.ts'),
         options: resolve(__dirname, 'src/options/index.html'),
+        popup: resolve(__dirname, 'src/popup/index.html'),
       },
       output: {
         entryFileNames: 'js/[name].js',

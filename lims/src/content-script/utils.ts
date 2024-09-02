@@ -1,13 +1,14 @@
 const systemId = window.location.pathname.startsWith('/pek') ? 'PEKGZ' : 'SEKGZ'
 let localConfig: Config = {
-  enabledReplace: false,
-  enableCopyProjectNo: false,
-  enableCopyProjectName: false,
-  enablePreventCloseBeforeSave: false,
-  enableSaveHotKey: false,
-  enableImportHotKey: false,
-  enableSetImportProjectNo: false,
-  enableSetQueryProjectNo: false
+  enabledReplace: true,
+  enableCopyProjectNo: true,
+  enableCopyProjectName: true,
+  enablePreventCloseBeforeSave: true,
+  enableSaveHotKey: true,
+  enableImportHotKey: true,
+  enableSetImportProjectNo: true,
+  enableSetQueryProjectNo: true,
+  enableSetImportClassification: true
 }
 
 interface Config {
@@ -19,6 +20,7 @@ interface Config {
   enableImportHotKey: boolean
   enableSetImportProjectNo: boolean
   enableSetQueryProjectNo: boolean
+  enableSetImportClassification: boolean
 }
 
 const configKeys: Array<keyof Config> = [
@@ -29,10 +31,14 @@ const configKeys: Array<keyof Config> = [
   'enableSaveHotKey',
   'enableImportHotKey',
   'enableSetImportProjectNo',
-  'enableSetQueryProjectNo'
+  'enableSetQueryProjectNo',
+  'enableSetImportClassification'
 ]
 chrome.storage.sync.get(configKeys, function (data) {
-  localConfig = data as Config
+  for (const key of Object.keys(data) as Array<keyof Config>) {
+    console.log(key, data[key])
+    localConfig[key] = data[key] as boolean
+  }
 })
 if (!window) {
   checkDate([])
