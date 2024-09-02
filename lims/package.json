@@ -4,9 +4,11 @@
   "description": "- 下载 lims 文件夹内所有文件。",
   "private": true,
   "workspaces": [
+    "src/popup",
     "src/options"
   ],
   "scripts": {
+    "dev:pp": "cd C:/Users/29115/dev/chrome/chrome-extensions/lims/src/popup && vite",
     "dev": "cd C:/Users/29115/dev/chrome/chrome-extensions/lims/src/options && vite",
     "build": "vite build --emptyOutDir",
     "zip": "7z a -tzip ./%npm_package_name%-%npm_package_version%.zip -r dist/*",

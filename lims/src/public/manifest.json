@@ -10,6 +10,9 @@
     "storage",
     "contextMenus"
   ],
+  "action": {
+    "default_popup": "popup/index.html"
+  },
   "options_page": "options/index.html",
   "background": {
     "service_worker": "js/background.js",
