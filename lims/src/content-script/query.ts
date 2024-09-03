@@ -5,6 +5,11 @@
     return
   }
   console.log('检验单查询脚本运行中...')
+  chrome.runtime.onMessage.addListener(async function (message) {
+    if (message !== 'lims_check_inspect') return
+    console.log('Message received from background script:', message)
+    await checkInspect()
+  })
   document.addEventListener('click', handleQueryBtnClick)
   // 物品种类
   ;(
@@ -50,4 +55,24 @@ async function handleQueryBtnClick() {
     document.getElementsByClassName('textbox-value')[2] as HTMLInputElement
   ).value = projectNo
   document.removeEventListener('click', handleQueryBtnClick)
+}
+
+async function checkInspect() {
+  const date = new Date().toISOString().split('T')[0]
+  const responseSek = await fetch(
+    `https://${window.location.host}/rest/inspect/query?projectNo=SEKGZ&category=battery&startDate=${date}&endDate=${date}&page=1&rows=100`
+  )
+  if (!responseSek.ok) {
+    return
+  }
+  const dataSek = await responseSek.json()
+  const responsePek = await fetch(
+    `https://${window.location.host}/rest/inspect/query?projectNo=PEKGZ&category=battery&startDate=${date}&endDate=${date}&page=1&rows=100`
+  )
+  if (!responsePek.ok) {
+    return
+  }
+  const dataPek = await responsePek.json()
+  const data = [...dataPek['rows'], ...dataSek['rows']]
+  console.log(data)
 }

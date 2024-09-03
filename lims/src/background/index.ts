@@ -23,8 +23,10 @@ chrome.contextMenus.onClicked.addListener(genericOnClick)
 function genericOnClick(info: chrome.contextMenus.OnClickData) {
   switch (info.menuItemId) {
     case 'lims_replace_data':
-      console.log('lims_replace_data')
       sendMessageToActiveTab('lims_replace_data')
+      break
+    case 'lims_check_inspect':
+      sendMessageToActiveTab('lims_check_inspect')
       break
     default:
       console.log('Standard context menu item clicked.')
@@ -45,6 +47,10 @@ chrome.runtime.onInstalled.addListener(async function () {
         title: '替换数据',
         enabled: enabledReplace,
         id: 'lims_replace_data'
+      },
+      {
+        title: '检验单校对',
+        id: 'lims_check_inspect'
       },
       {
         title: '其他',
