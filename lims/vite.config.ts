@@ -11,6 +11,7 @@ export default defineConfig({
         utils: resolve(__dirname, 'src/content-script/utils.ts'),
         query: resolve(__dirname, 'src/content-script/query.ts'),
         hotkey: resolve(__dirname, 'src/content-script/hotkey.ts'),
+        entrust: resolve(__dirname, 'src/content-script/entrust.ts'),
         background: resolve(__dirname, 'src/background/index.ts'),
         options: resolve(__dirname, 'src/options/index.html'),
         popup: resolve(__dirname, 'src/popup/index.html'),

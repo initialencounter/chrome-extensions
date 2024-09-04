@@ -43,6 +43,15 @@
         "js/utils.js",
         "js/query.js"
       ]
+    },
+    {
+      "matches": [
+        "https://*/sales/entrust/list"
+      ],
+      "all_frames": true,
+      "js": [
+        "js/entrust.js"
+      ]
     }
   ]
 }

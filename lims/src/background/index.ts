@@ -25,6 +25,9 @@ function genericOnClick(info: chrome.contextMenus.OnClickData) {
     case 'lims_check_inspect':
       sendMessageToActiveTab('lims_check_inspect')
       break
+    case 'lims_onekey_assign':
+      sendMessageToActiveTab('lims_onekey_assign')
+      break
     default:
       console.log('Standard context menu item clicked.')
   }
@@ -39,6 +42,10 @@ chrome.runtime.onInstalled.addListener(async function () {
       {
         title: '检验单校对',
         id: 'lims_check_inspect'
+      },
+      {
+        title: '一键分配',
+        id: 'lims_onekey_assign'
       },
       {
         title: '其他',
