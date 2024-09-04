@@ -40,7 +40,7 @@ jobs:
         run: |
           pwd
           tree -R ../
-          zip -q -r lims-${{ steps.get_version.outputs.VERSION }}.zip dist/*
+          zip -q -r lims-${{ steps.get_version.outputs.VERSION }}.zip lims/dist/*
           ls -lh
       - name: Release
         uses: softprops/action-gh-release@v2
