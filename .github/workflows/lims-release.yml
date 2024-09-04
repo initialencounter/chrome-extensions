@@ -38,9 +38,7 @@ jobs:
           echo ::set-output name=version::"${GITHUB_REF:10}"
       - name: zip
         run: |
-          pwd
-          tree -R ../
-          zip -q -r lims-${{ steps.get_version.outputs.VERSION }}.zip lims/dist/*
+          zip -q -r lims-${{ steps.get_version.outputs.VERSION }}.zip dist
           ls -lh
       - name: Release
         uses: softprops/action-gh-release@v2
