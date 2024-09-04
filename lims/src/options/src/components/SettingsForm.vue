@@ -3,11 +3,19 @@
     <h1>Settings</h1>
     <div v-for="(item, index) in Object.keys(metaData)" :key="index">
       <SwitchItem
+        v-if="metaData[item].type === 'boolean'"
         :name="item"
         :description="metaData[item]['meta'].description as string"
-        v-model="ruleForm[item as keyof typeof ruleForm]"
+        v-model="(ruleForm[item as keyof typeof ruleForm] as boolean)"
       >
       </SwitchItem>
+      <InputText
+        v-if="metaData[item].type === 'string'"
+        :name="item"
+        :description="metaData[item]['meta'].description as string"
+        v-model="(ruleForm[item as keyof typeof ruleForm] as string)"
+      >
+      </InputText>
     </div>
     <br />
     <el-form-item>
@@ -22,6 +30,7 @@ import { ElMessage, type FormInstance } from 'element-plus'
 import { ref } from 'vue'
 import Schema from 'schemastery'
 import SwitchItem from './Switch.vue'
+import InputText from './InputText.vue'
 
 interface Config {
   enableCopyProjectNo: boolean
@@ -32,6 +41,7 @@ interface Config {
   enableSetImportProjectNo: boolean
   enableSetQueryProjectNo: boolean
   enableSetImportClassification: boolean
+  assignUID: string
 }
 
 const Config: Schema<Config> = Schema.object({
@@ -74,6 +84,7 @@ const Config: Schema<Config> = Schema.object({
     .description(
       `设置导入分类 （在导入窗口中，自动填充分类）`
     ).default(true),
+  assignUID: Schema.string().description('分配用户的ID')
 })
 
 const saveConfig = () => {
@@ -99,6 +110,7 @@ const saveConfig = () => {
 const ruleFormRef = ref<FormInstance>()
 let ruleForm = ref<Config>(new Config())
 const metaData = { ...Config['dict'] }
+console.log(metaData['assignUID'].type)
 // 判断是否处于开发环境
 const isDev = import.meta.env.DEV
 if (!isDev) {
