@@ -22,9 +22,6 @@ chrome.contextMenus.onClicked.addListener(genericOnClick)
 // A generic onclick callback function.
 function genericOnClick(info: chrome.contextMenus.OnClickData) {
   switch (info.menuItemId) {
-    case 'lims_replace_data':
-      sendMessageToActiveTab('lims_replace_data')
-      break
     case 'lims_check_inspect':
       sendMessageToActiveTab('lims_check_inspect')
       break
@@ -34,20 +31,11 @@ function genericOnClick(info: chrome.contextMenus.OnClickData) {
 }
 
 chrome.runtime.onInstalled.addListener(async function () {
-  let enabledReplace = false
-  chrome.storage.sync.get('enabledReplace', function (data) {
-    enabledReplace = data.enabledReplace
-  })
   await backgroundSleep(500)
   const menus: ExtendedCreateProperties = {
     title: 'LIMS',
     id: 'lims',
     child: [
-      {
-        title: '替换数据',
-        enabled: enabledReplace,
-        id: 'lims_replace_data'
-      },
       {
         title: '检验单校对',
         id: 'lims_check_inspect'

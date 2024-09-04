@@ -24,7 +24,6 @@ import Schema from 'schemastery'
 import SwitchItem from './Switch.vue'
 
 interface Config {
-  enabledReplace: boolean
   enableCopyProjectNo: boolean
   enableCopyProjectName: boolean
   enablePreventCloseBeforeSave: boolean
@@ -36,11 +35,6 @@ interface Config {
 }
 
 const Config: Schema<Config> = Schema.object({
-  enabledReplace: Schema.boolean()
-    .description(
-      `开启替换 （当检验单为*空运*时，点击右键菜单栏的替换数据按钮，将自动替换为剪切板中的*海运*编号数据；当检验单为*海运*时，点击右键菜单栏的替换数据按钮，将自动替换为剪切板中的*空运*编号数据）`
-    )
-    .default(true),
   enableCopyProjectNo: Schema.boolean()
     .description(
       `复制项目编号 （点击项目编号，或者双击 *Ctrl*，即可将项目编号复制到剪切板）`

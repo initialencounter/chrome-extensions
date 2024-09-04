@@ -1,6 +1,5 @@
 const systemId = window.location.pathname.startsWith('/pek') ? 'PEKGZ' : 'SEKGZ'
 let localConfig: Config = {
-  enabledReplace: true,
   enableCopyProjectNo: true,
   enableCopyProjectName: true,
   enablePreventCloseBeforeSave: true,
@@ -12,7 +11,6 @@ let localConfig: Config = {
 }
 
 interface Config {
-  enabledReplace: boolean
   enableCopyProjectNo: boolean
   enableCopyProjectName: boolean
   enablePreventCloseBeforeSave: boolean
@@ -24,7 +22,6 @@ interface Config {
 }
 
 const configKeys: Array<keyof Config> = [
-  'enabledReplace',
   'enableCopyProjectNo',
   'enableCopyProjectName',
   'enablePreventCloseBeforeSave',
