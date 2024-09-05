@@ -1,5 +1,6 @@
 const systemId = window.location.pathname.startsWith('/pek') ? 'PEKGZ' : 'SEKGZ'
-let localConfig: Config = {
+let localConfig = {
+  enableSetEntrust: true,
   enableCopyProjectNo: true,
   enableCopyProjectName: true,
   enablePreventCloseBeforeSave: true,
@@ -10,18 +11,8 @@ let localConfig: Config = {
   enableSetImportClassification: true
 }
 
-interface Config {
-  enableCopyProjectNo: boolean
-  enableCopyProjectName: boolean
-  enablePreventCloseBeforeSave: boolean
-  enableSaveHotKey: boolean
-  enableImportHotKey: boolean
-  enableSetImportProjectNo: boolean
-  enableSetQueryProjectNo: boolean
-  enableSetImportClassification: boolean
-}
-
-const configKeys: Array<keyof Config> = [
+const configKeys: Array<keyof typeof localConfig> = [
+  'enableSetEntrust',
   'enableCopyProjectNo',
   'enableCopyProjectName',
   'enablePreventCloseBeforeSave',
@@ -32,7 +23,7 @@ const configKeys: Array<keyof Config> = [
   'enableSetImportClassification'
 ]
 chrome.storage.sync.get(configKeys, function (data) {
-  for (const key of Object.keys(data) as Array<keyof Config>) {
+  for (const key of Object.keys(data) as Array<keyof typeof localConfig>) {
     console.log(key, data[key])
     localConfig[key] = data[key] as boolean
   }

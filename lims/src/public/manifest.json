@@ -56,6 +56,16 @@
         "js/entrust.js",
         "assets/message.min.mjs"
       ]
+    },
+    {
+      "matches": [
+        "https://*/sales/entrust/main"
+      ],
+      "all_frames": true,
+      "js": [
+        "js/utils.js",
+        "js/entrustMain.js"
+      ]
     }
   ]
 }

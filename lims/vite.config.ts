@@ -15,6 +15,7 @@ export default defineConfig({
         background: resolve(__dirname, 'src/background/index.ts'),
         options: resolve(__dirname, 'src/options/index.html'),
         popup: resolve(__dirname, 'src/popup/index.html'),
+        entrustMain: resolve(__dirname, 'src/content-script/entrustMain.ts'),
       },
       output: {
         entryFileNames: 'js/[name].js',

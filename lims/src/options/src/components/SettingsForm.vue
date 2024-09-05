@@ -42,6 +42,7 @@ interface Config {
   enableSetQueryProjectNo: boolean
   enableSetImportClassification: boolean
   selfId: string
+  enableSetEntrust: boolean
 }
 
 const Config: Schema<Config> = Schema.object({
@@ -85,6 +86,11 @@ const Config: Schema<Config> = Schema.object({
       `设置导入分类 （在导入窗口中，自动填充分类）`
     ).default(true),
   selfId: Schema.string().description('占位').default(''),
+  enableSetEntrust: Schema.boolean()
+    .description(
+      `自动设置初验的内容`
+    )
+    .default(true)
 })
 
 const saveConfig = () => {
