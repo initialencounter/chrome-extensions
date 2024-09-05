@@ -1,10 +1,44 @@
-chrome.storage.sync.get('assignUID', async function (data) {
-  const uid = data.assignUID as string
-  if (!(await checkAssignUID(uid))) return
+interface Task {
+  assignee: string
+  attchmentFiles: string[]
+  backId: null
+  category: string
+  comment: null
+  companyName: string
+  completeTime: null
+  completeUser: null
+  createTime: number
+  entrustId: string
+  freezed: boolean
+  id: string
+  itemCName: string
+  itemSendSample: number
+  nextYear: boolean
+  parallel: boolean
+  projectDate: number
+  projectId: string
+  projectNo: string
+  serviceType: number
+  submitDate: string
+  submitUser: string
+  submitUserName: string
+  systemId: string
+  taskName: string
+}
+
+interface User {
+  userId: string
+  userName: string
+}
+
+let globalAssignUser = ''
+chrome.storage.sync.get('assignUser', async function (data) {
+  const assignUser = data.assignUser as string
+  globalAssignUser = assignUser
   console.log('一键分配脚本运行中...')
   chrome.runtime.onMessage.addListener(async function (message) {
     if (message !== 'lims_onekey_assign') return
-    await assignSelectId(uid)
+    await assignSelectId(assignUser)
   })
   // 监听 V 键的弹起事件
   let lastVPressTime = 0
@@ -19,11 +53,12 @@ chrome.storage.sync.get('assignUID', async function (data) {
       }
       lastVPressTime = currentTime
       if (vPressCount === 2 && event.ctrlKey) {
-        await assignSelectId(uid)
+        await assignSelectId(assignUser)
         vPressCount = 0
       }
     }
   })
+  await insertElement(assignUser)
 })
 
 function getIds(): string[] {
@@ -38,9 +73,23 @@ function getIds(): string[] {
   })
 }
 
-async function checkAssignUID(uid: string): Promise<boolean> {
+async function checkAssignUID(uid: string) {
   if (!uid) return false
-  return true
+  const users = await getUsers()
+  if (!users.length) return false
+  for (let i = 0; i < users.length; i++) {
+    if (users[i].userId === uid) return true
+  }
+  return false
+}
+
+async function getUsers(): Promise<User[]> {
+  const response = await fetch(
+    `https://${window.location.host}/rest/flow/task/users/inspect`
+  )
+  if (!response.ok) return []
+  const users: User[] = await response.json()
+  return users
 }
 
 async function assignSelectId(uid: string) {
@@ -137,34 +186,70 @@ async function assignTask(taskIds: string[], uid: string) {
     return
   }
   const result = await response.json()
-  if (result['result'] === 'success') console.log('assign task success')
-  else console.error('assign task failed2')
+  if (result['result'] === 'success') {
+    // @ts-expect-error: use Qmsg from assets
+    Qmsg['success']('分配成功')
+  } else {
+    console.error('assign task failed2')
+    // @ts-expect-error: use Qmsg from assets
+    Qmsg['error']('分配失败')
+  }
 }
 
-interface Task {
-  assignee: string
-  attchmentFiles: string[]
-  backId: null
-  category: string
-  comment: null
-  companyName: string
-  completeTime: null
-  completeUser: null
-  createTime: number
-  entrustId: string
-  freezed: boolean
-  id: string
-  itemCName: string
-  itemSendSample: number
-  nextYear: boolean
-  parallel: boolean
-  projectDate: number
-  projectId: string
-  projectNo: string
-  serviceType: number
-  submitDate: string
-  submitUser: string
-  submitUserName: string
-  systemId: string
-  taskName: string
+async function insertElement(uid: string) {
+  await entrustSleep(200)
+  const targetParent = document.getElementById('toolbar')
+  if (!targetParent) return
+  const div = document.createElement('div')
+  div.style.display = 'flex'
+  div.style.gap = '4px'
+  // button
+  const assignButton = document.createElement('a')
+  assignButton.href = 'javascript:void(0);'
+  assignButton.className = 'easyui-linkbutton l-btn l-btn-small'
+  assignButton.dataset.options = 'width:120'
+  assignButton.style.width = '118.4px'
+  assignButton.innerHTML = `
+  <span class="l-btn-left" style="margin-top: 0px;">
+    <span class="l-btn-text">一键分配给：</span>
+  </span>
+  `
+  assignButton.onclick = lims_onekey_assign_click
+  div.appendChild(assignButton)
+
+  // select
+  const select = document.createElement('select')
+  select.id = 'lims_onekey_assign_user'
+  select.style.width = '120px'
+  select.style.height = '26px'
+  select.style.border = '1px solid #bbb'
+  select.style.background = 'linear-gradient(to bottom,#ffffff 0,#e6e6e6 100%)'
+  select.className = 'easyui-linkbutton l-btn l-btn-small'
+  select.setAttribute('textboxname', 'systemId')
+  select.setAttribute('comboname', 'systemId')
+  const users = await getUsers()
+  users.forEach(function (user) {
+    const option = document.createElement('option')
+    option.value = user.userId
+    option.innerText = user.userName
+    select.appendChild(option)
+  })
+  if (await checkAssignUID(uid)) select.value = uid
+  div.appendChild(select)
+
+  targetParent.appendChild(div)
+  console.log('一键分配按钮插入成功')
+}
+
+async function lims_onekey_assign_click() {
+  const select = document.getElementById(
+    'lims_onekey_assign_user'
+  ) as HTMLSelectElement
+  const selectUid = select.value
+  if (!selectUid) return
+  if (globalAssignUser !== selectUid) {
+    chrome.storage.sync.set({ assignUser: selectUid })
+    globalAssignUser = selectUid
+  }
+  await assignSelectId(selectUid)
 }
