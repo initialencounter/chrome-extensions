@@ -105,12 +105,12 @@ async function getTaskIds(ids: string[]): Promise<string[]> {
   }
   const data = await response.json()
   const taskIds = data['rows']
-    .filter(function (row) {
+    .filter(function (row: Task) {
       for (let i = 0; i < ids.length; i++) {
         if (row['entrustId'] === ids[i]) return true
       }
     })
-    .map((item) => item.id)
+    .map((item: Task) => item.id)
   return taskIds
 }
 
@@ -139,4 +139,32 @@ async function assignTask(taskIds: string[], uid: string) {
   const result = await response.json()
   if (result['result'] === 'success') console.log('assign task success')
   else console.error('assign task failed2')
+}
+
+interface Task {
+  assignee: string
+  attchmentFiles: string[]
+  backId: null
+  category: string
+  comment: null
+  companyName: string
+  completeTime: null
+  completeUser: null
+  createTime: number
+  entrustId: string
+  freezed: boolean
+  id: string
+  itemCName: string
+  itemSendSample: number
+  nextYear: boolean
+  parallel: boolean
+  projectDate: number
+  projectId: string
+  projectNo: string
+  serviceType: number
+  submitDate: string
+  submitUser: string
+  submitUserName: string
+  systemId: string
+  taskName: string
 }
