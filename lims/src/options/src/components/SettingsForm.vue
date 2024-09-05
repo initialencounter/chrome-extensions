@@ -41,7 +41,7 @@ interface Config {
   enableSetImportProjectNo: boolean
   enableSetQueryProjectNo: boolean
   enableSetImportClassification: boolean
-  assignUID: string
+  selfId: string
 }
 
 const Config: Schema<Config> = Schema.object({
@@ -84,7 +84,7 @@ const Config: Schema<Config> = Schema.object({
     .description(
       `设置导入分类 （在导入窗口中，自动填充分类）`
     ).default(true),
-  assignUID: Schema.string().description('分配用户的ID')
+  selfId: Schema.string().description('占位').default(''),
 })
 
 const saveConfig = () => {
@@ -110,7 +110,6 @@ const saveConfig = () => {
 const ruleFormRef = ref<FormInstance>()
 let ruleForm = ref<Config>(new Config())
 const metaData = { ...Config['dict'] }
-console.log(metaData['assignUID'].type)
 // 判断是否处于开发环境
 const isDev = import.meta.env.DEV
 if (!isDev) {
