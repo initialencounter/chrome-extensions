@@ -25,8 +25,8 @@ function setAmount(money: string) {
     target.value = money
   }
   const targetShow = document.querySelectorAll(
-    'input[type="text"][class="textbox-text validatebox-text"][autocomplete="off"][style="margin-left: 0px; margin-right: 0px; padding-top: 3px; padding-bottom: 3px; width: 140.4px;"]'
-  )[0] as HTMLInputElement
+    'input[type="text"][class="textbox-text validatebox-text"][autocomplete="off"]'
+  )[6] as HTMLInputElement
   if (targetShow) {
     targetShow.value = '￥' + money
   }
