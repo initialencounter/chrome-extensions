@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
 import vue from '@vitejs/plugin-vue';
+import yaml from '@maikolib/vite-plugin-yaml'
 
 export default defineConfig({
   root: 'src',
@@ -30,6 +31,7 @@ export default defineConfig({
     extensions: ['.ts', '.js'],
   },
   plugins: [
+    yaml(),
     vue(),
   ],
 });
