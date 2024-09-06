@@ -106,6 +106,7 @@ async function assignSelectId(uid: string) {
   if (!taskIds) return
   console.log('taskIds:', taskIds)
   await assignTask(taskIds, uid)
+  document.location.reload()
 }
 
 async function entrustSleep(ms: number) {
