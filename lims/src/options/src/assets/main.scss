@@ -33,6 +33,8 @@ a,
 }
 
 
+@import './element.scss';
+
 :root {
   --color-text: #ebebe2;
   --color-background: #313136;
@@ -42,6 +44,9 @@ a,
   --el-border-color-lighter: #414148;
   --el-fill-color: #414148;
   --el-color-primary: #519f1f;
+  .k-schema-item:hover {
+    background-color: #252529;
+  }
 }
 
 .el-button{
@@ -65,8 +70,4 @@ a,
 
 .el-popover{
   --el-popup-bg-color: #000000;
-}
-
-.k-schema-item:hover {
-  background-color: #252529;
 }

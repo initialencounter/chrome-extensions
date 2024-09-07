@@ -1,7 +1,7 @@
 import 'element-plus/dist/index.css'
 import ElementPlus from 'element-plus'
 import { createApp } from 'vue'
-import './assets/main.css'
+import './assets/main.scss'
 // @ts-ignore
 import App from './App.vue'
 import form from 'schemastery-vue'
