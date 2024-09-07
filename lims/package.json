@@ -11,6 +11,8 @@
     "dev:pp": "cd C:/Users/29115/dev/chrome/chrome-extensions/lims/src/popup && vite",
     "dev": "cd C:/Users/29115/dev/chrome/chrome-extensions/lims/src/options && vite",
     "build": "vite build --emptyOutDir",
+    "build:op": "vite build -c vite.options.config.ts",
+    "build:cs": "vite build -c vite.content-script.config.ts",
     "zip": "7z a -tzip ./%npm_package_name%-%npm_package_version%.zip -r dist/*",
     "lint": "eslint src/ts/*.ts",
     "format": "prettier --write src/*/*.ts"

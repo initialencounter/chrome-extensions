@@ -31,7 +31,8 @@
       "js": [
         "js/utils.js",
         "js/hotkey.js",
-        "assets/message.min.mjs"
+        "assets/message.min.mjs",
+        "js/verify.js"
       ]
     },
     {
