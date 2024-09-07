@@ -6,14 +6,14 @@
         v-if="metaData[item].type === 'boolean'"
         :name="item"
         :description="metaData[item]['meta'].description as string"
-        v-model="(ruleForm[item as keyof typeof ruleForm] as boolean)"
+        v-model="ruleForm[item as keyof typeof ruleForm] as boolean"
       >
       </SwitchItem>
       <InputText
         v-if="metaData[item].type === 'string'"
         :name="item"
         :description="metaData[item]['meta'].description as string"
-        v-model="(ruleForm[item as keyof typeof ruleForm] as string)"
+        v-model="ruleForm[item as keyof typeof ruleForm] as string"
       >
       </InputText>
     </div>
@@ -28,70 +28,9 @@
 <script lang="ts" setup>
 import { ElMessage, type FormInstance } from 'element-plus'
 import { ref } from 'vue'
-import Schema from 'schemastery'
 import SwitchItem from './Switch.vue'
 import InputText from './InputText.vue'
-
-interface Config {
-  enableCopyProjectNo: boolean
-  enableCopyProjectName: boolean
-  enablePreventCloseBeforeSave: boolean
-  enableSaveHotKey: boolean
-  enableImportHotKey: boolean
-  enableSetImportProjectNo: boolean
-  enableSetQueryProjectNo: boolean
-  enableSetImportClassification: boolean
-  selfId: string
-  enableSetEntrust: boolean
-}
-
-const Config: Schema<Config> = Schema.object({
-  enableCopyProjectNo: Schema.boolean()
-    .description(
-      `复制项目编号 （点击项目编号，或者双击 *Ctrl*，即可将项目编号复制到剪切板）`
-    )
-    .default(true),
-  enableCopyProjectName: Schema.boolean()
-    .description(
-      `复制项目名称 （双击项目名称，或者按住 *Ctrl* 键并双击两次 *C* 键，即可将项目名称复制到剪切板）`
-    )
-    .default(true),
-  enablePreventCloseBeforeSave: Schema.boolean()
-    .description(
-      `保存前阻止关闭 （当有未保存的数据时，关闭页面时会弹出提示）`
-    )
-    .default(true),
-  enableSaveHotKey: Schema.boolean()
-    .description(
-      `保存快捷键 （使用快捷键 *Ctrl + C* 将保存检验单）`
-    )
-    .default(true),
-  enableImportHotKey: Schema.boolean()
-    .description(
-      `导入快捷键 （使用快捷键 *Ctrl + D* 将打开导入窗口）`
-    )
-    .default(true),
-  enableSetImportProjectNo: Schema.boolean()
-    .description(
-      `设置导入项目编号 （在导入窗口中，自动填充项目编号）`
-    )
-    .default(true),
-  enableSetQueryProjectNo: Schema.boolean()
-    .description(
-      `设置查询项目编号 （在查询窗口中，自动填充项目编号）`
-    )
-    .default(true),
-  enableSetImportClassification: Schema.boolean()
-    .description(
-      `设置导入分类 （在导入窗口中，自动填充分类）`
-    ).default(true),
-  selfId: Schema.string().description('占位').default(''),
-  enableSetEntrust: Schema.boolean()
-    .description(
-      `自动设置初验的内容`
-    )
-    .default(true)
-})
+import { Config } from './Schema'
 
 const saveConfig = () => {
   const tmpConfig = { ...ruleForm.value }
@@ -119,12 +58,9 @@ const metaData = { ...Config['dict'] }
 // 判断是否处于开发环境
 const isDev = import.meta.env.DEV
 if (!isDev) {
-  chrome.storage.sync.get(
-    Object.keys(ruleForm.value),
-    (data) => {
-      ruleForm.value = new Config(data as Config)
-    }
-  )
+  chrome.storage.sync.get(Object.keys(ruleForm.value), (data) => {
+    ruleForm.value = new Config(data as Config)
+  })
 }
 
 const submitForm = async () => {
@@ -138,7 +74,6 @@ const resetForm = () => {
 
 <style>
 .el-form {
-  background: rgba(121, 187, 255, 0.18);
   padding: 2rem;
   display: block;
   margin: auto;

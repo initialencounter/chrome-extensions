@@ -31,3 +31,40 @@ a,
     display: grid;
   }
 }
+
+
+:root {
+  --color-text: #ebebe2;
+  --color-background: #313136;
+  --el-menu-bg-color: #101c2e;
+  --el-dialog-bg-color: #000000;
+  --el-border-color-light: #414148;
+  --el-color-primary: #519f1f;
+}
+
+.el-button{
+  --el-button-border-color: #414148;
+  --el-button-hover-bg-color: #252529;
+  --el-button-hover-border-color: #519f1f;
+  background-color: #313136;
+}
+
+.el-input{
+  --el-input-border-color: rgba(82, 82, 89, 0.8);
+  --el-input-bg-color: #313136;
+  --el-input-hover-border-color: #519f1f;
+  --el-input-hover-bg-color: #252529;
+}
+
+.el-switch {
+  --el-switch-on-color: #519f1f;
+  --el-switch-off-color: #4c4c4c;
+}
+
+.el-popover{
+  --el-popup-bg-color: #000000;
+}
+
+.k-schema-item:hover {
+  background-color: #252529;
+}
