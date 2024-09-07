@@ -39,6 +39,8 @@ a,
   --el-menu-bg-color: #101c2e;
   --el-dialog-bg-color: #000000;
   --el-border-color-light: #414148;
+  --el-border-color-lighter: #414148;
+  --el-fill-color: #414148;
   --el-color-primary: #519f1f;
 }
 
