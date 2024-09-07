@@ -27,6 +27,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
+      // https://github.com/intlify/bundle-tools/issues/23
+      'vue-i18n': 'vue-i18n/dist/vue-i18n.runtime.esm-bundler.js',
     },
     extensions: ['.ts', '.js'],
   },

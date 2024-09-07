@@ -1,13 +1,13 @@
 import 'element-plus/dist/index.css'
 import ElementPlus from 'element-plus'
 import { createApp } from 'vue'
+import './assets/main.css'
 // @ts-ignore
 import App from './App.vue'
 import form from 'schemastery-vue'
 import { createI18n } from 'vue-i18n'
 // @ts-ignore
 import Markdown from 'markdown-vue'
-import './assets/main.css'
 const i18n = createI18n({
     legacy: false,
 })
