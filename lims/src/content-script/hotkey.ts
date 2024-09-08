@@ -135,7 +135,7 @@ function myCustomSaveFunction() {
   if (button) {
     button.click()
     // @ts-expect-error: use Qmsg from assets
-    Qmsg['success']('保存成功')
+    Qmsg['success']('保存成功', {timeout: 500})
   } else {
     console.log('Button not found')
     // @ts-expect-error: use Qmsg from assets
@@ -160,7 +160,7 @@ function copyProjectName() {
   console.log(projectName)
   navigator.clipboard.writeText(projectName)
   // @ts-expect-error: use Qmsg from assets
-  Qmsg['success']('已复制项目名称')
+  Qmsg['success']('已复制项目名称', {timeout: 500})
 }
 
 function watchInput() {

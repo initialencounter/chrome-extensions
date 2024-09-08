@@ -82,7 +82,7 @@ function setProjectNoToClipText() {
   const projectNo = projectNoSpan?.innerText // Add null check here
   navigator.clipboard.writeText(projectNo ?? '')
   // @ts-expect-error: use Qmsg from assets
-  Qmsg['success']('已复制项目编号')
+  Qmsg['success']('已复制项目编号', {timeout: 500})
 }
 
 async function getClipboardText() {

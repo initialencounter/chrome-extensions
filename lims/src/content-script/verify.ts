@@ -1105,7 +1105,7 @@ async function lims_verify_inspect() {
     return
   }
   // @ts-expect-error: use Qmsg from assets
-  Qmsg['warning']('初步验证未通过'+JSON.stringify(result, null, 2))
+  Qmsg['warning']('初步验证未通过'+JSON.stringify(result, null, 2), {timeout: 4000})
 }
 
 function matchWattHour(projectName: string) {
