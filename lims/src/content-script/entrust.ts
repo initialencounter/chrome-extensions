@@ -141,9 +141,12 @@ async function ReceiveSubmit(
 async function getTaskIds(ids: string[]): Promise<string[]> {
   if (!ids.length) return []
   await entrustSleep(100)
-  const date = /* @__PURE__ */ new Date().toISOString().split('T')[0]
+  const currentDate = new Date()
+  const date = currentDate.toISOString().split('T')[0]
+  currentDate.setMonth(currentDate.getMonth() - 1)
+  const startDate = currentDate.toISOString().split('T')[0]
   const response = await fetch(
-    `https://${window.location.host}/rest/flow/task/get/assignInspect?projectStartDate=${date}&projectEndDate=${date}&projectState=0&page=1&rows=10`,
+    `https://${window.location.host}/rest/flow/task/get/assignInspect?projectStartDate=${startDate}&projectEndDate=${date}&projectState=0&page=1&rows=10`,
     {
       method: 'GET',
       credentials: 'include' // 包含 cookies
