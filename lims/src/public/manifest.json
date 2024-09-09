@@ -67,6 +67,19 @@
         "js/utils.js",
         "js/entrustMain.js"
       ]
+    },
+    {
+      "matches": [
+        "https://*/flow/inspect/inspect/main"
+      ],
+      "all_frames": true,
+      "css": [
+        "assets/message.min.css"
+      ],
+      "js":[
+        "js/rollback.js",
+        "assets/message.min.mjs"
+      ]
     }
   ]
 }

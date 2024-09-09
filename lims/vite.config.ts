@@ -18,6 +18,7 @@ export default defineConfig({
         popup: resolve(__dirname, 'src/popup/index.html'),
         entrustMain: resolve(__dirname, 'src/content-script/entrustMain.ts'),
         verify: resolve(__dirname, 'src/content-script/verify.ts'),
+        rollback: resolve(__dirname, 'src/content-script/rollback.ts'),
       },
       output: {
         entryFileNames: 'js/[name].js',
