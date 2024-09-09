@@ -471,7 +471,10 @@ function checkSekIonBtyType(
       })
     }
   }
-  if (['≤100Wh', '≤20Wh'].includes(inspectionResult1)  && currentData['unno'] !== 'UN3171') {
+  if (
+    ['≤100Wh', '≤20Wh'].includes(inspectionResult1) &&
+    currentData['unno'] !== 'UN3171'
+  ) {
     // 非限制性
     if (otherDescribe === '540' && btyGrossWeight > 30)
       result.push({
@@ -1103,7 +1106,9 @@ async function lims_verify_inspect() {
     return
   }
   // @ts-expect-error: use Qmsg from assets
-  Qmsg['warning']('初步验证未通过'+JSON.stringify(result, null, 2), {timeout: 4000})
+  Qmsg['warning']('初步验证未通过' + JSON.stringify(result, null, 2), {
+    timeout: 4000
+  })
 }
 
 function matchWattHour(projectName: string) {
