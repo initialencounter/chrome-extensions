@@ -1,5 +1,6 @@
 const systemId = window.location.pathname.startsWith('/pek') ? 'PEKGZ' : 'SEKGZ'
 let localConfig = {
+  customIcon: false,
   enableSetEntrust: true,
   enableCopyProjectNo: true,
   enableCopyProjectName: true,
@@ -12,6 +13,7 @@ let localConfig = {
 }
 
 const configKeys: Array<keyof typeof localConfig> = [
+  'customIcon',
   'enableSetEntrust',
   'enableCopyProjectNo',
   'enableCopyProjectName',

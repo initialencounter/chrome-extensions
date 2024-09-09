@@ -11,6 +11,7 @@ export interface Config {
   enableSetImportClassification?: boolean
   selfId?: string
   enableSetEntrust?: boolean
+  customIcon?: boolean
 }
 
 export const Config: Schema<Config> = Schema.object({
@@ -45,5 +46,6 @@ export const Config: Schema<Config> = Schema.object({
   selfId: Schema.string().description('占位').default(''),
   enableSetEntrust: Schema.boolean()
     .description(`自动设置初验的内容`)
-    .default(true)
+    .default(true),
+  customIcon: Schema.boolean().description('自定义图标（用更显眼的图标来区分空海运）').default(false)
 }).description('设置')
