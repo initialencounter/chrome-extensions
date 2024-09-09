@@ -11,8 +11,6 @@ const host = window.location.host
   const verifyButton = document.createElement('a')
   verifyButton.href = 'javascript:void(0);'
   verifyButton.className = 'easyui-linkbutton l-btn l-btn-small'
-  verifyButton.dataset.options = '80vh'
-  verifyButton.style.width = '10vh'
   verifyButton.style.background = '#ffffff'
   // hover
   verifyButton.onmouseover = function () {
