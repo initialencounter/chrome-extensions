@@ -12,6 +12,7 @@ export interface Config {
   selfId?: string
   enableSetEntrust?: boolean
   customIcon?: boolean
+  onekeyRollback?: boolean
 }
 
 export const Config: Schema<Config> = Schema.object({
@@ -47,5 +48,6 @@ export const Config: Schema<Config> = Schema.object({
   enableSetEntrust: Schema.boolean()
     .description(`自动设置初验的内容`)
     .default(true),
-  customIcon: Schema.boolean().description('自定义图标（用更显眼的图标来区分空海运）').default(false)
+  customIcon: Schema.boolean().description('自定义图标（用更显眼的图标来区分空海运）').default(false),
+  onekeyRollback: Schema.boolean().description('一键回退').default(true)
 }).description('设置')
