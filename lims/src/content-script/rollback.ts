@@ -1,9 +1,10 @@
 ;(async () => {
   chrome.storage.sync.get(['onekeyRollback'], async function (result) {
-    if (result.onekeyRollback) {
-      await sleepRollBack(500)
-      getTbodyChild()
+    if (result.onekeyRollback === false) {
+      return
     }
+    await sleepRollBack(500)
+    getTbodyChild()
   })
 })()
 async function rollback(taskId: string): Promise<boolean> {
