@@ -106,7 +106,8 @@ function checkProjectNo(projectNo: string) {
 }
 
 function getMonthsAgoProjectNo() {
-  const currentDate = new Date()
-  currentDate.setMonth(currentDate.getMonth() - 1)
-  return systemId + currentDate.toISOString().slice(0, 7).replace('-', '')
+  // const currentDate = new Date()
+  // currentDate.setMonth(currentDate.getMonth() - 3)
+  // return systemId + currentDate.toISOString().slice(0, 7).replace('-', '')
+  return systemId
 }
