@@ -313,7 +313,7 @@ function setUnNo(projectName: string) {
     return
   }
   let UnNo = ''
-  let isLiIonBattery = isLiIon(projectName)
+  const isLiIonBattery = isLiIon(projectName)
   console.log('isLiIonBattery:', isLiIonBattery)
   if (isLiIonBattery) {
     UnNo = '3481'
@@ -344,7 +344,7 @@ function isDangerousGoods(projectName: string) {
 }
 
 function isLiIon(projectName: string) {
-  let metalBattery = ['纽扣', '锂金属', 'CR2032', 'CR2025']
+  const metalBattery = ['纽扣', '锂金属', 'CR2032', 'CR2025']
   if (metalBattery.some((item) => projectName.includes(item))) {
     return false
   }

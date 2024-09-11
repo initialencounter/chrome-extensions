@@ -1,5 +1,5 @@
 const systemId = window.location.pathname.startsWith('/pek') ? 'PEKGZ' : 'SEKGZ'
-let localConfig = {
+const localConfig = {
   customIcon: false,
   enableSetEntrust: true,
   enableCopyProjectNo: true,

@@ -47,11 +47,8 @@ function setAmountListener() {
   )
   if (paymentCompanyText) {
     const config = { attributes: true, childList: true, subtree: true }
-    const callback = function (
-      mutationsList: MutationRecord[],
-      observer: MutationObserver
-    ) {
-      for (let mutation of mutationsList) {
+    const callback = function (mutationsList: MutationRecord[]) {
+      for (const mutation of mutationsList) {
         if (mutation.type === 'childList') {
           console.log('A child node has been added or removed.')
           setAmount('500.00')
@@ -61,6 +58,14 @@ function setAmountListener() {
     const observer = new MutationObserver(callback)
     observer.observe(paymentCompanyText, config)
   }
-  document.getElementById('_easyui_combobox_i1_0').addEventListener('click', () => { setAmount('500.00') })
-  document.getElementById('_easyui_combobox_i1_1').addEventListener('click', () => { setAmount('500.00') })
+  const pekSystemButton = document.getElementById('_easyui_combobox_i1_0')
+  if (pekSystemButton)
+    pekSystemButton.addEventListener('click', () => {
+      setAmount('500.00')
+    })
+  const sekSystemButton = document.getElementById('_easyui_combobox_i1_1')
+  if (sekSystemButton)
+    sekSystemButton.addEventListener('click', () => {
+      setAmount('500.00')
+    })
 }
