@@ -61,4 +61,6 @@ function setAmountListener() {
     const observer = new MutationObserver(callback)
     observer.observe(paymentCompanyText, config)
   }
+  document.getElementById('_easyui_combobox_i1_0').addEventListener('click', () => { setAmount('500.00') })
+  document.getElementById('_easyui_combobox_i1_1').addEventListener('click', () => { setAmount('500.00') })
 }
