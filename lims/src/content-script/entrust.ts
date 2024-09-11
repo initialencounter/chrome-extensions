@@ -118,7 +118,7 @@ async function ReceiveSubmit(
   task: 'receive' | 'submit'
 ): Promise<string[]> {
   if (!ids.length) return []
-  await entrustSleep(100)
+  await entrustSleep(50)
   const response = await fetch(
     `https://${window.location.host}/rest/sales/entrust/entrusts/${task}`,
     {
@@ -140,7 +140,7 @@ async function ReceiveSubmit(
 
 async function getTaskIds(ids: string[]): Promise<string[]> {
   if (!ids.length) return []
-  await entrustSleep(100)
+  await entrustSleep(50)
   const currentDate = new Date()
   const date = currentDate.toISOString().split('T')[0]
   currentDate.setMonth(currentDate.getMonth() - 1)

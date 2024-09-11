@@ -17,7 +17,7 @@ function setCategory() {
 }
 
 async function setAmount(money: string) {
-  await sleep(500)
+  await sleep(200)
   const target = document.querySelectorAll(
     'input[type="hidden"][class="textbox-value"][value="480.00"][name="amount"]'
   )[0] as HTMLInputElement
