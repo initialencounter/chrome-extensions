@@ -24,6 +24,7 @@
         "tzip",
         "unno",
         "validatebox",
-        "VITE"
+        "VITE",
+        "vitepress"
     ]
 }

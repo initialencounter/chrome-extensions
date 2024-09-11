@@ -25,3 +25,5 @@ package-lock.json
 /.yarn
 yarn.lock
 *.svg
+cache
+dist
