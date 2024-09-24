@@ -241,6 +241,8 @@ async function handleImportBtnClick() {
     return
   }
   ;(document.getElementById('qProjectNo') as HTMLInputElement).value = projectNo
+  ;(document.getElementById('qItemCName1') as HTMLInputElement).value = ''
+  ;(document.getElementById('qUnNo') as HTMLInputElement).value = ''
   if (importBtn) {
     importBtn.removeEventListener('click', handleImportBtnClick)
   }
