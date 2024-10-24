@@ -1100,6 +1100,7 @@ async function lims_verify_inspect() {
   } else {
     result = checkSekBtyType(currentData as SekData)
   }
+  result.push(...(await checkAttchmentFiles(currentData.projectNo, currentData.projectId)))
   if (!result.length) {
     // @ts-expect-error: use Qmsg from assets
     Qmsg['success']('初步验证通过')
@@ -1259,3 +1260,37 @@ async function testVerify() {
 async function verifySleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
+
+async function getAttchmentFiles(type:'goodsfile'|'batteryfile', projectId: string) {
+  const response = await fetch(
+    `https://${window.location.host}/document/project/${type}/${projectId}`,
+    {
+      method: 'GET',
+      credentials: 'include' // 包含 cookies
+    }
+  )
+  if (!response.ok) {
+    return ''
+  }
+  const res = await response.text()
+  return res
+}
+
+async function checkAttchmentFile(type:'goodsfile'|'batteryfile', projectNo: string, projectId: string) {
+  let attchmentFilesName = type === 'goodsfile' ? '图片' : '概要'
+  let attchmentFilesText = await getAttchmentFiles(type, projectId)
+  if (!attchmentFilesText) return [{ ok: false, result: attchmentFilesName + '未上传' }]
+  const rawFileName = attchmentFilesText.match(/"filename":"(.*?)\.pdf"/g)
+  if (!rawFileName?.length) return [{ ok: false, result: attchmentFilesName + '未上传' }]
+  const fileName = rawFileName[0].slice(12, 29)
+  if (fileName !== projectNo) return [{ ok: false, result: attchmentFilesName + '上传错误' }]
+  return []
+}
+
+async function checkAttchmentFiles(projectNo: string, projectId: string) {
+  const check1 = await checkAttchmentFile('goodsfile', projectNo, projectId)
+  const check2 = await checkAttchmentFile('batteryfile', projectNo, projectId)
+  return [...check1, ...check2]
+}
+// 验证资料上传
+// (async () => {console.log(await checkAttchmentFiles('SEKGZ202410245479','2c9180839267761d0192bd77b32f1091'))})()
