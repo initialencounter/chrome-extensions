@@ -27,6 +27,12 @@ let lastCPressTime = 0
     }
   }
 
+  const btySizeSek = document.getElementById(systemId==="SEKGZ" ? 'btySize' : 'size') as HTMLInputElement
+  if (btySizeSek) {
+    btySizeSek.style.setProperty('width', '428px')
+    btySizeSek.parentElement?.style.setProperty('width', '428px')
+  }
+
   // 自定义图标
   if (localConfig.customIcon) {
     if (systemId === 'PEKGZ') {
