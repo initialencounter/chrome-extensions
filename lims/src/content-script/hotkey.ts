@@ -27,7 +27,9 @@ let lastCPressTime = 0
     }
   }
 
-  const btySizeSek = document.getElementById(systemId==="SEKGZ" ? 'btySize' : 'size') as HTMLInputElement
+  const btySizeSek = document.getElementById(
+    systemId === 'SEKGZ' ? 'btySize' : 'size'
+  ) as HTMLInputElement
   if (btySizeSek) {
     btySizeSek.style.setProperty('width', '428px')
     btySizeSek.parentElement?.style.setProperty('width', '428px')
