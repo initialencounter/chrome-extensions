@@ -11,7 +11,7 @@
 
 ### 下载并解压拓展
 
-[点我下载](https://gitee.com/initencunter/chrome-extensions/releases/download/v1.5.4/lims-v1.5.4.chrome.zip)👈下载地址
+[点我下载](https://gitee.com/initencunter/chrome-extensions/releases/download/v1.5.5/lims-v1.5.5.chrome.zip)👈下载地址
 
 ### 安装拓展
 
@@ -31,7 +31,7 @@
 
 ### 下载并解压拓展
 
-[点我下载](https://gitee.com/initencunter/chrome-extensions/releases/download/v1.5.4/lims-v1.5.4.firefox.zip) 👈下载地址
+[点我下载](https://gitee.com/initencunter/chrome-extensions/releases/download/v1.5.5/lims-v1.5.5.firefox.zip) 👈下载地址
 
 ### 安装拓展
 
