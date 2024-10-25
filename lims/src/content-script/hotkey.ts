@@ -231,7 +231,8 @@ async function importTemplate() {
   if (importBtn) {
     importBtn.addEventListener('click', handleImportBtnClick)
   }
-  qProjectNo.value = systemId
+  // qProjectNo.value = systemId
+  qProjectNo.value = getMonthsAgoProjectNo()
   qProjectNo.addEventListener('input', function () {
     // 项目编号
     const input = qProjectNo.value.replace(/[^0-9A-Z]/g, '')
