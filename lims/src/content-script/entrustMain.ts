@@ -5,6 +5,8 @@
   setMoonPay()
   setCategory()
   setAmountListener()
+  const nextYear = document.getElementById("nextYear") as HTMLInputElement
+  if(nextYear) nextYear.click()
 })()
 
 function setCategory() {
