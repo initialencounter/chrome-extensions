@@ -14,8 +14,7 @@
 :::
 
 ### 下载并解压拓展
-
-[点我下载](https://gitee.com/initencunter/chrome-extensions/releases/download/v1.5.8/lims-v1.5.8.chrome.zip)👈下载地址
+[点我下载](https://ghp.ci/https://github.com/initialencounter/chrome-extensions/releases/download/v1.5.8/lims-v1.5.8.chrome.zip)👈下载地址
 
 ### 安装拓展
 
@@ -24,14 +23,14 @@
 - 加载解压缩的拓展。
 - 选择解压后得到的 dist 文件夹。
 
-  ![加载拓展](https://github.com/initialencounter/chrome-extensions/blob/master/lims/assets/image.png?raw=true)
+![加载拓展](https://ghp.cihttps://github.com/initialencounter/chrome-extensions/blob/master/lims/assets/image.png?raw=true)
 
 
 ## Firefox 系浏览器
 
 ### 下载并解压拓展
 
-[点我下载](https://gitee.com/initencunter/chrome-extensions/releases/download/v1.5.8/lims-v1.5.8.firefox.xpi) 👈下载地址
+[点我下载](https://ghp.ci/https://github.com/initialencounter/chrome-extensions/releases/download/v1.5.8/lims-v1.5.8.firefox.xpi) 👈下载地址
 
 ### 安装拓展
 
