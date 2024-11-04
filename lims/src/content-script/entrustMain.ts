@@ -5,8 +5,6 @@
   setMoonPay()
   setCategory()
   setAmountListener()
-  const nextYear = document.getElementById("nextYear") as HTMLInputElement
-  if(nextYear) nextYear.click()
 })()
 
 function setCategory() {
@@ -54,6 +52,8 @@ function setAmountListener() {
         if (mutation.type === 'childList') {
           console.log('A child node has been added or removed.')
           setAmount('500.00')
+          const nextYear = document.getElementById("nextYear") as HTMLInputElement
+          if(nextYear) nextYear.click()
         }
       }
     }
