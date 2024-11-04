@@ -35,6 +35,20 @@ let lastCPressTime = 0
     btySizeSek.parentElement?.style.setProperty('width', '428px')
   }
 
+  const otherDescribeCAddition = document.getElementById("otherDescribeCAddition") as HTMLInputElement
+  if (otherDescribeCAddition && systemId === 'SEKGZ') {
+    otherDescribeCAddition.style.setProperty('width', '758px')
+    otherDescribeCAddition.parentElement?.style.setProperty('width', '750px')
+  }
+
+  // 缩小没用的输入框
+  // const otherDescribeEAddition = document.getElementById("otherDescribeEAddition")
+  // if (otherDescribeEAddition) {
+  //   otherDescribeEAddition.style.setProperty('height', '30px')
+  //   otherDescribeEAddition.parentElement?.style.setProperty('height', '30px')
+
+  // }
+  
   // 自定义图标
   if (localConfig.customIcon) {
     if (systemId === 'PEKGZ') {
