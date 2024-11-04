@@ -39,6 +39,7 @@
           "js/utils.js",
           "js/hotkey.js",
           "assets/message.min.mjs",
+          "js/checkList.js",
           "js/verify.js"
         ]
       },
