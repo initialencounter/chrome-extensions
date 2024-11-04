@@ -148,6 +148,30 @@ function checkPekBtyType(currentData: PekData) {
       result: '型号或英文品名错误，电池型号不在项目英文名称中'
     })
 
+  // 堆码检测
+  const inspectionItem6 = currentData['inspectionItem6'] // 堆码
+  const inspectionItem2 = currentData['inspectionItem2'] // 跌落
+  const according = currentData['according'] // 鉴定依据
+  if (according !== "IATA DGR 65th, 2024"){
+    if (String(inspectionItem6) === '0' || !otherDescribe.includes('2c9180849267773c0192dc73c77e5fb2')){
+      if (inspectionItem1 === "2") {
+        result.push({ ok: false, result: '967/970 未勾选堆码，或堆码评估' })
+      }
+      const conclusions = currentData['conclusions']
+      if (inspectionItem1 === "1" && String(conclusions) === "0") {
+        result.push({ ok: false, result: '966/969 第II部分未勾选堆码，或堆码评估' })
+      }
+    }
+  }
+  if (packCargo === '965，IB'){
+    if (String(inspectionItem6) === '0'){
+      result.push({ ok: false, result: '965，IB未勾选堆码' })
+    }
+    if (String(inspectionItem2) === '0'){
+      result.push({ ok: false, result: '965，IB未勾选跌落' })
+    }
+  }
+  
   // 检验项目4
   if (Number(currentData['inspectionItem3']) !== 1)
     result.push({
@@ -365,6 +389,15 @@ function checkSekBtyType(currentData: SekData) {
       result:
         '检验结果4错误，未勾选该锂电池不属于召回电池，不属于废弃和回收电池。'
     })
+
+  // 检验结果5 1.2米跌落
+  const inspectionResult5 = currentData['inspectionResult5']
+  const conclusions = currentData['conclusions']
+  if (String(inspectionResult5) !== "0"){ // 未通过堆码试验
+    if (otherDescribe.includes('540') && String(conclusions) === "0"){
+      result.push({ ok: false, result: '单独运输非限制性，未通过1.2米跌落' })
+    }
+  }
   // 随附文件
   if (currentData['inspectionResult7'] !== '2')
     result.push({ ok: false, result: '随附文件错误，未勾选不适用' })
