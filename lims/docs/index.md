@@ -19,6 +19,9 @@ hero:
     - theme: alt
       text: 更新日志
       link: /changelog
+    - theme: alt
+      text: 验证规则
+      link: /rule
 
 features:
   - title: 一键分配、退回
@@ -26,6 +29,6 @@ features:
   - title: 丰富的快捷键支持
     details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
   - title: 表单验证
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+    details: 强大的规则匹配，
 ---
 

@@ -19,6 +19,7 @@ export default defineConfig({
           { text: '功能介绍', link: '/about' },
           { text: '问题反馈', link: '/issue' },
           { text: '更新日志', link: '/changelog' },
+          { text: '验证规则', link: '/rule' },
         ]
       }
     ],

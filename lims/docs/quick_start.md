@@ -9,6 +9,10 @@
   - Microsoft Edge
   - Google Chrome
 
+::: warning
+目前某些套壳浏览器仅支持临时加载，即退出浏览器后要重新加载，Firefox 浏览器则无此问题，建议迁移到 Firefox 系浏览器
+:::
+
 ### 下载并解压拓展
 
 [点我下载](https://gitee.com/initencunter/chrome-extensions/releases/download/v1.5.7/lims-v1.5.7.chrome.zip)👈下载地址
@@ -24,10 +28,6 @@
 
 
 ## Firefox 系浏览器
-
-::: warning
-目前 Firefox 系浏览器仅支持临时加载，即退出浏览器后要重新加载，建议迁移到 Chrome 系浏览器
-:::
 
 ### 下载并解压拓展
 

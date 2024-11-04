@@ -85,15 +85,16 @@ function checkPekBtyType(currentData: PekData) {
       result.push({ ok: false, result: '电池形状或尺寸错误' })
     }
   }
+  if (!btyKind) result.push({ ok: false, result: '电池型号为空' })
   if (isCell) {
     // 1791,1794
     if (otherDescribe.includes('1791') || otherDescribe.includes('1794')) {
-      result.push({ ok: false, result: '电芯类型不应该有电池描述' })
+      result.push({ ok: false, result: '物品为电芯，不应勾选: 该电池已经做好防短路...或该锂电池不属于召回电芯...' })
     }
   } else {
     // 1792,1795
     if (otherDescribe.includes('1792') || otherDescribe.includes('1795')) {
-      result.push({ ok: false, result: '电池类型不应该有电芯描述' })
+      result.push({ ok: false, result: '物品为电池，不应勾选: 该电芯已经做好防短路...或该锂电芯不属于召回电芯...' })
     }
   }
   // 电芯or电池
@@ -102,13 +103,13 @@ function checkPekBtyType(currentData: PekData) {
     !currentData['otherDescribeCAddition'].includes('单块电芯') &&
     !currentData['otherDescribeCAddition'].includes('总净重')
   )
-    result.push({ ok: false, result: '其他描述不为电芯' })
+    result.push({ ok: false, result: '物品为电芯时，描述中不应该出现单块电池' })
   if (
     !isCell &&
     !currentData['otherDescribeCAddition'].includes('单块电池') &&
     !currentData['otherDescribeCAddition'].includes('总净重')
   )
-    result.push({ ok: false, result: '其他描述不为电池' })
+    result.push({ ok: false, result: '物品为电池时，描述中不应该出现单块电芯' })
   // 包装与其他描述验证
   // 包装类型 0 965 1 966 2 967
   const inspectionItem1 = String(currentData['inspectionItem1']) as
@@ -135,8 +136,7 @@ function checkPekBtyType(currentData: PekData) {
   )
     result.push({ ok: false, result: '安装在设备上，其他描述错误' })
   if (currentData['otherDescribeChecked'] !== '1')
-    result.push({ ok: false, result: '未勾选附加操作信息' })
-  if (!btyKind) result.push({ ok: false, result: '电池型号为空' })
+    result.push({ ok: false, result: '应勾选附加操作信息' })
   if (!itemCName.includes(btyKind))
     result.push({
       ok: false,
@@ -152,7 +152,7 @@ function checkPekBtyType(currentData: PekData) {
   const inspectionItem6 = currentData['inspectionItem6'] // 堆码
   const inspectionItem2 = currentData['inspectionItem2'] // 跌落
   const according = currentData['according'] // 鉴定依据
-  if (according !== "IATA DGR 65th, 2024"){
+  if (according !== "IATA DGR 66th, 2025"){
     if (String(inspectionItem6) === '0' || !otherDescribe.includes('2c9180849267773c0192dc73c77e5fb2')){
       if (inspectionItem1 === "2") {
         result.push({ ok: false, result: '967/970 未勾选堆码，或堆码评估' })
@@ -171,6 +171,10 @@ function checkPekBtyType(currentData: PekData) {
       result.push({ ok: false, result: '965，IB未勾选跌落' })
     }
   }
+  const inspectionItem5Text1 = currentData['inspectionItem5Text1']
+  if (inspectionItem5Text1 === '966' && String(inspectionItem2) === '0'){
+    result.push({ ok: false, result: '966，II未勾选跌落' })
+  }
   
   // 检验项目4
   if (Number(currentData['inspectionItem3']) !== 1)
@@ -180,7 +184,7 @@ function checkPekBtyType(currentData: PekData) {
     })
   // 随附文件
   if (Number(currentData['inspectionItem5']) !== 0)
-    result.push({ ok: false, result: '随附文件错误，未勾选否' })
+    result.push({ ok: false, result: '附有随机文件应为：否' })
   // 鉴别项目1
   if (isIon) {
     if (currentData['inspectionItem3Text1'] !== '')
@@ -596,7 +600,7 @@ function checkSekMetalBtyType(
       result.push({
         ok: false,
         result:
-          '结论错误，危险品物品，单独运输或与设备包装在一起，应达到II级包装性能'
+          '结论错误，危险品，单独运输或与设备包装在一起，应达到II级包装性能'
       })
     }
   }
