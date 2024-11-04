@@ -16,6 +16,9 @@ hero:
     - theme: alt
       text: 反馈
       link: /issue
+    - theme: alt
+      text: 更新日志
+      link: /changelog
 
 features:
   - title: 一键分配、退回

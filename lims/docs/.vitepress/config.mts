@@ -18,6 +18,7 @@ export default defineConfig({
           { text: '快速开始', link: '/quick_start' },
           { text: '功能介绍', link: '/about' },
           { text: '问题反馈', link: '/issue' },
+          { text: '更新日志', link: '/changelog' },
         ]
       }
     ],
