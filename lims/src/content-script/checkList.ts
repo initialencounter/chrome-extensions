@@ -1,8 +1,8 @@
 console.log("检查清单脚本注入成功！", systemId);
 let isListening = false
   ; (async function () {
-    if (!systemId) return
     await sleep(400)
+    if (!document.getElementById('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')) return
     const targetChild = document.getElementById('openDocumentsBtn0')
     if (!targetChild) return
     const targetParent = targetChild.parentElement
