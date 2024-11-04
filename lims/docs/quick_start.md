@@ -31,13 +31,14 @@
 
 ### 下载并解压拓展
 
-[点我下载](https://gitee.com/initencunter/chrome-extensions/releases/download/v1.5.7/lims-v1.5.7.firefox.zip) 👈下载地址
+[点我下载](https://gitee.com/initencunter/chrome-extensions/releases/download/v1.5.7/lims-v1.5.7.firefox.xpi) 👈下载地址
 
 ### 安装拓展
 
-- 浏览器地址输入 `about:debugging#/runtime/this-firefox`。
-- 点击临时加载附加组件...。
-- 加载解压缩的拓展。
-- 选择解压后得到的 `manifest.json` 文件。
+- 浏览器地址输入 `about:addons`。
+- 点击齿轮图标。
+- 点击从文件安装附加组件。
+- 选择文件后缀为 `.xpi` 的文件。
 
-  ![加载拓展](./assets/load_firefox.png)
+![加载拓展](./assets/load_firefox.png)
+![选择拓展](./assets/select-xpi.png)
