@@ -152,15 +152,13 @@ function checkPekBtyType(currentData: PekData) {
   const inspectionItem6 = currentData['inspectionItem6'] // 堆码
   const inspectionItem2 = currentData['inspectionItem2'] // 跌落
   const according = currentData['according'] // 鉴定依据
-  if (according !== "IATA DGR 66th, 2025"){
-    if (String(inspectionItem6) === '0' || !otherDescribe.includes('2c9180849267773c0192dc73c77e5fb2')){
-      if (inspectionItem1 === "2") {
-        result.push({ ok: false, result: '967/970 未勾选堆码，或堆码评估' })
-      }
-      const conclusions = currentData['conclusions']
-      if (inspectionItem1 === "1" && String(conclusions) === "0") {
-        result.push({ ok: false, result: '966/969 第II部分未勾选堆码，或堆码评估' })
-      }
+  if (String(inspectionItem6) === '0' || !otherDescribe.includes('2c9180849267773c0192dc73c77e5fb2')){
+    if (inspectionItem1 === "2") {
+      result.push({ ok: false, result: '967/970 未勾选堆码，或堆码评估，如果是24年报告请忽略' })
+    }
+    const conclusions = currentData['conclusions']
+    if (inspectionItem1 === "1" && String(conclusions) === "0") {
+      result.push({ ok: false, result: '966/969 第II部分未勾选堆码，或堆码评估，如果是24年报告请忽略' })
     }
   }
   if (packCargo === '965，IB'){

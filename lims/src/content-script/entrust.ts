@@ -32,7 +32,7 @@ interface User {
 }
 
 let globalAssignUser = ''
-chrome.storage.sync.get('assignUser', async function (data) {
+chrome.storage.sync.get(['assignUser','nextYearColor', 'nextYearBgColor'], async function (data) {
   const assignUser = data.assignUser as string
   globalAssignUser = assignUser
   console.log('一键分配脚本运行中...')
@@ -59,6 +59,16 @@ chrome.storage.sync.get('assignUser', async function (data) {
     }
   })
   await insertElement(assignUser)
+  // 设置下一年报告颜色
+  for(var i = 0; i < 10; i++) {
+    const target = document.querySelector(`#datagrid-row-r1-1-${i}`) as HTMLElement
+    if (target.style.color !== 'orange') return
+    target.style.color = data.nextYearColor
+    target.style.backgroundColor = data.nextYearBgColor
+    const target2 = document.querySelector(`#datagrid-row-r1-2-${i}`) as HTMLElement
+    target2.style.color = data.nextYearColor
+    target2.style.backgroundColor = data.nextYearBgColor
+  }
 })
 
 function getIds(): string[] {

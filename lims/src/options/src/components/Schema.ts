@@ -13,6 +13,8 @@ export interface Config {
   enableSetEntrust?: boolean
   customIcon?: boolean
   onekeyRollback?: boolean
+  nextYearColor?: string
+  nextYearBgColor?: string
 }
 
 export const Config: Schema<Config> = Schema.object({
@@ -49,5 +51,7 @@ export const Config: Schema<Config> = Schema.object({
     .description(`自动设置初验的内容`)
     .default(true),
   customIcon: Schema.boolean().description('自定义图标（用更显眼的图标来区分空海运）').default(false),
-  onekeyRollback: Schema.boolean().description('一键回退').default(true)
+  onekeyRollback: Schema.boolean().description('一键回退').default(true),
+  nextYearColor: Schema.string().description('下一年报告字体颜色').default(''),
+  nextYearBgColor: Schema.string().description('下一年报告背景颜色').default('#76EEC6'),
 }).description('设置')

@@ -1,10 +1,19 @@
 ;(async () => {
-  chrome.storage.sync.get(['onekeyRollback'], async function (result) {
+  chrome.storage.sync.get(['onekeyRollback', 'nextYearColor', 'nextYearBgColor'], async function (result) {
     if (result.onekeyRollback === false) {
       return
     }
     await sleepRollBack(500)
     getTbodyChild()
+    // 替换橘黄色
+    for(var i = 0; i < 10; i++) {
+      const targets = document.querySelector(`#datagrid-row-r1-2-${i}`) as HTMLTableRowElement
+      if (targets) {
+        if (targets.style.color !== "orange") return
+        targets.style.color = result.nextYearColor
+        targets.style.backgroundColor = result.nextYearBgColor
+      }
+    }
   })
 })()
 async function rollback(taskId: string): Promise<boolean> {
