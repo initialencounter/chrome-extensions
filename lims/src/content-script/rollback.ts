@@ -9,7 +9,7 @@
     for(var i = 0; i < 10; i++) {
       const targets = document.querySelector(`#datagrid-row-r1-2-${i}`) as HTMLTableRowElement
       if (targets) {
-        if (targets.style.color !== "orange") return
+        if (targets.style.color !== "orange") continue
         targets.style.color = result.nextYearColor
         targets.style.backgroundColor = result.nextYearBgColor
       }

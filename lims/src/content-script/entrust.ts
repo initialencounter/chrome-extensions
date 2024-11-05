@@ -62,7 +62,7 @@ chrome.storage.sync.get(['assignUser','nextYearColor', 'nextYearBgColor'], async
   // 设置下一年报告颜色
   for(var i = 0; i < 10; i++) {
     const target = document.querySelector(`#datagrid-row-r1-1-${i}`) as HTMLElement
-    if (target.style.color !== 'orange') return
+    if (target.style.color !== 'orange') continue
     target.style.color = data.nextYearColor
     target.style.backgroundColor = data.nextYearBgColor
     const target2 = document.querySelector(`#datagrid-row-r1-2-${i}`) as HTMLElement
@@ -266,4 +266,8 @@ async function lims_onekey_assign_click() {
     globalAssignUser = selectUid
   }
   await assignSelectId(selectUid)
+}
+
+async function sleepEntrust(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
