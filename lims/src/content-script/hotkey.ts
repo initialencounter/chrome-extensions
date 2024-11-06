@@ -40,14 +40,6 @@ let lastCPressTime = 0
     otherDescribeCAddition.style.setProperty('width', '758px')
     otherDescribeCAddition.parentElement?.style.setProperty('width', '750px')
   }
-
-  // 缩小没用的输入框
-  // const otherDescribeEAddition = document.getElementById("otherDescribeEAddition")
-  // if (otherDescribeEAddition) {
-  //   otherDescribeEAddition.style.setProperty('height', '30px')
-  //   otherDescribeEAddition.parentElement?.style.setProperty('height', '30px')
-
-  // }
   
   // 自定义图标
   if (localConfig.customIcon) {
@@ -145,23 +137,6 @@ let lastCPressTime = 0
       }
     })
   }
-
-  // const queryString = window.location.search
-  // const urlParams = new URLSearchParams(queryString)
-  // const pid = urlParams.get('projectId')
-  // const host = window.location.host
-  // const url = `https://${host}/document?pid=${pid}`
-  // const link = document.createElement('a')
-  // link.href = url
-
-  // const event = new MouseEvent('click', {
-  //     ctrlKey: true,
-  //     bubbles: true,
-  //     cancelable: true
-  // })
-
-  // // 将事件派发到 a 标签
-  // link.dispatchEvent(event)
 })()
 
 function myCustomSaveFunction() {
@@ -199,13 +174,15 @@ function copyProjectName() {
 }
 
 function watchInput() {
-  const table = document.getElementById('batteryInspectForm')?.children[3]
+  const table = document.getElementById(category === 'chemical' ? 'chemicalInspectForm' : 'batteryInspectForm')?.children[3]
   table?.addEventListener('change', function (event: Event) {
+    if (!document.hasFocus()) return
     const target = event.target as HTMLElement
     if (target) console.log('Changed tag name:', target.tagName)
     if (
       target instanceof HTMLInputElement ||
-      target instanceof HTMLSelectElement
+      target instanceof HTMLSelectElement || 
+      target instanceof HTMLTextAreaElement
     ) {
       console.log('Changed value:', target.value)
       changed = true
@@ -246,7 +223,12 @@ async function importTemplate() {
     importBtn.addEventListener('click', handleImportBtnClick)
   }
   // qProjectNo.value = systemId
-  qProjectNo.value = getMonthsAgoProjectNo()
+  if (localConfig.autoProjectNoPreset){
+    if (systemId.startsWith('PEK')) 
+      qProjectNo.value = localConfig.pekProjectNoPreset
+    else qProjectNo.value = localConfig.sekProjectNoPreset
+  } else qProjectNo.value = getMonthsAgoProjectNo()
+  
   qProjectNo.addEventListener('input', function () {
     // 项目编号
     const input = qProjectNo.value.replace(/[^0-9A-Z]/g, '')
@@ -330,7 +312,7 @@ function setUnNo(projectName: string) {
     return
   }
   if (projectName.includes('车')) {
-    UnNoInputItem.value = '3171'
+    UnNoInputItem.value = '3556'
     return
   }
   const isDangerous = isDangerousGoods(projectName)
