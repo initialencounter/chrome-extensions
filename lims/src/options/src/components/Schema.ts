@@ -49,7 +49,7 @@ export const Config: Schema<Config> = Schema.intersect([
       ]).description(`分类`).default(1),
       moonPay: Schema.boolean().description(`月结`).default(true),
       amount: Schema.string().description(`金额`).default('500.00'),
-      tagNextYear: Schema.boolean().description(`标记下一年`).default(false),
+      tagNextYear: Schema.boolean().description(`导入项目后，标记为下一年报告`).default(false),
     }),
     Schema.object({
       enableSetEntrust: Schema.const(false),
@@ -62,7 +62,7 @@ export const Config: Schema<Config> = Schema.intersect([
 
   // 样品检验-主界面 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   Schema.object({
-    verify: Schema.boolean().description('表单验证（仅限锂电池）').default(true),
+    verify: Schema.boolean().description('表单验证（仅限锂电池），验证规则详见[rule](https://lims.initenc.cn/rule.html)，欢迎补充').default(true),
     enableCopyProjectNo: Schema.boolean()
       .description(
         `复制项目编号 （点击项目编号，或者双击 *Ctrl*，即可将项目编号复制到剪切板）`

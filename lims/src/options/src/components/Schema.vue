@@ -2,8 +2,38 @@
   <el-row class="row-bg" justify="end">
     <el-button class="el-button-save" @click="submitForm()">保存</el-button>
     <el-button class="el-button-reset" @click="resetForm()">重置</el-button>
+    <el-button class="el-button-export" @click="exportConfig"
+      >导出配置</el-button
+    >
+    <el-button class="el-button-import" @click="centerDialogVisible = true"
+      >导入配置</el-button
+    >
   </el-row>
   <k-form v-model="config" :schema="Config" :initial="initial"></k-form>
+  <el-dialog
+    v-model="centerDialogVisible"
+    title="导入配置"
+    width="500"
+    destroy-on-close
+    center
+  >
+    <template #footer>
+      <textarea
+        v-model="importText"
+        style="width: 100%;"
+        :rows="6"
+        type="textarea"
+        placeholder="请输入您要导入的配置信息"
+      ></textarea>
+
+      <div class="dialog-footer">
+        <el-button type="primary" @click="centerDialogVisible = false">
+          取消
+        </el-button>
+        <el-button @click="importConfig">确认</el-button>
+      </div>
+    </template>
+  </el-dialog>
 </template>
 
 <script lang="ts" setup>
@@ -12,6 +42,8 @@ import { ref } from 'vue'
 import { Config } from './Schema'
 // 判断是否处于开发环境
 const isDev = import.meta.env.DEV
+const centerDialogVisible = ref(false)
+const importText = ref('')
 
 const saveConfig = () => {
   try {
@@ -54,6 +86,38 @@ const submitForm = async () => {
 const resetForm = () => {
   config.value = new Config()
 }
+
+const exportConfig = () => {
+  // set clipboard
+  navigator.clipboard.writeText(JSON.stringify(new Config(config.value)))
+  ElMessage({
+    message: '导出成功，配置信息已复制到剪贴板，请妥善保存',
+    type: 'success',
+    plain: true
+  })
+}
+
+const importConfig = () => {
+  centerDialogVisible.value = false
+  // get clipboard
+  try {
+    const tmpConfig = new Config(JSON.parse(importText.value))
+    config.value = tmpConfig
+    saveConfig()
+    document.location.reload()
+    ElMessage({
+      message: '导入成功',
+      type: 'success',
+      plain: true
+    })
+  } catch (error) {
+    ElMessage({
+      message: '导入失败，请检查剪切板中是否存在配置信息',
+      type: 'error',
+      plain: true
+    })
+  }
+}
 </script>
 
 <style>
@@ -83,10 +147,13 @@ const resetForm = () => {
   color: #000;
 }
 
-.el-button-save:hover {
-  background-color: rgb(110, 216, 110);
-}
 .el-button-reset:hover {
-  background-color: rgb(192, 192, 192);
+  background-color: rgb(233, 87, 57);
+}
+.el-button-export {
+  background-color: rgb(57, 108, 99);
+}
+.el-button-import {
+  background-color: rgb(131, 37, 165);
 }
 </style>
