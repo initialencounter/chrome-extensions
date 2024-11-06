@@ -1,4 +1,5 @@
 const systemId = window.location.pathname.startsWith('/pek') ? 'PEKGZ' : 'SEKGZ'
+const category = new URLSearchParams(window.location.search).get('category')
 const localConfig = {
   customIcon: false,
   enableSetEntrust: true,
@@ -8,8 +9,16 @@ const localConfig = {
   enableSaveHotKey: true,
   enableImportHotKey: true,
   enableSetImportProjectNo: true,
+  autoProjectNoPreset: false,
+  pekProjectNoPreset: 'PEKGZ2024',
+  sekProjectNoPreset: 'SEKGZ2024',
   enableSetQueryProjectNo: true,
-  enableSetImportClassification: true
+  enableSetImportClassification: true,
+  verify: true,
+  category: 1,
+  moonPay: true,
+  amount: '500.00',
+  tagNextYear: true,
 }
 
 const configKeys: Array<keyof typeof localConfig> = [
@@ -21,13 +30,22 @@ const configKeys: Array<keyof typeof localConfig> = [
   'enableSaveHotKey',
   'enableImportHotKey',
   'enableSetImportProjectNo',
+  'autoProjectNoPreset',
+  'pekProjectNoPreset',
+  'sekProjectNoPreset',
   'enableSetQueryProjectNo',
-  'enableSetImportClassification'
+  'enableSetImportClassification',
+  'verify',
+  'category',
+  'moonPay',
+  'amount',
+  'tagNextYear',
 ]
 chrome.storage.sync.get(configKeys, function (data) {
   for (const key of Object.keys(data) as Array<keyof typeof localConfig>) {
     console.log(key, data[key])
-    localConfig[key] = data[key] as boolean
+    // @ts-ignore
+    localConfig[key] = data[key]
   }
 })
 if (!window) {
@@ -38,7 +56,7 @@ if (!window) {
   getClipboardText()
   checkProjectNo('')
   getMonthsAgoProjectNo()
-  console.log(configKeys, localConfig)
+  console.log(configKeys, localConfig, category)
 }
 function checkDate(dateText: string[]) {
   for (const text of dateText) {

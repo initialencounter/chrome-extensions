@@ -22,9 +22,6 @@ chrome.contextMenus.onClicked.addListener(genericOnClick)
 // A generic onclick callback function.
 function genericOnClick(info: chrome.contextMenus.OnClickData) {
   switch (info.menuItemId) {
-    case 'lims_check_inspect':
-      sendMessageToActiveTab('lims_check_inspect')
-      break
     case 'lims_onekey_assign':
       sendMessageToActiveTab('lims_onekey_assign')
       break
@@ -34,19 +31,12 @@ function genericOnClick(info: chrome.contextMenus.OnClickData) {
 }
 
 chrome.runtime.onInstalled.addListener(async function () {
+  let version = chrome.runtime.getManifest().version
   await backgroundSleep(500)
   const menus: ExtendedCreateProperties = {
-    title: 'LIMS',
+    title: '当前插件版本：' + version,
     id: 'lims',
     child: [
-      {
-        title: '检验单校对',
-        id: 'lims_check_inspect'
-      },
-      {
-        title: '一键分配',
-        id: 'lims_onekey_assign'
-      },
       {
         title: '其他',
         id: 'other_menu',

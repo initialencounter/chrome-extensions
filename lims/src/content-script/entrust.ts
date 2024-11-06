@@ -32,43 +32,13 @@ interface User {
 }
 
 let globalAssignUser = ''
-chrome.storage.sync.get(['assignUser','nextYearColor', 'nextYearBgColor'], async function (data) {
+chrome.storage.sync.get(['assignUser', 'nextYearColor', 'nextYearBgColor', 'onekeyAssign'], async function (data) {
   const assignUser = data.assignUser as string
   globalAssignUser = assignUser
-  console.log('一键分配脚本运行中...')
-  chrome.runtime.onMessage.addListener(async function (message) {
-    if (message !== 'lims_onekey_assign') return
-    await assignSelectId(assignUser)
-  })
-  // 监听 V 键的弹起事件
-  let lastVPressTime = 0
-  let vPressCount = 0
-  document.addEventListener('keyup', async function (event) {
-    if (event.key === 'v' && event.ctrlKey) {
-      const currentTime = new Date().getTime()
-      if (currentTime - lastVPressTime < 500) {
-        vPressCount++
-      } else {
-        vPressCount = 1
-      }
-      lastVPressTime = currentTime
-      if (vPressCount === 2 && event.ctrlKey) {
-        await assignSelectId(assignUser)
-        vPressCount = 0
-      }
-    }
-  })
-  await insertElement(assignUser)
+  console.log('一键分配脚本运行中...', data)
+  if (!(data.onekeyAssign === false)) await insertElement(assignUser)
   // 设置下一年报告颜色
-  for(var i = 0; i < 10; i++) {
-    const target = document.querySelector(`#datagrid-row-r1-1-${i}`) as HTMLElement
-    if (target.style.color !== 'orange') continue
-    target.style.color = data.nextYearColor
-    target.style.backgroundColor = data.nextYearBgColor
-    const target2 = document.querySelector(`#datagrid-row-r1-2-${i}`) as HTMLElement
-    target2.style.color = data.nextYearColor
-    target2.style.backgroundColor = data.nextYearBgColor
-  }
+  removeOrange(data.nextYearColor, data.nextYearBgColor)
 })
 
 function getIds(): string[] {
@@ -270,4 +240,20 @@ async function lims_onekey_assign_click() {
 
 async function sleepEntrust(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+function removeOrange(nextYearColor: string, nextYearBgColor: string) {
+  setInterval(() => {
+    if (nextYearColor === undefined) nextYearColor = ''
+    if (nextYearBgColor === undefined) nextYearBgColor = '#76EEC6'
+    for (var i = 0; i < 10; i++) {
+      const target = document.querySelector(`#datagrid-row-r1-1-${i}`) as HTMLElement
+      if (target.style.color !== 'orange') continue
+      target.style.color = nextYearColor
+      target.style.backgroundColor = nextYearBgColor
+      const target2 = document.querySelector(`#datagrid-row-r1-2-${i}`) as HTMLElement
+      target2.style.color = nextYearColor
+      target2.style.backgroundColor = nextYearBgColor
+    }
+  }, 100)
 }
