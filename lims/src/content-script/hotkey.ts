@@ -120,18 +120,18 @@ let lastCPressTime = 0
       }
     }
   })
-  if (localConfig.enableSaveHotKey) {
+  if (localConfig.enableSaveHotKey || localConfig.enableImportHotKey) {
     // 监听 Ctrl + S 的按下事件
     document.addEventListener('keydown', function (event) {
       if (!event.ctrlKey) {
         return
       }
       // 检查是否按下了Ctrl+S
-      if (event.key === 's') {
+      if (event.key === 's' && localConfig.enableSaveHotKey) {
         event.preventDefault() // 阻止默认的保存行为
         myCustomSaveFunction()
       }
-      if (event.key === 'd') {
+      if (event.key === 'd' && localConfig.enableImportHotKey) {
         event.preventDefault() // 阻止默认的保存行为
         importDocument()
       }
