@@ -4,6 +4,11 @@ const systemIdLowercase = window.location.pathname.startsWith('/pek')
 const host = window.location.host
 ;(async () => {
   await verifySleep(500)
+  if (category !== "battery") return
+  if (localConfig.verify === false) {
+    console.log('未启用验证，退出脚本')
+    return
+  }
   const targetChild = document.getElementById('openDocumentsBtn0')
   if (!targetChild) return
   const targetParent = targetChild.parentElement
@@ -152,7 +157,7 @@ function checkPekBtyType(currentData: PekData) {
   const inspectionItem6 = currentData['inspectionItem6'] // 堆码
   const inspectionItem2 = currentData['inspectionItem2'] // 跌落
   const according = currentData['according'] // 鉴定依据
-  if (String(inspectionItem6) === '0' || !otherDescribe.includes('2c9180849267773c0192dc73c77e5fb2')){
+  if (String(inspectionItem6) === '0' && !otherDescribe.includes('2c9180849267773c0192dc73c77e5fb2')){
     if (inspectionItem1 === "2") {
       result.push({ ok: false, result: '967/970 未勾选堆码，或堆码评估，如果是24年报告请忽略' })
     }
