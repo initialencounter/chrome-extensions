@@ -1,19 +1,13 @@
 ;(async () => {
   chrome.storage.sync.get(['onekeyRollback', 'nextYearColor', 'nextYearBgColor'], async function (result) {
+    removeOrangeRollBack(result.nextYearColor, result.nextYearBgColor)
+    await sleepRollBack(500)
+    // 替换橘黄色
     if (result.onekeyRollback === false) {
+      console.log('未启用一键退回，退出脚本')
       return
     }
-    await sleepRollBack(500)
     getTbodyChild()
-    // 替换橘黄色
-    for(var i = 0; i < 10; i++) {
-      const targets = document.querySelector(`#datagrid-row-r1-2-${i}`) as HTMLTableRowElement
-      if (targets) {
-        if (targets.style.color !== "orange") continue
-        targets.style.color = result.nextYearColor
-        targets.style.backgroundColor = result.nextYearBgColor
-      }
-    }
   })
 })()
 async function rollback(taskId: string): Promise<boolean> {
@@ -147,4 +141,15 @@ function getTbodyChild() {
 
 async function sleepRollBack(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+function removeOrangeRollBack(nextYearColor: string, nextYearBgColor: string) {
+  for(var i = 0; i < 10; i++) {
+    const targets = document.querySelector(`#datagrid-row-r1-2-${i}`) as HTMLTableRowElement
+    if (targets) {
+      if (targets.style.color !== "orange") continue
+      targets.style.color = nextYearColor
+      targets.style.backgroundColor = nextYearBgColor
+    }
+  }
 }
