@@ -1,4 +1,4 @@
-;(async () => {
+; (async () => {
   chrome.storage.sync.get(['onekeyRollback', 'nextYearColor', 'nextYearBgColor'], async function (result) {
     removeOrangeRollBack(result.nextYearColor, result.nextYearBgColor)
     await sleepRollBack(500)
@@ -144,12 +144,14 @@ async function sleepRollBack(ms: number) {
 }
 
 function removeOrangeRollBack(nextYearColor: string, nextYearBgColor: string) {
-  for(var i = 0; i < 10; i++) {
-    const targets = document.querySelector(`#datagrid-row-r1-2-${i}`) as HTMLTableRowElement
-    if (targets) {
-      if (targets.style.color !== "orange") continue
-      targets.style.color = nextYearColor
-      targets.style.backgroundColor = nextYearBgColor
+  setInterval(() => {
+    for (var i = 0; i < 10; i++) {
+      const targets = document.querySelector(`#datagrid-row-r1-2-${i}`) as HTMLTableRowElement
+      if (targets) {
+        if (targets.style.color !== "orange") continue
+        targets.style.color = nextYearColor
+        targets.style.backgroundColor = nextYearBgColor
+      }
     }
-  }
+  }, 100)
 }
