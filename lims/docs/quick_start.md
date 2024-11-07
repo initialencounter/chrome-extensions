@@ -14,7 +14,7 @@
 :::
 
 ### 下载并解压拓展
-[点我下载](https://ghp.ci/https://github.com/initialencounter/chrome-extensions/releases/download/v1.5.11/lims-v1.5.11.chrome.zip)👈下载地址
+[点我下载](https://ghp.ci/https://github.com/initialencounter/chrome-extensions/releases/download/v1.5.12/lims-v1.5.12.chrome.zip)👈下载地址
 
 ### 安装拓展
 
@@ -30,7 +30,7 @@
 
 ### 下载并解压拓展
 
-[点我下载](https://ghp.ci/https://github.com/initialencounter/chrome-extensions/releases/download/v1.5.11/lims-v1.5.11.firefox.xpi) 👈下载地址
+[点我下载](https://ghp.ci/https://github.com/initialencounter/chrome-extensions/releases/download/v1.5.12/lims-v1.5.12.firefox.xpi) 👈下载地址
 
 ### 安装拓展
 
