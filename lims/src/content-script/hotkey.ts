@@ -37,8 +37,8 @@ let lastCPressTime = 0
 
   const otherDescribeCAddition = document.getElementById("otherDescribeCAddition") as HTMLInputElement
   if (otherDescribeCAddition && systemId === 'SEKGZ') {
-    otherDescribeCAddition.style.setProperty('width', '758px')
-    otherDescribeCAddition.parentElement?.style.setProperty('width', '750px')
+    otherDescribeCAddition.style.setProperty('width', '750px')
+    otherDescribeCAddition.parentElement?.style.setProperty('width', '758px')
   }
   
   // 自定义图标
