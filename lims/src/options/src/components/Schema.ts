@@ -12,7 +12,7 @@ export interface Config {
   sekProjectNoPreset?: string
   enableSetQueryProjectNo?: boolean
   enableSetImportClassification?: boolean
-  enableReplaceEntrustEName?: boolean
+  enableDisplayEntrustEName?: boolean
   enableSetEntrust?: boolean
   category?: 0 | 1 | 2 | 3
   moonPay?: boolean
@@ -34,7 +34,7 @@ export const Config: Schema<Config> = Schema.intersect([
 
   // 初验 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   Schema.object({
-    enableReplaceEntrustEName: Schema.boolean().description('替换结算人为客户英文名称').default(true),
+    enableDisplayEntrustEName: Schema.boolean().description('显示委托方英文名称').default(true),
     enableSetEntrust: Schema.boolean()
       .description(`自动设置初验的内容`)
       .default(true),

@@ -69,9 +69,14 @@ async function insertEntrustEname(customerList: Customer[]) {
 
     if (!cnameElement || !enameElement) continue;
 
-    const matchingEname = customerMap.get(cnameElement.innerHTML);
+    let parentElement = enameElement.parentElement?.parentElement
+    if (!parentElement) continue;
+    const matchingEname = customerMap.get(cnameElement.innerHTML)
     if (matchingEname !== undefined) {
-      enameElement.innerHTML = matchingEname || '/';
+      let realEnameElement = document.createElement('td')
+      realEnameElement.innerHTML = `<div class="datagrid-cell" style="width: 400px;">${matchingEname || '/'}</div>`
+      realEnameElement.setAttribute('field', 'customerEName')
+      parentElement.appendChild(realEnameElement)
     }
   }
 }
@@ -90,7 +95,7 @@ function expandTable(width: number, height: number) {
       "body > div:nth-child(10) > div > div > div > div.datagrid-view > div.datagrid-view2 > div.datagrid-body > table > tbody",
     ],
     height: {
-      "body > div:nth-child(10) > div": 470,
+      "body > div:nth-child(10) > div": 450,
       "body > div:nth-child(10) > div > div > div": 450,
       "body > div:nth-child(10) > div > div > div > div.datagrid-view": 420,
       "body > div:nth-child(10) > div > div > div > div.datagrid-view > div.datagrid-view2 > div.datagrid-body": 390
@@ -118,12 +123,22 @@ function expandTable(width: number, height: number) {
       });
     }
   });
+}
 
-  // 设置名称列宽度
+function addEnameColumn() {
+  const headerRow = document.querySelector("body > div:nth-child(10) > div > div > div > div.datagrid-view > div.datagrid-view2 > div.datagrid-header > div > table > tbody > tr");
+  if (headerRow) {
+    const newHeader = document.createElement('td');
+    newHeader.innerHTML = `<div class="datagrid-cell" style="width: 400px;"><span>客户英文名称</span></div>`;
+    headerRow.appendChild(newHeader);
+  }
+
   for (let i = 0; i < 10; i++) {
-    const nameElement = document.querySelector(`#datagrid-row-r1-2-${i} > td:nth-child(2) > div`) as HTMLElement;
-    if (nameElement) {
-      nameElement.style.width = '400px'
+    const row = document.querySelector(`#datagrid-row-r1-2-${i}`);
+    if (row) {
+      const newCell = document.createElement('td');
+      newCell.innerHTML = `<div class="datagrid-cell" style="width: 400px;"></div>`;
+      row.appendChild(newCell);
     }
   }
 }
@@ -139,11 +154,11 @@ function debounceInput(delay: number = 500) {
 
   const handleInput = async (value: string) => {
     try {
-      expandTable(700, 400);
+      expandTable(800, 400);
       searchText = value;
       const customers = await getEntrustEName(searchText);
       await insertEntrustEname(customers);
-      expandTable(700, 400);
+      expandTable(800, 400);
     } catch (error) {
       console.error('处理输入时发生错误:', error);
     }
@@ -180,16 +195,16 @@ function replaceTableHeaderName() {
   }
 }
 
-// IIFE 优化
 (async () => {
-  chrome.storage.sync.get('enableReplaceEntrustEName', async (data) => {
-    if (data.enableReplaceEntrustEName === false) return
-    console.log("启用替换委托方英文名称")
+  chrome.storage.sync.get('enableDisplayEntrustEName', async (data) => {
+    if (data.enableDisplayEntrustEName === false) return
+    console.log("启用委托方英文名称显示")
     try {
       await sleepEntrustEname(500);
-      replaceTableHeaderName();
+      addEnameColumn();
       debounceInput();
       setPage();
+      expandTable(700, 400);
     } catch (error) {
       console.error('初始化失败:', error);
     }
