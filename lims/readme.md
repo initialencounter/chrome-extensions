@@ -17,14 +17,14 @@ Lims 是一个浏览器扩展，支持 Chrome 和 Firefox 浏览器。该扩展�
 
 ### Chrome 系浏览器
 
-1. 下载并解压拓展：[点我下载](https://ghp.ci/https://github.com/initialencounter/chrome-extensions/releases/download/v1.5.13/lims-v1.5.13.chrome.zip)
+1. 下载并解压拓展：[点我下载](https://ghp.ci/https://github.com/initialencounter/chrome-extensions/releases/download/v1.6.0/lims-v1.6.0.chrome.zip)
 2. 在浏览器地址栏输入 `chrome://extensions`。
 3. 打开开发人员模式。
 4. 加载解压缩的拓展，选择解压后的 dist 文件夹。
 
 ### Firefox 系浏览器
 
-1. 下载并解压拓展：[点我下载](https://ghp.ci/https://github.com/initialencounter/chrome-extensions/releases/download/v1.5.13/lims-v1.5.13.firefox.xpi)
+1. 下载并解压拓展：[点我下载](https://ghp.ci/https://github.com/initialencounter/chrome-extensions/releases/download/v1.6.0/lims-v1.6.0.firefox.xpi)
 2. 在浏览器地址栏输入 `about:addons`。
 3. 点击齿轮图标，从文件安装附加组件，选择 `.xpi` 文件。
 

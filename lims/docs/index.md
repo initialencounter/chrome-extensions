@@ -5,7 +5,7 @@ layout: home
 hero:
   name: "Lims"
   text: "browser-extensions for own use"
-  tagline: v1.5.13
+  tagline: v1.6.0
   actions:
     - theme: brand
       text: 快速开始
