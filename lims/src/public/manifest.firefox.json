@@ -73,7 +73,8 @@
         "all_frames": true,
         "js": [
           "js/utils.js",
-          "js/entrustMain.js"
+          "js/entrustMain.js",
+          "js/entrustEname.js"
         ]
       },
       {

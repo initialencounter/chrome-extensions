@@ -20,6 +20,7 @@ export default defineConfig({
         verify: resolve(__dirname, 'src/content-script/verify.ts'),
         rollback: resolve(__dirname, 'src/content-script/rollback.ts'),
         checkList: resolve(__dirname, 'src/content-script/checkList.ts'),
+        entrustEname: resolve(__dirname, 'src/content-script/entrustEname.ts'),
       },
       output: {
         entryFileNames: 'js/[name].js',
