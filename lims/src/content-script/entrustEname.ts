@@ -70,8 +70,8 @@ async function insertEntrustEname(customerList: Customer[]) {
     if (!cnameElement || !enameElement) continue;
 
     const matchingEname = customerMap.get(cnameElement.innerHTML);
-    if (matchingEname) {
-      enameElement.innerHTML = matchingEname;
+    if (matchingEname !== undefined) {
+      enameElement.innerHTML = matchingEname || '/';
     }
   }
 }
@@ -182,12 +182,16 @@ function replaceTableHeaderName() {
 
 // IIFE 优化
 (async () => {
-  try {
-    await sleepEntrustEname(500);
-    replaceTableHeaderName();
-    debounceInput();
-    setPage();
-  } catch (error) {
-    console.error('初始化失败:', error);
-  }
+  chrome.storage.sync.get('enableReplaceEntrustEName', async (data) => {
+    if (data.enableReplaceEntrustEName === false) return
+    console.log("启用替换委托方英文名称")
+    try {
+      await sleepEntrustEname(500);
+      replaceTableHeaderName();
+      debounceInput();
+      setPage();
+    } catch (error) {
+      console.error('初始化失败:', error);
+    }
+  })
 })();
