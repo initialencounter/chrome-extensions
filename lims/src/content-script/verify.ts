@@ -45,6 +45,7 @@ function checkPekBtyType(currentData: PekData) {
   const btyKind = currentData['model']
   // 瓦时
   const wattHour = Number(currentData['inspectionItem3Text1'])
+  const wattHourFromName = matchWattHour(currentData['itemCName'])
   // 锂含量
   const liContent = Number(currentData['inspectionItem4Text1'])
   // 电池数量
@@ -279,10 +280,8 @@ function checkPekBtyType(currentData: PekData) {
   }
 
   // 验证瓦数数
-  const wattHourFromName = matchWattHour(currentData['itemCName'])
-  const inspectionResult1 = currentData['inspectionItem3Text1']
-  if (wattHourFromName > 0 && !isNaN(Number(inspectionResult1))) {
-    if (Number(inspectionResult1) !== wattHourFromName)
+  if (wattHourFromName > 0 && !isNaN(wattHour) && isIon) {
+    if (wattHour !== wattHourFromName)
       result.push({ ok: false, result: '瓦时数与项目名称不匹配' })
   }
 
@@ -1237,7 +1236,7 @@ function matchWattHour(projectName: string) {
   let wattHour = Number(results[0])
   if (!results.length) return 0
   if (isNaN(wattHour)) return 0
-  if (projectName.includes('kWh')) wattHour *= 1000
+  if (projectName.toLowerCase().includes('kWh')) wattHour *= 1000
   return wattHour
 }
 
