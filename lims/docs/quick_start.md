@@ -1,6 +1,6 @@
 # 快速开始
 
-本章节主要介绍拓展的安装
+本章节主要介绍拓展的安装。
 
 ## Chrome 系浏览器
 
@@ -10,11 +10,11 @@
   - Google Chrome
 
 ::: warning
-目前某些套壳浏览器仅支持临时加载，即退出浏览器后要重新加载，Firefox 浏览器则无此问题，建议迁移到 Firefox 系浏览器
+目前某些套壳浏览器仅支持临时加载，即退出浏览器后要重新加载，Firefox 浏览器则无此问题，建议迁移到 Firefox 系浏览器。
 :::
 
 ### 下载并解压拓展
-[点我下载](https://ghp.ci/https://github.com/initialencounter/chrome-extensions/releases/download/v1.6.1/lims-v1.6.1.chrome.zip)👈下载地址
+[点我下载](https://ghp.ci/https://github.com/initialencounter/chrome-extensions/releases/download/v1.6.1/lims-v1.6.1.chrome.zip)👈下载地址。
 
 ### 安装拓展
 
@@ -23,7 +23,7 @@
 - 加载解压缩的拓展。
 - 选择解压后得到的 dist 文件夹。
 
-![加载拓展](https://ghp.cihttps://github.com/initialencounter/chrome-extensions/blob/master/lims/assets/image.png?raw=true)
+![加载拓展](./assets/load-chrome.png)
 
 
 ## Firefox 系浏览器

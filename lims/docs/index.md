@@ -4,7 +4,7 @@ layout: home
 
 hero:
   name: "Lims"
-  text: "browser-extensions for own use"
+  text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
   tagline: v1.6.1
   actions:
     - theme: brand
@@ -29,6 +29,6 @@ features:
   - title: 丰富的快捷键支持
     details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
   - title: 表单验证
-    details: 强大的规则匹配，
+    details: 强大的规则匹配
 ---
 

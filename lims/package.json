@@ -1,7 +1,7 @@
 {
   "name": "lims",
   "version": "1.6.1",
-  "description": "- 下载 lims 文件夹内所有文件。",
+  "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
   "private": true,
   "workspaces": [
     "src/popup",
@@ -13,7 +13,7 @@
     "build": "vite build --emptyOutDir",
     "build:op": "vite build -c vite.options.config.ts",
     "build:cs": "vite build -c vite.content-script.config.ts",
-    "zip": "7z a -tzip ./%npm_package_name%-%npm_package_version%.zip -r dist/*",
+    "zip": "7z a -tzip lims-v$npm_package_version.zip -r dist/*",
     "lint": "eslint src/*/*.ts",
     "format": "prettier --write src/*/*.ts",
     "docs:dev": "vitepress dev docs",
