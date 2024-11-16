@@ -29,6 +29,7 @@ const host = window.location.host
         <span class="l-btn-text">验证</span>
     </span>
     `
+    // verifyButton.onclick = testVerify
     verifyButton.onclick = lims_verify_inspect
     targetParent.appendChild(verifyButton)
     console.log('验证按钮插入成功')
@@ -46,6 +47,8 @@ function checkPekBtyType(currentData: PekData) {
   const wattHour = Number(currentData['inspectionItem3Text1'])
   // 锂含量
   const liContent = Number(currentData['inspectionItem4Text1'])
+  // 电池数量
+  const btyCount = Number(currentData['btyCount'])
   // 净重
   const netWeight = Number(currentData['netWeight'])
   // 单芯电池或电芯
@@ -72,10 +75,10 @@ function checkPekBtyType(currentData: PekData) {
     | '1'
     | '2'
   // 是否锂离子电池
-  const isIon = String(currentData['type1']) === '0'
+  const isIon = String(currentData['type1']) === '1'
   // 包装类型, 通过UN编号、电池类型、包装类型获取，录入错误的信息可能会导致判断错误
   const pkgInfo: PekPkgInfo = getPkgInfo(unno, isIon, inspectionItem1)
-  // 第一个包装说明，可能为空，通常来自于模板
+  // 参见包装说明，可能为空，通常来自于模板
   const inspectionItem5Text1: PekPkgInfo = currentData['inspectionItem5Text1']
   // 结论的包装类型，通常来自于模板
   const pkgInfoByPackCargo: PekPkgInfo = getPkgInfoByPackCargo(inspectionItem5Text1, packCargo)
@@ -115,7 +118,7 @@ function checkPekBtyType(currentData: PekData) {
         '2c9180838b90642e018bf132f37f5a60'
       ].includes(btyShape)
     ) {
-      result.push({ ok: false, result: '电池形状或尺寸错误' })
+      result.push({ ok: false, result: '电池形状或尺寸错误，应为扣式 近圆柱体 圆柱体 球形' })
     }
   }
   if (!btyKind) result.push({ ok: false, result: '电池型号为空' })
@@ -177,6 +180,7 @@ function checkPekBtyType(currentData: PekData) {
     result.push({ ok: false, result: '物品为电池时，描述中不应该出现单块电芯' })
   // 包装与其他描述验证
   if (pkgInfo !== pkgInfoByPackCargo) {
+    console.log(pkgInfo, pkgInfoByPackCargo)
     result.push({ ok: false, result: `${pkgInfo}包装，但结论是${pkgInfoByPackCargo}` })
   }
   if (
@@ -233,19 +237,26 @@ function checkPekBtyType(currentData: PekData) {
       result: '检验项目4错误，未勾选锂电池已通过 UN38.3 测试'
     })
   // 检查项目5 是否加贴锂电池标记
-  if (isBatteryLabel(pkgInfoSubType, btyShape)) {
+  if (isBatteryLabel(pkgInfoSubType, btyShape, btyCount, isCell)) {
     if (Number(currentData['inspectionItem4']) !== 1)
-      result.push({ ok: false, result: `检验项目5错误，${pkgInfoSubType}应勾选加贴锂电池标记` })
+      if (pkgInfoSubType === '970, II')
+        result.push({ ok: false, result: `检验项目5错误，970, II，无特殊情况，应勾选加贴锂电池标记` })
+      else
+        result.push({ ok: false, result: `检验项目5错误，${pkgInfoSubType}应勾选加贴锂电池标记` })
   } else {
     if (Number(currentData['inspectionItem4']) !== 0)
       if (pkgInfoSubType === '970, II' && btyShape === '8aad92b65aae82c3015ab094788a0026')
         result.push({ ok: false, result: `检验项目5错误，设备内置纽扣电池不应勾选加贴锂电池标记` })
+      else if (pkgInfoSubType === '970, II' && isCell && btyCount < 4)
+        result.push({ ok: false, result: `检验项目5错误，970, II，电芯数量小于4个不应勾选加贴锂电池标记` })
+      else if (pkgInfoSubType === '970, II' && !isCell && btyCount < 2)
+        result.push({ ok: false, result: `检验项目5错误，970, II，电池数量小于2个不应勾选加贴锂电池标记` })
       else
         result.push({ ok: false, result: `检验项目5错误，${pkgInfoSubType}不应勾选加贴锂电池标记` })
   }
   // 包装说明
-  if (isDangerous && pkgInfoSubType !== '') {
-    result.push({ ok: false, result: '危险品，包装说明应为空' })
+  if (isDangerous && inspectionItem5Text1 !== '') {
+    result.push({ ok: false, result: '危险品，参见包装说明应为空' })
   } else {
     if (isNaN(Number(inspectionItem5Text1))) {
       result.push({ ok: false, result: '非限制性，包装说明应为数字' })
@@ -256,14 +267,14 @@ function checkPekBtyType(currentData: PekData) {
     result.push({ ok: false, result: '检查项目6错误，附有随机文件应为：否' })
   // 鉴别项目1
   if (isIon) {
-    if (currentData['inspectionItem3Text1'] !== '')
+    if (currentData['inspectionItem3Text1'] === '')
       result.push({ ok: false, result: '鉴别项目1错误，瓦时数为空' })
-    if (currentData['inspectionItem4Text1'] === '')
+    if (currentData['inspectionItem4Text1'] !== '')
       result.push({ ok: false, result: '鉴别项目1错误，锂含量不为空' })
   } else {
-    if (currentData['inspectionItem3Text1'] === '')
+    if (currentData['inspectionItem3Text1'] !== '')
       result.push({ ok: false, result: '鉴别项目1错误，瓦时数不为空' })
-    if (currentData['inspectionItem4Text1'] !== '')
+    if (currentData['inspectionItem4Text1'] === '')
       result.push({ ok: false, result: '鉴别项目1错误，锂含量为空' })
   }
 
@@ -1232,8 +1243,8 @@ function matchWattHour(projectName: string) {
 
 function getBtyTypeCode(
   currentData: PekData
-): '500' | '501' | '504' | '502' | '503' | '505' {
-  const isIon: boolean = String(currentData['type1']) === '0'
+): '500' | '501' | '502' | '503' | '504' | '505' {
+  const isIon: boolean = String(currentData['type1']) === '1'
   const isCell: boolean = String(currentData['type2']) === '1'
   const isSingleCell: boolean = currentData['otherDescribe'].includes('1790')
   if (isIon) {
@@ -1247,8 +1258,8 @@ function getBtyTypeCode(
 
 function getIsSingleCell(
   // 锂离子电池 锂离子电芯 锂金属电池 锂金属电芯 单芯锂离子电池 单芯锂金属电池
-  // '500' | '501' | '504' | '502' | '503' | '505'
-  btyType: '500' | '501' | '504' | '502' | '503' | '505'
+  // '500'     | '501'   | '502'   | '503'   | '504'       | '505'
+  btyType: '500' | '501' | '502' | '503' | '504' | '505'
 ) {
   return !['500', '502'].includes(btyType)
 }
@@ -1297,7 +1308,7 @@ function getPkgInfo(
   }
 }
 
-function isBatteryLabel(pkgInfoSubType: PkgInfoSubType, shape: string) {
+function isBatteryLabel(pkgInfoSubType: PkgInfoSubType, shape: string, btyCount: number, isCell: boolean) {
   switch (pkgInfoSubType) {
     case '952':
     case '965, IA':
@@ -1310,6 +1321,10 @@ function isBatteryLabel(pkgInfoSubType: PkgInfoSubType, shape: string) {
     case '970, II':
       // 纽扣电池
       if (shape === '8aad92b65aae82c3015ab094788a0026') return false
+      // 电芯小于4个
+      if (isCell && btyCount < 4) return false
+      // 电池小于2个
+      if (!isCell && btyCount < 2) return false
     case '965, IB':
     case '966, II':
     case '967, II':
@@ -1375,45 +1390,6 @@ function getIsCargoOnly(
   }
 }
 
-async function testVerify() {
-  const response = await fetch(
-    `https://${host}/rest/inspect/query?category=battery&projectNo=${systemIdLowercase.toUpperCase()}GZ&startDate=2024-09-03&endDate=2024-09-03&page=1&rows=100`,
-    {
-      method: 'GET',
-      credentials: 'include' // 包含 cookies
-    }
-  )
-  if (!response.ok) {
-    console.log('请求失败1')
-    return
-  }
-  const { total, rows }: { total: number; rows: PekData[] } =
-    await response.json()
-  const output: Record<string, Array<{ ok: boolean; result: string }>> = {}
-  for (let i = 0; i < total; i++) {
-    await verifySleep(100)
-    if (rows[i]['editStatus'] !== 3) continue
-    const projectId = rows[i]['projectId']
-    console.log(rows[i]['projectNo'])
-    const currentData = await getData(projectId)
-    if (currentData === null) {
-      console.log(projectId)
-      console.log('请求失败2')
-      continue
-    }
-    let result = []
-    if (systemIdLowercase === 'pek') {
-      result = checkPekBtyType(currentData as PekData)
-    } else {
-      result = checkSekBtyType(currentData as SekData)
-    }
-    if (result.length) {
-      output[rows[i]['projectNo']] = result
-    }
-  }
-  console.log(output)
-}
-
 async function verifySleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
@@ -1461,3 +1437,44 @@ async function checkAttchmentFiles(projectNo: string, projectId: string) {
 }
 // 验证资料上传
 // (async () => {console.log(await checkAttchmentFiles('SEKGZ202410245479','2c9180839267761d0192bd77b32f1091'))})()
+
+
+// tests
+async function testVerify() {
+  const response = await fetch(
+    `https://${host}/rest/inspect/query?category=battery&projectNo=${systemIdLowercase.toUpperCase()}GZ&startDate=2024-09-03&endDate=2024-09-03&page=1&rows=100`,
+    {
+      method: 'GET',
+      credentials: 'include' // 包含 cookies
+    }
+  )
+  if (!response.ok) {
+    console.log('请求失败1')
+    return
+  }
+  const { total, rows }: { total: number; rows: PekData[] } =
+    await response.json()
+  const output: Record<string, Array<{ ok: boolean; result: string }>> = {}
+  for (let i = 0; i < total; i++) {
+    await verifySleep(100)
+    if (rows[i]['editStatus'] !== 3) continue
+    const projectId = rows[i]['projectId']
+    console.log(rows[i]['projectNo'])
+    const currentData = await getData(projectId)
+    if (currentData === null) {
+      console.log(projectId)
+      console.log('请求失败2')
+      continue
+    }
+    let result = []
+    if (systemIdLowercase === 'pek') {
+      result = checkPekBtyType(currentData as PekData)
+    } else {
+      result = checkSekBtyType(currentData as SekData)
+    }
+    if (result.length) {
+      output[rows[i]['projectNo']] = result
+    }
+  }
+  console.log(output)
+}

@@ -1,5 +1,5 @@
 console.log('快捷键脚本运行中...')
-
+const fromQuery = new URLSearchParams(window.location.search).get('from') === 'query' ? true : false
 let changed = false
 let originalTitle: string
 
