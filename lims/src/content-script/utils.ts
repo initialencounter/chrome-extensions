@@ -1,4 +1,5 @@
 const systemId = window.location.pathname.startsWith('/pek') ? 'PEKGZ' : 'SEKGZ'
+const fromQuery = new URLSearchParams(window.location.search).get('from') === 'query' ? true : false
 const category = new URLSearchParams(window.location.search).get('category')
 const localConfig = {
   customIcon: false,

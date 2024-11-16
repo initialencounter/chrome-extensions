@@ -65,7 +65,7 @@ let lastCPressTime = 0
     }
   }
   // 监听改动
-  if (localConfig.enablePreventCloseBeforeSave) {
+  if (localConfig.enablePreventCloseBeforeSave && !fromQuery) {
     watchInput()
     // 保存时重置改动状态
     watchSaveBtn()
@@ -74,16 +74,12 @@ let lastCPressTime = 0
   }
 
   // 导入检验单
-  if (localConfig.enableImportHotKey) {
-    if (!window.location.href.includes('from=query')) {
-      importTemplate()
-    }
+  if (localConfig.enableImportHotKey && !fromQuery) {
+    importTemplate()
   }
   // 导入检验单时设置分类
-  if (localConfig.enableSetImportClassification) {
-    if (!window.location.href.includes('from=query')) {
-      importClassification()
-    }
+  if (localConfig.enableSetImportClassification && !fromQuery) {
+    importClassification()
   }
 
   // 监听 Ctrl 键的弹起事件
@@ -120,7 +116,7 @@ let lastCPressTime = 0
       }
     }
   })
-  if (localConfig.enableSaveHotKey || localConfig.enableImportHotKey) {
+  if ((localConfig.enableSaveHotKey || localConfig.enableImportHotKey) && !fromQuery) {
     // 监听 Ctrl + S 的按下事件
     document.addEventListener('keydown', function (event) {
       if (!event.ctrlKey) {
