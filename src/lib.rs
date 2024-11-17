@@ -1,11 +1,11 @@
+use wasm_bindgen::prelude::*;
+
+use models::pek::PekData;
+use models::sek::SekData;
+use utils::{check_pek_bty_type, check_sek_bty_type};
+
 mod models;
 mod utils;
-
-use models::pek_data::PekData;
-use models::sek_data::SekData;
-
-use utils::{check_pek_bty_type, check_sek_bty_type};
-use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 pub fn check_pek_bty(data: String) -> String {
@@ -23,7 +23,7 @@ pub fn check_sek_bty(data: String) -> String {
 
 #[cfg(test)]
 mod tests {
-    use std::{fs, task::Context};
+    use std::fs;
 
     use super::*;
 
@@ -47,7 +47,7 @@ mod tests {
     }
     #[test]
     fn sek_works() {
-        for i in 0..199{
+        for i in 0..199 {
             let data = fs::read_to_string(format!("tests/data/sek/{}.json", i)).unwrap();
             let data: SekData = serde_json::from_str(&data).unwrap();
             let result = check_sek_bty_type(data);
@@ -57,7 +57,6 @@ mod tests {
             }
         }
     }
-
 
 
     #[test]

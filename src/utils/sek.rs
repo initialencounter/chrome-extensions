@@ -1,6 +1,8 @@
-use crate::models::SekData;
-use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+
+use serde::{Deserialize, Serialize};
+
+use crate::models::SekData;
 
 use super::regex::match_watt_hour;
 
@@ -12,7 +14,7 @@ pub struct CheckResult {
 
 pub fn check_sek_bty_type(current_data: SekData) -> Vec<CheckResult> {
     let mut result = Vec::new();
-    
+
     let mut check_map: HashMap<&str, [&str; 2]> = HashMap::new();
     check_map.insert("500", ["≤100Wh", ">100Wh"]);
     check_map.insert("501", ["≤20Wh", ">20Wh"]);
@@ -22,7 +24,7 @@ pub fn check_sek_bty_type(current_data: SekData) -> Vec<CheckResult> {
     check_map.insert("505", [">1g", "≤1g"]);
 
     let bty_type = &current_data.bty_type;
-    
+
     if !check_map.contains_key(bty_type.as_str()) {
         result.push(CheckResult {
             ok: false,
@@ -35,7 +37,7 @@ pub fn check_sek_bty_type(current_data: SekData) -> Vec<CheckResult> {
     let item_ename = &current_data.item_e_name;
     let bty_kind = &current_data.bty_kind;
     let bty_type = &current_data.bty_type;
-    
+
     // 电池类型验证
     if item_cname.contains("芯") && !["501", "503"].contains(&bty_type.as_str()) {
         result.push(CheckResult {
@@ -70,10 +72,10 @@ pub fn check_sek_bty_type(current_data: SekData) -> Vec<CheckResult> {
         });
     }
 
-    if bty_size.contains('Φ') 
-        || bty_size.contains('φ') 
-        || bty_size.contains('Ø') 
-        || bty_size.contains('ø') 
+    if bty_size.contains('Φ')
+        || bty_size.contains('φ')
+        || bty_size.contains('Ø')
+        || bty_size.contains('ø')
     {
         let valid_shapes = [
             "8aad92b65aae82c3015ab094788a0026",
@@ -92,7 +94,7 @@ pub fn check_sek_bty_type(current_data: SekData) -> Vec<CheckResult> {
     // 其他描述验证
     let other_describe = &current_data.other_describe;
     let bty_gross_weight = &current_data.bty_gross_weight;
-    
+
     if other_describe.is_empty() {
         result.push(CheckResult {
             ok: false,
@@ -123,9 +125,9 @@ pub fn check_sek_bty_type(current_data: SekData) -> Vec<CheckResult> {
 
     // 电芯/电池描述验证
     let other_describe_c_addition = &current_data.other_describe_c_addition;
-    if ["501", "503"].contains(&bty_type.as_str()) 
+    if ["501", "503"].contains(&bty_type.as_str())
         && !other_describe_c_addition.contains("单块电芯")
-        && !other_describe_c_addition.contains("总净重") 
+        && !other_describe_c_addition.contains("总净重")
     {
         result.push(CheckResult {
             ok: false,
@@ -144,7 +146,7 @@ pub fn check_sek_bty_type(current_data: SekData) -> Vec<CheckResult> {
     }
 
     // 包装描述验证
-    if other_describe == "541" 
+    if other_describe == "541"
         && !other_describe_c_addition.contains("包装")
         && !other_describe_c_addition.contains("总净重")
     {
@@ -217,9 +219,9 @@ pub fn check_sek_bty_type(current_data: SekData) -> Vec<CheckResult> {
     }
 
     // 跌落试验验证
-    if current_data.inspection_result5 != "0" 
-        && other_describe.contains("540") 
-        && current_data.conclusions == 0 
+    if current_data.inspection_result5 != "0"
+        && other_describe.contains("540")
+        && current_data.conclusions == 0
     {
         result.push(CheckResult {
             ok: false,
@@ -298,7 +300,7 @@ fn check_sek_ion_bty_type(
     let inspection_result1 = &current_data.inspection_result1;
 
     if !check_map.get(bty_type)
-        .map_or(false, |values| values.contains(&inspection_result1.as_str())) 
+        .map_or(false, |values| values.contains(&inspection_result1.as_str()))
     {
         result.push(CheckResult {
             ok: false,
@@ -382,9 +384,9 @@ fn check_sek_ion_bty_type(
             });
         }
 
-        if other_describe != "540" 
-            && current_data.unno != "UN3481" 
-            && current_data.unno != "UN3171" 
+        if other_describe != "540"
+            && current_data.unno != "UN3481"
+            && current_data.unno != "UN3171"
         {
             result.push(CheckResult {
                 ok: false,

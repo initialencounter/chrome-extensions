@@ -1,8 +1,8 @@
 use serde::{Deserialize, Serialize};
 
 use crate::models::{
-    transfer_i64_to_other_describe, transfer_str_to_bty_type, transfer_str_to_pek_pkg_info,
-    transfer_str_to_pek_unno, OtherDescribe, PekData, PekPkgInfo, PekUNNO, PkgInfoSubType,
+    OtherDescribe, PekData, PekPkgInfo,
+    PekUNNO, PkgInfoSubType, transfer_i64_to_other_describe, transfer_str_to_bty_type, transfer_str_to_pek_pkg_info, transfer_str_to_pek_unno,
 };
 
 use super::{
@@ -488,8 +488,8 @@ pub fn check_pek_bty_type(current_data: PekData) -> Vec<CheckResult> {
             result.push(CheckResult {
                 ok: false,
                 result:
-                    "结论错误，经包装、电池瓦时、锂含量、净重、电芯类型判断，物品为非限制性货物"
-                        .to_string(),
+                "结论错误，经包装、电池瓦时、锂含量、净重、电芯类型判断，物品为非限制性货物"
+                    .to_string(),
             });
         }
         // UN编号验证

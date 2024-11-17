@@ -16,7 +16,7 @@ pub fn match_watt_hour(project_name: &str) -> f32 {
     }
 
     let mut watt_hour = captures[0];
-    
+
     if project_name.to_lowercase().contains("kwh") {
         watt_hour *= 1000.0;
     }
