@@ -256,8 +256,10 @@ function checkPekBtyType(currentData: PekData) {
         result.push({ ok: false, result: `检验项目5错误，${pkgInfoSubType}不应勾选加贴锂电池标记` })
   }
   // 包装说明
-  if (isDangerous && inspectionItem5Text1 !== '') {
-    result.push({ ok: false, result: '危险品，参见包装说明应为空' })
+  if (isDangerous) {
+    if (inspectionItem5Text1 !== '') {
+      result.push({ ok: false, result: '危险品，参见包装说明应为空' })
+    }
   } else {
     if (isNaN(Number(inspectionItem5Text1))) {
       result.push({ ok: false, result: '非限制性，包装说明应为数字' })
