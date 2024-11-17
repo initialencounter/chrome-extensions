@@ -417,11 +417,6 @@ function checkSekBtyType(currentData: SekData) {
 
   // 包装与其他描述验证
   if (
-    otherDescribe === '540' &&
-    currentData['otherDescribeCAddition'].length > 30
-  )
-    result.push({ ok: false, result: '单独运输，其他描述长度错误' })
-  if (
     otherDescribe === '541' &&
     !currentData['otherDescribeCAddition'].includes('包装') &&
     !currentData['otherDescribeCAddition'].includes('总净重')
