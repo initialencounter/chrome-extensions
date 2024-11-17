@@ -18,17 +18,17 @@ pub struct SekData {
 
     pub bty_count: String,
 
-    pub bty_count_checked: String,
+    pub bty_count_checked: Option<String>,
 
     pub bty_gross_weight: String,
 
-    pub bty_gross_weight_checked: Option<serde_json::Value>,
+    pub bty_gross_weight_checked: Option<String>,
 
     pub bty_kind: String,
 
     pub bty_net_weight: String,
 
-    pub bty_net_weight_checked: String,
+    pub bty_net_weight_checked: Option<String>,
 
     pub bty_shape: String,
 
@@ -52,7 +52,7 @@ pub struct SekData {
 
     pub comment: String,
 
-    pub comment_extra: String,
+    pub comment_extra: Option<String>,
 
     pub conclusions: i64,
 

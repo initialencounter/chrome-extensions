@@ -2,7 +2,7 @@ use lazy_static::lazy_static;
 use regex::Regex;
 
 lazy_static! {
-    static ref WATT_HOUR_REGEX: Regex = Regex::new(r"\s(\d+\.{0,1}\d+)k?[Ww]h").unwrap();
+    static ref WATT_HOUR_REGEX: Regex = Regex::new(r"\s(\d+\.{0,1}\d+)[Kk]?[Ww][Hh]").unwrap();
 }
 
 pub fn match_watt_hour(project_name: &str) -> f32 {
