@@ -1,8 +1,22 @@
+const WASM_MOD_URL = chrome.runtime.getURL('js/wasm/validators.js');
+let mod: any = null;
+const loadWasmModule = async () => {
+  const mod = await import(WASM_MOD_URL);
+
+  // default export is an init function
+  const isOk = await mod.default().catch((e:any) => {
+      console.warn('Failed to init wasm module in content script. Probably CSP of the page has restricted wasm loading.', e);
+      return null;
+  });
+
+  return isOk ? mod : null;
+};
 const systemIdLowercase = window.location.pathname.startsWith('/pek')
   ? 'pek'
   : 'sek'
 const host = window.location.host
   ; (async () => {
+    mod = await loadWasmModule();
     await verifySleep(500)
     if (category !== "battery") return
     if (localConfig.verify === false) {
@@ -1209,9 +1223,11 @@ async function lims_verify_inspect() {
     return { ok: false, result: '未找到当前项目编号的数据' }
   let result = []
   if (systemIdLowercase === 'pek') {
-    result = checkPekBtyType(currentData as PekData)
+    // result = checkPekBtyType(currentData as PekData)
+    result = mod.check_pek_bty(currentData as PekData)
   } else {
-    result = checkSekBtyType(currentData as SekData)
+    // result = checkSekBtyType(currentData as SekData)
+    result = mod.check_sek_bty(currentData as SekData)
   }
   result.push(
     ...(await checkAttchmentFiles(currentData.projectNo, currentData.projectId))
