@@ -1353,7 +1353,7 @@ function getPkgInfoSubType(
   if (!clearPackCargo.length) return inspectionItem5Text1 + ', II' as PkgInfoSubType
   if (clearPackCargo.length < 3) return '' as PkgInfoSubType
   if (clearPackCargo === '952') return '952'
-  let subType = clearPackCargo.slice(-2)
+  let subType = clearPackCargo.replace(/[^A-Z]/g, '')
   return `${clearPackCargo.slice(0, 3)}, ${subType}` as PkgInfoSubType
 }
 
