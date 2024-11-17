@@ -1,4 +1,5 @@
 use wasm_bindgen::prelude::*;
+use serde_wasm_bindgen::from_value;
 
 use models::pek::PekData;
 use models::sek::SekData;
@@ -8,17 +9,17 @@ mod models;
 mod utils;
 
 #[wasm_bindgen]
-pub fn check_pek_bty(data: String) -> String {
-    let data: PekData = serde_json::from_str(&data).unwrap();
+pub fn check_pek_bty(data: JsValue) -> Result<JsValue, JsError> {
+    let data: PekData = from_value(data).unwrap();
     let result = check_pek_bty_type(data);
-    serde_json::to_string(&result).expect("Failed to serialize result")
+    Ok(serde_wasm_bindgen::to_value(&result)?)
 }
 
 #[wasm_bindgen]
-pub fn check_sek_bty(data: String) -> String {
-    let data: SekData = serde_json::from_str(&data).unwrap();
+pub fn check_sek_bty(data: JsValue) -> Result<JsValue, JsError> {
+    let data: SekData = from_value(data).unwrap();
     let result = check_sek_bty_type(data);
-    serde_json::to_string(&result).expect("Failed to serialize result")
+    Ok(serde_wasm_bindgen::to_value(&result)?)
 }
 
 #[cfg(test)]
