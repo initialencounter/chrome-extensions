@@ -40,6 +40,12 @@ let lastCPressTime = 0
     otherDescribeCAddition.style.setProperty('width', '750px')
     otherDescribeCAddition.parentElement?.style.setProperty('width', '758px')
   }
+
+  const wattHourInput = document.getElementById('inspectionItem1Text1') as HTMLInputElement
+  if (wattHourInput && systemId === 'SEKGZ') {
+    wattHourInput.style.setProperty('width', '252px')
+    wattHourInput.parentElement?.style.setProperty('width', '260px')
+  }
   
   // 自定义图标
   if (localConfig.customIcon) {
