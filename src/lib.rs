@@ -1,5 +1,5 @@
-use wasm_bindgen::prelude::*;
 use serde_wasm_bindgen::from_value;
+use wasm_bindgen::prelude::*;
 
 use models::pek::PekData;
 use models::sek::SekData;
@@ -29,10 +29,27 @@ mod tests {
     use super::*;
 
     #[test]
+    fn it_works_single() {
+        let i = 67;
+        let data = fs::read_to_string(format!("tests/data/pek/data{}.json", i)).unwrap();
+        let data: PekData = serde_json::from_str(&data).unwrap();
+        let result = check_pek_bty_type(data);
+        if result.len() > 0 {
+            if result.len() == 1 {}
+            println!("id: ------------  {}", i);
+            println!("{:?}", result);
+        }
+
+        assert_eq!(0, 0);
+    }
+    #[test]
     fn it_works() {
         for i in 1..=164 {
             let data = fs::read_to_string(format!("tests/data/pek/data{}.json", i)).unwrap();
             let data: PekData = serde_json::from_str(&data).unwrap();
+            if data.inspection_item3_text1.is_empty() {
+                println!("id: ------------  {}", i);
+            }
             let result = check_pek_bty_type(data);
             if result.len() > 0 {
                 if result.len() == 1 {
@@ -58,7 +75,6 @@ mod tests {
             }
         }
     }
-
 
     #[test]
     fn prepare_pek_data() {
