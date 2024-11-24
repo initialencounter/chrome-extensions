@@ -1,14 +1,14 @@
 use serde::{Deserialize, Serialize};
 
 use crate::models::{
-    OtherDescribe, PekData, PekPkgInfo,
-    PekUNNO, PkgInfoSubType, transfer_i64_to_other_describe, transfer_str_to_bty_type, transfer_str_to_pek_pkg_info, transfer_str_to_pek_unno,
+    transfer_i64_to_other_describe, transfer_str_to_bty_type, transfer_str_to_pek_pkg_info,
+    transfer_str_to_pek_unno, OtherDescribe, PekData, PekPkgInfo, PekUNNO, PkgInfoSubType,
 };
 
 use super::{
     get_bty_type_code, get_is_cargo_only, get_is_single_cell, get_pkg_info,
     get_pkg_info_by_pack_cargo, get_pkg_info_subtype, get_un_no, is_battery_label,
-    pek_is_dangerous, regex::match_watt_hour,
+    pek_is_dangerous, pkg_info_is_ia, regex::match_watt_hour,
 };
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -95,6 +95,8 @@ pub fn check_pek_bty_type(current_data: PekData) -> Vec<CheckResult> {
     );
     //随机文件
     let inspection_item5 = current_data.inspection_item5;
+    // IA IB
+    let is_ia = pkg_info_is_ia(watt_hour, &pkg_info, li_content, net_weight, is_single_cell);
     // 基本验证
     if item_cname.contains("芯") && !["501", "503"].contains(&bty_type_string.as_str()) {
         result.push(CheckResult {
@@ -488,8 +490,8 @@ pub fn check_pek_bty_type(current_data: PekData) -> Vec<CheckResult> {
             result.push(CheckResult {
                 ok: false,
                 result:
-                "结论错误，经包装、电池瓦时、锂含量、净重、电芯类型判断，物品为非限制性货物"
-                    .to_string(),
+                    "结论错误，经包装、电池瓦时、锂含量、净重、电芯类型判断，物品为非限制性货物"
+                        .to_string(),
             });
         }
         // UN编号验证
@@ -566,6 +568,27 @@ pub fn check_pek_bty_type(current_data: PekData) -> Vec<CheckResult> {
             ok: false,
             result: "瓦时数，锂含量，净重，三者中有非数字，表单验证可能不准确".to_string(),
         });
+    }
+    // IA IB 验证
+    if is_ia {
+        if (matches!(pkg_info_subtype, PkgInfoSubType::Pkg965IB)
+            || matches!(pkg_info_subtype, PkgInfoSubType::Pkg968IB))
+        {
+            result.push(CheckResult {
+                ok: false,
+                result: "应为IA".to_string(),
+            });
+        }
+    }
+    if !is_ia {
+        if (matches!(pkg_info_subtype, PkgInfoSubType::Pkg965IA)
+            || matches!(pkg_info_subtype, PkgInfoSubType::Pkg968IA))
+        {
+            result.push(CheckResult {
+                ok: false,
+                result: "应为IB".to_string(),
+            });
+        }
     }
     // 技术备注验证
     if current_data.market.is_empty() {

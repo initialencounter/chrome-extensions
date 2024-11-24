@@ -1,7 +1,7 @@
 use crate::models::{
-    BtyType, OtherDescribe,
-    PekData, PekPkgInfo, PekUNNO, pkg_info_subtype_from_string, PkgInfoSubType,
-    transfer_pek_pkg_info_to_pkg_info_subtype, transfer_pkg_info_subtype_to_pek_pkg_info,
+    pkg_info_subtype_from_string, transfer_pek_pkg_info_to_pkg_info_subtype,
+    transfer_pkg_info_subtype_to_pek_pkg_info, BtyType, OtherDescribe, PekData, PekPkgInfo,
+    PekUNNO, PkgInfoSubType,
 };
 
 pub fn get_un_no(pkg_info: &PekPkgInfo) -> PekUNNO {
@@ -123,6 +123,40 @@ pub fn get_pkg_info(un_no: &PekUNNO, is_ion: bool, other_describe: &OtherDescrib
             }
         },
     }
+}
+
+pub fn pkg_info_is_ia(
+    watt_hour: f32,
+    pkg_info: &PekPkgInfo,
+    li_content: f32,
+    net_weight: f32,
+    is_single_cell: bool,
+) -> bool {
+    if pkg_info == &PekPkgInfo::Pkg965 {
+        if watt_hour > 100f32 {
+            return true;
+        }
+        if is_single_cell && watt_hour > 20f32 {
+            return true;
+        }
+        if net_weight > 10f32 {
+            return true;
+        }
+        return false;
+    }
+    if pkg_info == &PekPkgInfo::Pkg968 {
+        if li_content > 2f32 {
+            return true;
+        }
+        if is_single_cell && li_content > 1f32 {
+            return true;
+        }
+        if net_weight > 2.5f32 {
+            return true;
+        }
+        return false;
+    }
+    false
 }
 
 pub fn pek_is_dangerous(
