@@ -93,7 +93,6 @@ pub fn check_sek_bty_type(current_data: SekData) -> Vec<CheckResult> {
 
     // 其他描述验证
     let other_describe = &current_data.other_describe;
-    let bty_gross_weight = &current_data.bty_gross_weight;
 
     if other_describe.is_empty() {
         result.push(CheckResult {
@@ -106,20 +105,6 @@ pub fn check_sek_bty_type(current_data: SekData) -> Vec<CheckResult> {
         result.push(CheckResult {
             ok: false,
             result: "其他描述包装方式不唯一".to_string(),
-        });
-    }
-
-    if other_describe == "540" && current_data.bty_gross_weight_checked != Some("1".to_string()) {
-        result.push(CheckResult {
-            ok: false,
-            result: "单独运输，未勾选毛重".to_string(),
-        });
-    }
-
-    if other_describe == "540" && bty_gross_weight.is_empty() {
-        result.push(CheckResult {
-            ok: false,
-            result: "单独运输，毛重不能为空".to_string(),
         });
     }
 
@@ -214,7 +199,8 @@ pub fn check_sek_bty_type(current_data: SekData) -> Vec<CheckResult> {
     if current_data.inspection_result4 != "0" {
         result.push(CheckResult {
             ok: false,
-            result: "检验结果4错误，未勾选该锂电池不属于召回电池，不属于废弃和回收电池。".to_string(),
+            result: "检验结果4错误，未勾选该锂电池不属于召回电池，不属于废弃和回收电池。"
+                .to_string(),
         });
     }
 
@@ -260,7 +246,11 @@ pub fn check_sek_bty_type(current_data: SekData) -> Vec<CheckResult> {
     if ["500", "501", "504"].contains(&bty_type.as_str()) {
         result.extend(check_sek_ion_bty_type(&current_data, &check_map, bty_type));
     } else if ["502", "503", "505"].contains(&bty_type.as_str()) {
-        result.extend(check_sek_metal_bty_type(&current_data, &check_map, bty_type));
+        result.extend(check_sek_metal_bty_type(
+            &current_data,
+            &check_map,
+            bty_type,
+        ));
     }
 
     result
@@ -299,9 +289,9 @@ fn check_sek_ion_bty_type(
     let watt_hour_from_name = match_watt_hour(&current_data.item_c_name);
     let inspection_result1 = &current_data.inspection_result1;
 
-    if !check_map.get(bty_type)
-        .map_or(false, |values| values.contains(&inspection_result1.as_str()))
-    {
+    if !check_map.get(bty_type).map_or(false, |values| {
+        values.contains(&inspection_result1.as_str())
+    }) {
         result.push(CheckResult {
             ok: false,
             result: "检验结果1错误，瓦时数取值范围错误".to_string(),
@@ -384,9 +374,7 @@ fn check_sek_ion_bty_type(
             });
         }
 
-        if other_describe != "540"
-            && current_data.unno != "UN3481"
-            && current_data.unno != "UN3171"
+        if other_describe != "540" && current_data.unno != "UN3481" && current_data.unno != "UN3171"
         {
             result.push(CheckResult {
                 ok: false,
@@ -397,12 +385,14 @@ fn check_sek_ion_bty_type(
         if ["540", "541"].contains(&other_describe.as_str()) && current_data.comment != "1200" {
             result.push(CheckResult {
                 ok: false,
-                result: "结论错误，危险品物品，单独运输或与设备包装在一起，应达到II级包装性能".to_string(),
+                result: "结论错误，危险品物品，单独运输或与设备包装在一起，应达到II级包装性能"
+                    .to_string(),
             });
         }
     }
 
-    if ["≤100Wh", "≤20Wh"].contains(&inspection_result1.as_str()) && current_data.unno != "UN3171" {
+    if ["≤100Wh", "≤20Wh"].contains(&inspection_result1.as_str()) && current_data.unno != "UN3171"
+    {
         // 非限制性验证
         if other_describe == "540" && bty_gross_weight > 30.0 {
             result.push(CheckResult {
@@ -460,11 +450,14 @@ fn check_sek_metal_bty_type(
 
     // 验证锂含量
     let inspection_result1 = &current_data.inspection_result1;
-    let li_content = current_data.inspection_item1_text2.parse::<f32>().unwrap_or(0.0);
+    let li_content = current_data
+        .inspection_item1_text2
+        .parse::<f32>()
+        .unwrap_or(0.0);
 
-    if !check_map.get(bty_type)
-        .map_or(false, |values| values.contains(&inspection_result1.as_str()))
-    {
+    if !check_map.get(bty_type).map_or(false, |values| {
+        values.contains(&inspection_result1.as_str())
+    }) {
         result.push(CheckResult {
             ok: false,
             result: "检验结果1错误，锂含量取值范围错误".to_string(),
@@ -547,7 +540,8 @@ fn check_sek_metal_bty_type(
         if ["540", "541"].contains(&other_describe.as_str()) && current_data.comment != "1200" {
             result.push(CheckResult {
                 ok: false,
-                result: "结论错误，危险品，单独运输或与设备包装在一起，应达到II级包装性能".to_string(),
+                result: "结论错误，危险品，单独运输或与设备包装在一起，应达到II级包装性能"
+                    .to_string(),
             });
         }
     }
