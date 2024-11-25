@@ -225,7 +225,7 @@ async function importTemplate() {
     importBtn.addEventListener('click', handleImportBtnClick)
   }
   // qProjectNo.value = systemId
-  if (localConfig.autoProjectNoPreset){
+  if (!localConfig.autoProjectNoPreset){
     if (systemId.startsWith('PEK')) 
       qProjectNo.value = localConfig.pekProjectNoPreset
     else qProjectNo.value = localConfig.sekProjectNoPreset
