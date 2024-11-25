@@ -15,13 +15,6 @@
       "storage",
       "contextMenus"
     ],
-    "web_accessible_resources": [{
-      "resources": [
-        "js/wasm/validators_bg.wasm",
-        "js/wasm/validators.js"
-      ],
-      "matches": ["<all_urls>"]
-    }],
     "action": {
       "default_popup": "popup/index.html"
     },
@@ -43,6 +36,7 @@
           "assets/message.min.css"
         ],
         "js": [
+          "js/validators.js",
           "js/utils.js",
           "js/hotkey.js",
           "assets/message.min.mjs",
