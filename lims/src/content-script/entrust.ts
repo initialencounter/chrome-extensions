@@ -38,7 +38,7 @@ chrome.storage.sync.get(['assignUser', 'nextYearColor', 'nextYearBgColor', 'onek
   console.log('一键分配脚本运行中...', data)
   if (!(data.onekeyAssign === false)) await insertElement(assignUser)
   // 设置下一年报告颜色
-  removeOrange(data.nextYearColor, data.nextYearBgColor)
+  removeOrange(data.nextYearColor ?? '', data.nextYearBgColor ?? '#76EEC6')
 })
 
 function getIds(): string[] {

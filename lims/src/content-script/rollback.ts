@@ -1,6 +1,6 @@
 ; (async () => {
   chrome.storage.sync.get(['onekeyRollback', 'nextYearColor', 'nextYearBgColor'], async function (result) {
-    removeOrangeRollBack(result.nextYearColor, result.nextYearBgColor)
+    removeOrangeRollBack(result.nextYearColor ?? '', result.nextYearBgColor ?? '#76EEC6')
     await sleepRollBack(500)
     // 替换橘黄色
     if (result.onekeyRollback === false) {
