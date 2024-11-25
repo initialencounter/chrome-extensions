@@ -12,7 +12,7 @@ const localConfig = {
   autoProjectNoPreset: false,
   pekProjectNoPreset: 'PEKGZ2024',
   sekProjectNoPreset: 'SEKGZ2024',
-  enableSetQueryProjectNo: true,
+  enableSetQueryProjectNo: false,
   enableSetImportClassification: true,
   verify: true,
   category: 1,
