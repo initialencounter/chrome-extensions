@@ -209,7 +209,7 @@ function checkPekBtyType(currentData: PekData) : CheckResult[] {
       result: '检验项目4错误，未勾选锂电池已通过 UN38.3 测试'
     })
   // 检查项目5 是否加贴锂电池标记
-  if (isBatteryLabel(pkgInfoSubType, btyShape, btyCount, isCell)) {
+  if (isBatteryLabel(pkgInfoSubType, btyShape)) {
     if (Number(currentData['inspectionItem4']) !== 1)
       if (pkgInfoSubType === '970, II')
         result.push({ ok: false, result: `检验项目5错误，970, II，无特殊情况，应勾选加贴锂电池标记` })

@@ -356,7 +356,7 @@ pub fn check_pek_bty_type(current_data: PekData) -> Vec<CheckResult> {
     }
     // 检查项目5 是否加贴锂电池标记
     let inspection_item4 = current_data.inspection_item4;
-    if is_battery_label(&pkg_info_subtype, &bty_shape, bty_count as i32, is_cell) {
+    if is_battery_label(&pkg_info_subtype, &bty_shape) {
         if inspection_item4 != 1 {
             if matches!(pkg_info_subtype, PkgInfoSubType::Pkg970II) {
                 result.push(CheckResult {

@@ -80,8 +80,6 @@ function getPkgInfo(
 function isBatteryLabel(
   pkgInfoSubType: PkgInfoSubType,
   shape: string,
-  btyCount: number,
-  isCell: boolean
 ): boolean {
   switch (pkgInfoSubType) {
     case '952':
@@ -93,10 +91,7 @@ function isBatteryLabel(
     case '970, I':
       return false;
     case '970, II':
-      if (shape === '8aad92b65aae82c3015ab094788a0026') return false;
-      if (isCell && btyCount < 4) return false;
-      return !(!isCell && btyCount < 2);
-
+      return shape !== '8aad92b65aae82c3015ab094788a0026';
     case '965, IB':
     case '966, II':
     case '967, II':

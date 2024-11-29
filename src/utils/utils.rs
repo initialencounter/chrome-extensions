@@ -62,8 +62,6 @@ pub fn get_pkg_info_by_pack_cargo(
 pub fn is_battery_label(
     pkg_info_sub_type: &PkgInfoSubType,
     shape: &str,
-    bty_count: i32,
-    is_cell: bool,
 ) -> bool {
     return match pkg_info_sub_type {
         PkgInfoSubType::Pkg952 => false,
@@ -73,18 +71,7 @@ pub fn is_battery_label(
         PkgInfoSubType::Pkg968IA => false,
         PkgInfoSubType::Pkg969I => false,
         PkgInfoSubType::Pkg970I => false,
-        PkgInfoSubType::Pkg970II => {
-            if shape == "8aad92b65aae82c3015ab094788a0026" {
-                return false;
-            }
-            if is_cell && bty_count < 4 {
-                return false;
-            }
-            if !is_cell && bty_count < 2 {
-                return false;
-            }
-            true
-        }
+        PkgInfoSubType::Pkg970II => shape != "8aad92b65aae82c3015ab094788a0026",
         PkgInfoSubType::Pkg965IB => true,
         PkgInfoSubType::Pkg966II => true,
         PkgInfoSubType::Pkg967II => true,
