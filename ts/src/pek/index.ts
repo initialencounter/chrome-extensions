@@ -1,11 +1,11 @@
-import {CheckResult, PekData, PekPkgInfo, PekUNNO, PkgInfoSubType} from "../types/index"
+import { CheckResult, PekData, PekPkgInfo, PekUNNO, PkgInfoSubType } from "../types/index"
 import {
   matchWattHour, getBtyTypeCode, getIsSingleCell, pekIsDangerous,
   getPkgInfo, isBatteryLabel, getPkgInfoByPackCargo, getPkgInfoSubType,
   getUNNO, getIsCargoOnly, pkgInfoIsIA
 } from "../utils/index"
 
-function checkPekBtyType(currentData: PekData) : CheckResult[] {
+function checkPekBtyType(currentData: PekData): CheckResult[] {
   const result = []
   const btyType = getBtyTypeCode(currentData)
   // 品名
@@ -212,17 +212,13 @@ function checkPekBtyType(currentData: PekData) : CheckResult[] {
   if (isBatteryLabel(pkgInfoSubType, btyShape)) {
     if (Number(currentData['inspectionItem4']) !== 1)
       if (pkgInfoSubType === '970, II')
-        result.push({ ok: false, result: `检验项目5错误，970, II，无特殊情况，应勾选加贴锂电池标记` })
+        result.push({ ok: false, result: `检验项目5错误，970, II，非纽扣电池，应勾选加贴锂电池标记` })
       else
         result.push({ ok: false, result: `检验项目5错误，${pkgInfoSubType}应勾选加贴锂电池标记` })
   } else {
     if (Number(currentData['inspectionItem4']) !== 0)
       if (pkgInfoSubType === '970, II' && btyShape === '8aad92b65aae82c3015ab094788a0026')
         result.push({ ok: false, result: `检验项目5错误，设备内置纽扣电池不应勾选加贴锂电池标记` })
-      else if (pkgInfoSubType === '970, II' && isCell && btyCount < 4)
-        result.push({ ok: false, result: `检验项目5错误，970, II，电芯数量小于4个不应勾选加贴锂电池标记` })
-      else if (pkgInfoSubType === '970, II' && !isCell && btyCount < 2)
-        result.push({ ok: false, result: `检验项目5错误，970, II，电池数量小于2个不应勾选加贴锂电池标记` })
       else
         result.push({ ok: false, result: `检验项目5错误，${pkgInfoSubType}不应勾选加贴锂电池标记` })
   }
@@ -266,16 +262,16 @@ function checkPekBtyType(currentData: PekData) : CheckResult[] {
     result.push({ ok: false, result: 'DGR规定，资料核实错误，未勾选错误' })
   // 是否属于危险品
   // 危险品
-  if (conclusions === Number(1)) {
+  if (conclusions === 1) {
     if (!isDangerous) {
       result.push({ ok: false, result: '结论错误，经包装、电池瓦时、锂含量、净重、电芯类型判断，物品为非限制性货物' })
     }
-    const UNNO = getUNNO(pkgInfo)
+    const UNNO = getUNNO(pkgInfoByPackCargo, isIon)
     const isCargoOnly = getIsCargoOnly(pkgInfo, netWeight)
     if (isCargoOnly && packPassengerCargo !== 'Forbidden') {
       result.push({ ok: false, result: '结论错误，客货机禁止运输' })
     }
-    if (unno !== UNNO && unno !== 'UN3171') {
+    if (unno !== UNNO) {
       result.push({ ok: false, result: '结论错误，UN编号应为' + UNNO })
     }
     if (String(classOrDiv) !== '9') {
@@ -284,7 +280,7 @@ function checkPekBtyType(currentData: PekData) : CheckResult[] {
     if (inspectionItem5Text1 !== '') {
       result.push({ ok: false, result: '结论错误，危险品，参见包装说明应为空' })
     }
-  } else if (conclusions === Number(0)) {
+  } else if (conclusions === 0) {
     // 非限制性
     if (packCargo !== '') {
       result.push({ ok: false, result: '结论错误，仅限货机应为空' })
@@ -297,9 +293,6 @@ function checkPekBtyType(currentData: PekData) : CheckResult[] {
     }
     if (unno !== '') {
       result.push({ ok: false, result: '结论错误，非限制性，UN编号应为空' })
-    }
-    if (conclusions !== 0 && currentData['unno'] !== 'UN3171') {
-      result.push({ ok: false, result: '结论错误，应为非限制性' })
     }
   }
   if (isNaN(wattHour) && isNaN(liContent) && isNaN(netWeight)) {

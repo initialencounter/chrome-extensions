@@ -4,7 +4,7 @@ use crate::models::{
     PekUNNO, PkgInfoSubType,
 };
 
-pub fn get_un_no(pkg_info: &PekPkgInfo) -> PekUNNO {
+pub fn get_un_no(pkg_info: &PekPkgInfo, is_ion: bool) -> PekUNNO {
     match pkg_info {
         PekPkgInfo::Pkg965 => PekUNNO::UN3480,
         PekPkgInfo::Pkg966 => PekUNNO::UN3481,
@@ -12,6 +12,13 @@ pub fn get_un_no(pkg_info: &PekPkgInfo) -> PekUNNO {
         PekPkgInfo::Pkg968 => PekUNNO::UN3090,
         PekPkgInfo::Pkg969 => PekUNNO::UN3091,
         PekPkgInfo::Pkg970 => PekUNNO::UN3091,
+        PekPkgInfo::Pkg952 => {
+            if is_ion {
+                PekUNNO::UN3556
+            } else {
+                PekUNNO::UN3557
+            }
+        }
         _ => PekUNNO::None,
     }
 }

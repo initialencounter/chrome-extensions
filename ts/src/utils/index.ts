@@ -124,7 +124,8 @@ function getPkgInfoSubType(
 }
 
 function getUNNO(
-  pkgInfo: PekPkgInfo
+  pkgInfo: PekPkgInfo,
+  isIon: boolean
 ): PekUNNO {
   switch (pkgInfo) {
     case '965':
@@ -137,6 +138,8 @@ function getUNNO(
     case '969':
     case '970':
       return 'UN3091'
+    case '952':
+      return isIon ? 'UN3556' : 'UN3557'
   }
   return ''
 }

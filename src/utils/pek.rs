@@ -41,7 +41,7 @@ pub fn check_pek_bty_type(current_data: PekData) -> Vec<CheckResult> {
         .unwrap_or(0.0);
 
     // 电池数量转换
-    let bty_count = current_data.bty_count.parse::<f32>().unwrap_or(0.0);
+    let _bty_count = current_data.bty_count.parse::<f32>().unwrap_or(0.0);
 
     // 净重转换
     let net_weight = current_data.net_weight.parse::<f32>().unwrap_or(0.0);
@@ -361,7 +361,7 @@ pub fn check_pek_bty_type(current_data: PekData) -> Vec<CheckResult> {
             if matches!(pkg_info_subtype, PkgInfoSubType::Pkg970II) {
                 result.push(CheckResult {
                     ok: false,
-                    result: "检验项目5错误，970, II，无特殊情况，应勾选加贴锂电池标记".to_string(),
+                    result: "检验项目5错误，970, II，非纽扣电池，应勾选加贴锂电池标记".to_string(),
                 });
             } else {
                 result.push(CheckResult {
@@ -381,24 +381,6 @@ pub fn check_pek_bty_type(current_data: PekData) -> Vec<CheckResult> {
                 result.push(CheckResult {
                     ok: false,
                     result: "检验项目5错误，设备内置纽扣电池不应勾选加贴锂电池标记".to_string(),
-                });
-            } else if matches!(pkg_info_subtype, PkgInfoSubType::Pkg970II)
-                && is_cell
-                && bty_count < 4.0
-            {
-                result.push(CheckResult {
-                    ok: false,
-                    result: "检验项目5错误，970, II，电芯数量小于4个不应勾选加贴锂电池标记"
-                        .to_string(),
-                });
-            } else if matches!(pkg_info_subtype, PkgInfoSubType::Pkg970II)
-                && !is_cell
-                && bty_count < 2.0
-            {
-                result.push(CheckResult {
-                    ok: false,
-                    result: "检验项目5错误，970, II，电池数量小于2个不应勾选加贴锂电池标记"
-                        .to_string(),
                 });
             } else {
                 result.push(CheckResult {
@@ -495,7 +477,7 @@ pub fn check_pek_bty_type(current_data: PekData) -> Vec<CheckResult> {
             });
         }
         // UN编号验证
-        let un_no = get_un_no(&pkg_info);
+        let un_no = get_un_no(&pkg_info_by_pack_cargo, is_ion);
         // 客货机验证
         let is_cargo_only = get_is_cargo_only(&pkg_info, net_weight as i32);
         if is_cargo_only && pack_passenger_cargo != "Forbidden".to_string() {
@@ -504,7 +486,7 @@ pub fn check_pek_bty_type(current_data: PekData) -> Vec<CheckResult> {
                 result: "结论错误，客货机禁止运输'".to_string(),
             });
         }
-        if unno.clone() != un_no && unno.clone() != PekUNNO::UN3171 {
+        if unno.clone() != un_no {
             result.push(CheckResult {
                 ok: false,
                 result: format!("结论错误，UN编号应为{}", un_no),
@@ -551,13 +533,6 @@ pub fn check_pek_bty_type(current_data: PekData) -> Vec<CheckResult> {
             result.push(CheckResult {
                 ok: false,
                 result: "结论错误，非限制性，UN编号应为空".to_string(),
-            });
-        }
-
-        if conclusions != 0 && unno.clone() != PekUNNO::UN3171 {
-            result.push(CheckResult {
-                ok: false,
-                result: "结论错误，应为非限制性".to_string(),
             });
         }
     }
