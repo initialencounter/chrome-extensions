@@ -86,7 +86,7 @@ async function assignSelectId(uid: string) {
   if (!taskIds) return
   console.log('taskIds:', taskIds)
   await assignTask(taskIds, uid)
-  document.location.reload()
+  entrustReloadDatagrid()
 }
 
 async function entrustSleep(ms: number) {
@@ -256,4 +256,9 @@ function removeOrange(nextYearColor: string, nextYearBgColor: string) {
       target2.style.backgroundColor = nextYearBgColor
     }
   }, 100)
+}
+
+function entrustReloadDatagrid() {
+  const datagrid = $('#etrustDatagrid') as any;
+  datagrid.datagrid('reload');
 }

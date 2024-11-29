@@ -57,7 +57,7 @@ async function rollbackOneKey(taskId: string) {
   }
   // @ts-expect-error: use Qmsg from assets
   Qmsg['success']('退回成功', { timeout: 1000 })
-  document.location.reload()
+  rollbackReloadDatagrid()
 }
 
 // 检验页面
@@ -154,4 +154,9 @@ function removeOrangeRollBack(nextYearColor: string, nextYearBgColor: string) {
       }
     }
   }, 100)
+}
+
+function rollbackReloadDatagrid() {
+  const datagrid = $('#etrustDatagrid') as any;
+  datagrid.datagrid('reload');
 }
