@@ -287,6 +287,13 @@ async function getData(projectId: string): Promise<SekData | PekData | null> {
   return await response.json()
 }
 
+function getCurrentProjectNo() {
+  const projectNoElement = document.getElementById('projectNo') as HTMLInputElement
+  if (!projectNoElement) return null
+  const projectNo = projectNoElement.innerHTML
+  if (!projectNo) return null
+  return projectNo
+}
 
 function getCurrentProjectId() {
   const queryString = window.location.search
@@ -327,19 +334,29 @@ async function lims_verify_inspect() {
   // await testVerify()
   // return
   const currentProjectId = getCurrentProjectId()
-  if (currentProjectId === null)
-    return { ok: false, result: '未找到当前项目编号' }
-  const currentData = await getData(currentProjectId)
-  if (currentData === null)
-    return { ok: false, result: '未找到当前项目编号的数据' }
+  if (currentProjectId === null) {
+    // @ts-expect-error: use Qmsg from assets
+    Qmsg['warning']('获取项目ID失败')
+    return
+  }
+  const projectNo = getCurrentProjectNo()
+  if (!projectNo) {
+    // @ts-expect-error: use Qmsg from assets
+    Qmsg['warning']('获取项目编号失败')
+    return
+  }
+
   let result = []
+  let dataFromForm: PekData | SekData
   if (systemIdLowercase === 'pek') {
-    result = window.checkPekBtyType(currentData as PekData)
+    dataFromForm = getFormData<PekData>(systemIdLowercase)
+    result = window.checkPekBtyType(dataFromForm)
   } else {
-    result = window.checkSekBtyType(currentData as SekData)
+    dataFromForm = getFormData<SekData>(systemIdLowercase)
+    result = window.checkSekBtyType(dataFromForm)
   }
   result.push(
-    ...(await checkAttchmentFiles(currentData.projectNo, currentData.projectId))
+    ...(await checkAttchmentFiles(projectNo, currentProjectId))
   )
   if (!result.length) {
     // @ts-expect-error: use Qmsg from assets
@@ -440,4 +457,200 @@ async function testVerify() {
     }
   }
   console.log(output)
+}
+
+const PekFullData = {
+  "createdBy": "",
+  "createdDate": "",
+  "modifiedBy": "",
+  "modifiedDate": "",
+  "id": "",
+  "projectId": "",
+  "brands": "",
+  "color": "",
+  "model": "",
+  "shape": "",
+  "size": "",
+  "grossWeight": "",
+  "btyCount": "",
+  "netWeight": "",
+  "type1": 1,
+  "type2": 0,
+  "otherDescribe": "",
+  "otherDescribeChecked": "",
+  "otherDescribeCAddition": "",
+  "otherDescribeEAddition": "",
+  "inspectionItem1": 1,
+  "inspectionItem1Text1": "",
+  "inspectionItem1Text2": "",
+  "inspectionItem1Text3": "",
+  "inspectionItem1Text4": "",
+  "inspectionItem2": 1,
+  "inspectionItem2Text1": "",
+  "inspectionItem2Text2": "",
+  "inspectionItem3": 1,
+  "inspectionItem3Text1": "",
+  "inspectionItem4": 1,
+  "inspectionItem4Text1": "",
+  "inspectionItem5": 0,
+  "inspectionItem5Text1": "",
+  "inspectionItem6": 0,
+  "result1": "",
+  "packPassengerCargo": "",
+  "packSubDanger": "",
+  "packCargo": "",
+  "packSpecial": "",
+  "remarks": "",
+  "projectNo": "",
+  "principalName": null,
+  "itemCName": "",
+  "itemEName": "",
+  "checkLocation": "",
+  "checkLocationName": "",
+  "appraiser": "",
+  "appraiserName": "",
+  "appraiseDate": "",
+  "according": "",
+  "conclusions": 0,
+  "unno": "",
+  "psn": "",
+  "classOrDiv": "",
+  "pg": "",
+  "checked": false,
+  "checker": null,
+  "checkerName": null,
+  "checkDate": null,
+  "editStatus": 0,
+  "market": ""
+}
+
+const SekFullData = {
+  "according": "",
+  "appraiseDate": "",
+  "appraiser": "",
+  "appraiserName": "",
+  "btyBrand": "",
+  "btyColor": "",
+  "btyCount": "",
+  "btyCountChecked": "",
+  "btyGrossWeight": "",
+  "btyGrossWeightChecked": "",
+  "btyKind": "",
+  "btyNetWeight": "",
+  "btyNetWeightChecked": "",
+  "btyShape": "",
+  "btySize": "",
+  "btyType": "",
+  "checkDate": 1725614365000,
+  "checked": false,
+  "checker": "",
+  "checkerName": "",
+  "checkLocation": "",
+  "checkLocationName": "",
+  "classOrDiv": "",
+  "comment": "",
+  "commentExtra": "",
+  "conclusions": 0,
+  "createdBy": "",
+  "createdDate": "",
+  "editStatus": 3,
+  "id": "",
+  "inspectionItem1": "",
+  "inspectionItem1Text1": "",
+  "inspectionItem1Text2": "",
+  "inspectionItem2": "",
+  "inspectionItem3": "",
+  "inspectionItem4": "",
+  "inspectionItem5": "",
+  "inspectionItem6": "",
+  "inspectionItem7": "",
+  "inspectionItem8Cn": "",
+  "inspectionItem8En": "",
+  "inspectionItem9Cn": "",
+  "inspectionItem9En": "",
+  "inspectionResult1": "",
+  "inspectionResult2": "",
+  "inspectionResult3": "",
+  "inspectionResult4": "",
+  "inspectionResult5": "",
+  "inspectionResult6": "",
+  "inspectionResult7": "",
+  "inspectionResult8": "",
+  "inspectionResult9": "",
+  "itemCName": "",
+  "itemEName": "",
+  "market": "",
+  "modifiedBy": "",
+  "modifiedDate": "",
+  "otherDescribe": "",
+  "otherDescribeCAddition": "",
+  "otherDescribeChecked": "",
+  "otherDescribeEAddition": "",
+  "pg": "",
+  "principalName": null,
+  "projectId": "",
+  "projectNo": "",
+  "psn": "",
+  "remarks": "",
+  "unno": ""
+}
+
+const PekTypeTransMap = [
+  'type1',
+  'type2',
+  'inspectionItem1',
+  'inspectionItem2',
+  'inspectionItem3',
+  'inspectionItem4',
+  'inspectionItem5',
+  'inspectionItem6',
+  'conclusions',
+]
+
+const SekTypeTransMap = [
+  'conclusions',
+]
+function getFormData<T>(systemId: 'pek' | 'sek'): T {
+  const form = document.querySelector("#batteryInspectForm") as HTMLFormElement;
+  // 获取表单数据
+  const formData = new FormData(form);
+  const data: Partial<T> = {};
+
+  // 遍历 FormData 并构建数据对象
+  for (const [name, value] of formData.entries()) {
+    if (data[name as keyof Partial<T>]) {
+      // 如果已存在该字段，添加逗号并附加新值
+      data[name as keyof Partial<T>] = (data[name as keyof Partial<T>] + `,${value}`) as T[keyof T];
+    } else {
+      // 如果是新字段，直接赋值
+      data[name as keyof Partial<T>] = value as T[keyof T];
+    }
+  }
+
+  if (systemId === 'pek') {
+    Object.keys(PekFullData).forEach(key => {
+      if (data[key as keyof Partial<T>] === undefined) {
+        // @ts-ignore
+        data[key as keyof Partial<T>] = PekFullData[key]
+      }
+    });
+    PekTypeTransMap.forEach(key => {
+      if (data[key as keyof Partial<T>] !== undefined) {
+        data[key as keyof Partial<T>] = Number(data[key as keyof Partial<T>]) as T[keyof T]
+      }
+    })
+  } else {
+    Object.keys(SekFullData).forEach(key => {
+      if (data[key as keyof Partial<T>] === undefined) {
+        // @ts-ignore
+        data[key as keyof Partial<T>] = SekFullData[key]
+      }
+    });
+    SekTypeTransMap.forEach(key => {
+      if (data[key as keyof Partial<T>] !== undefined) {
+        data[key as keyof Partial<T>] = Number(data[key as keyof Partial<T>]) as T[keyof T]
+      }
+    })
+  }
+  return data as T;
 }
