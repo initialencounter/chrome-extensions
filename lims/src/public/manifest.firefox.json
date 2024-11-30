@@ -71,11 +71,15 @@
         "matches": [
           "https://*/sales/entrust/main"
         ],
+        "css": [
+          "assets/message.min.css"
+        ],
         "all_frames": true,
         "js": [
           "js/utils.js",
           "js/entrustMain.js",
-          "js/entrustEname.js"
+          "js/entrustEname.js",
+          "assets/message.min.mjs"
         ]
       },
       {

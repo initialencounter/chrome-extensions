@@ -53,9 +53,8 @@ function getIds(): string[] {
   })
 }
 
-async function checkAssignUID(uid: string) {
+async function checkAssignUID(users: User[], uid: string) {
   if (!uid) return false
-  const users = await getUsers()
   if (!users.length) return false
   for (let i = 0; i < users.length; i++) {
     if (users[i].userId === uid) return true
@@ -218,7 +217,7 @@ async function insertElement(uid: string) {
     option.innerText = user.userName
     select.appendChild(option)
   })
-  if (await checkAssignUID(uid)) select.value = uid
+  if (await checkAssignUID(users, uid)) select.value = uid
   div.appendChild(select)
 
   targetParent.appendChild(div)
