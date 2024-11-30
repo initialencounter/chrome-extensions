@@ -53,6 +53,7 @@ let globalAssignUser = ''
     setMoonPay()
     setCategory()
     setAmountListener()
+    insertReloadButton()
     chrome.storage.sync.get(['assignUser', 'saveAndAssign'], async function (data) {
       const assignUser = data.assignUser as string
       globalAssignUser = assignUser
@@ -397,4 +398,23 @@ async function assignTask(taskIds: string[], uid: string) {
     // @ts-expect-error: use Qmsg from assets
     Qmsg['error']('分配失败')
   }
+}
+
+function insertReloadButton() {
+  const parentElement = document.querySelector("body > div.panel.easyui-fluid > div.easyui-panel.panel-body")
+  if (!parentElement) return
+  const reloadButton = document.createElement('a')
+  reloadButton.href = 'javascript:void(0);'
+  reloadButton.className = 'easyui-linkbutton l-btn l-btn-small'
+  reloadButton.dataset.options = 'width:120'
+  reloadButton.style.width = '118.4px'
+  reloadButton.innerHTML = `
+  <span class="l-btn-left" style="margin-top: 0px;">
+    <span class="l-btn-text">刷新页面</span>
+  </span>
+  `
+  reloadButton.onclick = () => {
+    document.location.reload()
+  }
+  parentElement.appendChild(reloadButton)
 }
