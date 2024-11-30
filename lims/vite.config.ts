@@ -21,12 +21,20 @@ export default defineConfig({
         rollback: resolve(__dirname, 'src/content-script/rollback.ts'),
         checkList: resolve(__dirname, 'src/content-script/checkList.ts'),
         entrustEname: resolve(__dirname, 'src/content-script/entrustEname.ts'),
+        entrustImport: resolve(__dirname, 'src/content-script/entrustImport.ts'),
       },
       output: {
         entryFileNames: 'js/[name].js',
       },
     },
     minify: false,
+  },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        api: "modern-compiler",
+      },
+    },
   },
   resolve: {
     alias: {

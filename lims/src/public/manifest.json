@@ -73,6 +73,16 @@
     },
     {
       "matches": [
+        "https://*/sales/entrust/dict/main?callback=entrust_dict_callback"
+      ],
+      "all_frames": true,
+      "js": [
+        "js/utils.js",
+        "js/entrustImport.js"
+      ]
+    },
+    {
+      "matches": [
         "https://*/flow/inspect/inspect/main"
       ],
       "all_frames": true,
