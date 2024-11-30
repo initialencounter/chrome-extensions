@@ -27,3 +27,4 @@ yarn.lock
 *.svg
 cache
 dist
+notes

@@ -10,7 +10,7 @@
     "paths": {
       "@/*": ["src/*"]
     },
-    "types": ["chrome", "@types/jquery"],
+    "types": ["chrome"],
     "outDir": "./dist"
   },
   "include": ["src/**/*.ts"],
