@@ -50,6 +50,7 @@ let globalAssignUser = ''
       return
     }
     console.log('委托单脚本运行中...')
+    createMask()
     setMoonPay()
     setCategory()
     setAmountListener()
@@ -242,6 +243,7 @@ async function getUsers(): Promise<User[]> {
 async function saveAndAssign() {
   if (assignRunning) return
   assignRunning = true
+  showMask()
   try {
     const select = document.getElementById(
       'lims_onekey_assign_user'
@@ -249,6 +251,7 @@ async function saveAndAssign() {
     const selectUid = select.value
     if (!selectUid) {
       assignRunning = false
+      hideMask()
       return
     }
     if (globalAssignUser !== selectUid) {
@@ -258,11 +261,13 @@ async function saveAndAssign() {
     let data: EntrustFormData | undefined = getEntrustFormData()
     if (!data) {
       assignRunning = false
+      hideMask()
       return
     }
     const id = await saveFormData(data)
     if (!id) {
       assignRunning = false
+      hideMask()
       return
     }
     await okAssignTask(id, selectUid)
@@ -270,6 +275,7 @@ async function saveAndAssign() {
     console.error(error)
   } finally {
     assignRunning = false
+    hideMask()
   }
 }
 
@@ -417,4 +423,48 @@ function insertReloadButton() {
     document.location.reload()
   }
   parentElement.appendChild(reloadButton)
+}
+
+function createMask() {
+  const mask = document.createElement('div')
+  mask.id = 'assignMask'
+  mask.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  `
+  
+  const loadingText = document.createElement('div')
+  loadingText.style.cssText = `
+    color: white;
+    font-size: 20px;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 20px 40px;
+    border-radius: 8px;
+  `
+  loadingText.textContent = '正在处理中...'
+  
+  mask.appendChild(loadingText)
+  document.body.appendChild(mask)
+}
+
+function showMask() {
+  const mask = document.getElementById('assignMask')
+  if (mask) {
+    mask.style.display = 'flex'
+  }
+}
+
+function hideMask() {
+  const mask = document.getElementById('assignMask')
+  if (mask) {
+    mask.style.display = 'none'
+  }
 }
