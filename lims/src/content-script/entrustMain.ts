@@ -1,3 +1,36 @@
+interface Task {
+  assignee: string
+  attchmentFiles: string[]
+  backId: null
+  category: string
+  comment: null
+  companyName: string
+  completeTime: null
+  completeUser: null
+  createTime: number
+  entrustId: string
+  freezed: boolean
+  id: string
+  itemCName: string
+  itemSendSample: number
+  nextYear: boolean
+  parallel: boolean
+  projectDate: number
+  projectId: string
+  projectNo: string
+  serviceType: number
+  submitDate: string
+  submitUser: string
+  submitUserName: string
+  systemId: string
+  taskName: string
+}
+
+interface User {
+  userId: string
+  userName: string
+}
+
 export interface EntrustFormData {
   amount: string;
   category: string;

@@ -31,14 +31,97 @@ interface User {
   userName: string
 }
 
+interface EntrustList {
+  rows: EntrustRow[];
+  total: number;
+}
+
+interface EntrustRow {
+  amount?: number;
+  category?: null;
+  checkLocation?: null;
+  checkLocationName?: string;
+  contractId?: null;
+  createdBy?: null;
+  createdDate?: string;
+  destination?: null;
+  displayStatus?: string;
+  editStatus?: number;
+  entrustNo?: string;
+  freezed?: string;
+  id?: string;
+  images?: null;
+  itemAttachFile?: null;
+  itemBrand?: null;
+  itemCName?: string;
+  itemColor?: null;
+  itemDanger?: boolean;
+  itemDangerReason?: null;
+  itemDesc?: null;
+  itemEName?: null;
+  itemFlashPoint?: null;
+  itemMeltingPoint?: null;
+  itemNameChanged?: boolean;
+  itemOtherAttachFileDetail?: null;
+  itemSampleHandle?: number;
+  itemSampleHandleOther?: null;
+  itemSendSample?: number;
+  itemSmell?: null;
+  itemSpec?: null;
+  itemStatus?: null;
+  manufacturersCName?: null;
+  manufacturersEName?: null;
+  market?: string;
+  modifiedBy?: null;
+  modifiedDate?: null;
+  nextYear?: boolean;
+  owner?: null;
+  ownerName?: null;
+  paymentCompany?: null;
+  paymentCompanyContact?: null;
+  paymentCompanyContactName?: null;
+  paymentCompanyName?: null;
+  payStatus?: number;
+  payType?: number;
+  pieces?: null;
+  principal?: string;
+  principalContact?: null;
+  principalContactName?: null;
+  principalEName?: null;
+  principalExhort?: number;
+  principalExhortDetail?: null;
+  principalName?: string;
+  projectId?: string;
+  projectNo?: string;
+  repeat?: string;
+  reportCopy?: number;
+  reportCreated?: boolean;
+  reportLocation?: null;
+  reportLocationName?: string;
+  reportPrinted?: boolean;
+  reportType?: number;
+  reportWay?: number;
+  sampleReceived?: boolean;
+  serviceType?: number;
+  submitDate?: null;
+  systemId?: null;
+  techRemark?: null;
+  trustee?: null;
+  trusteeName?: null;
+  waybillNo?: null;
+  webSignature?: boolean;
+  webWt?: boolean;
+}
+
 let globalAssignUser = ''
 let globalCheckAssignUser = true
-chrome.storage.sync.get(['assignUser', 'nextYearColor', 'nextYearBgColor', 'onekeyAssign', 'checkAssignUser'], async function (data) {
+chrome.storage.sync.get(['assignUser', 'nextYearColor', 'nextYearBgColor', 'onekeyAssign', 'checkAssignUser', 'showInspectFormLink'], async function (data) {
   const assignUser = data.assignUser as string
   globalAssignUser = assignUser
   globalCheckAssignUser = data.checkAssignUser === false ? false : true
   console.log('一键分配脚本运行中...', data)
   if (!(data.onekeyAssign === false)) await insertElement(assignUser)
+  if (!(data.showInspectFormLink === false)) observeItemNumberList1()
   // 设置下一年报告颜色
   removeOrange(data.nextYearColor ?? '', data.nextYearBgColor ?? '#76EEC6')
 })
@@ -261,4 +344,118 @@ function removeOrange(nextYearColor: string, nextYearBgColor: string) {
       target2.style.backgroundColor = nextYearBgColor
     }
   }, 100)
+}
+
+let globalItemNumberList1: string[] = []
+let globalItemNumberList2: EntrustRow[] = []
+
+async function insertInspectFormLink(length1: number) {
+  let url = getInspectFormUpdateUrl()
+  await updateGlobalItemNumberList2(url)
+  if (!url) return
+  console.log(url)
+  let projectIdMap: Record<string, number> = {}
+  for (let j = 0; j < globalItemNumberList2.length; j++) {
+    // @ts-ignore
+    projectIdMap[globalItemNumberList2[j]['projectNo']] = j
+  }
+  for (let i = 0; i < length1; i++) {
+    let targetIndex: number | undefined = projectIdMap[globalItemNumberList1[i]]
+    if (targetIndex === undefined) continue
+    const params = new URLSearchParams({
+      projectId: globalItemNumberList2[targetIndex]['projectId'] ?? '',
+      entrustId: globalItemNumberList2[targetIndex]['id'] ?? '',
+      category: 'battery',
+      from: 'query'
+    })
+    let link = `/pek/inspect?${params.toString()}`
+    console.log(link)
+    const itemCNameElement = document.querySelector(`#datagrid-row-r1-2-${i} > td:nth-child(3) > div`) as HTMLDivElement
+    if (!itemCNameElement) {
+      console.log('itemCNameElement not found', i)
+      continue
+    }
+    const operateElement = document.querySelector(`#datagrid-row-r1-2-${i} > td:nth-child(14) > div`) as HTMLAnchorElement
+    if (operateElement) {
+      const inspectElement = document.createElement('a')
+      inspectElement.href = link
+      inspectElement.target = '_blank'
+      inspectElement.innerHTML = '检验单'
+      operateElement.appendChild(document.createTextNode(' '))
+      operateElement.appendChild(inspectElement)
+    }
+    let itemCName = itemCNameElement.innerHTML
+    const innerHTML = `<a href="${link}" target="_blank" style="text-decoration: none; color: inherit;"
+    onmouseover="this.style.textDecoration='underline'; this.style.color='blue';" 
+    onmouseout="this.style.textDecoration='none'; this.style.color='inherit';">${itemCName}</a>`
+    itemCNameElement.innerHTML = innerHTML
+  }
+}
+
+
+function getInspectFormUpdateUrl(): string {
+  const startDate = (document.querySelector("#toolbar > form > table > tbody > tr:nth-child(2) > td:nth-child(4) > span:nth-child(2) > input.textbox-text.validatebox-text") as HTMLInputElement)?.value
+  const endDate = (document.querySelector("#toolbar > form > table > tbody > tr:nth-child(2) > td:nth-child(4) > span:nth-child(4) > input.textbox-text.validatebox-text") as HTMLInputElement)?.value
+  if (!startDate || !endDate) return ''
+  const systemId = (document.querySelector("#toolbar > form > table > tbody > tr:nth-child(1) > td:nth-child(2) > span > input.textbox-value") as HTMLInputElement)?.value ?? ''
+  const reportTypeString =  (document.querySelector("#toolbar > form > table > tbody > tr:nth-child(1) > td:nth-child(4) > span > input.textbox-text.validatebox-text") as HTMLInputElement).value ?? ''
+  let reportType = ''
+  if (reportTypeString === '全部') reportType = ''
+  if (reportTypeString === '初验') reportType = '0'
+  if (reportTypeString === '换证') reportType = '1'
+  const principal = (document.querySelector("#principal") as HTMLInputElement)?.value ?? ''
+  const itemCEName = (document.querySelector("#itemCEName") as HTMLInputElement)?.value ?? ''
+  let pyType = (document.querySelector("#toolbar > form > table > tbody > tr:nth-child(2) > td:nth-child(2) > span > input.textbox-text.validatebox-text") as HTMLInputElement)?.value ?? ''
+  if (pyType === '全部') pyType = ''
+  if (pyType === '现结') pyType = '0'
+  if (pyType === '月结') pyType = '1'
+  const rows = (document.querySelector("body > div.panel.easyui-fluid > div.easyui-panel.panel-body.panel-noscroll > div > div > div.datagrid-pager.pagination > table > tbody > tr > td:nth-child(1) > select") as HTMLInputElement)?.value ?? '10'
+  let pages = (document.querySelector("body > div.panel.easyui-fluid > div.easyui-panel.panel-body.panel-noscroll > div > div > div.datagrid-pager.pagination > table > tbody > tr > td:nth-child(7) > input") as HTMLInputElement)?.value ?? '1'
+  if (pages === '0') pages = '1'
+  const url = `${window.location.origin}/rest/sales/entrust?systemId=${systemId}&reportType=${reportType
+    }&principal=${principal}&itemCEName=${itemCEName}&payType=${pyType}&startDate=${startDate}&endDate=${endDate}&page=${pages}&rows=${rows}`
+  return url
+}
+
+function updateGlobalItemNumberList1(): string[] {
+  const dataGridRow1 =  document.querySelector("#datagrid-row-r1-1-0")
+  if (!dataGridRow1) return []
+  const gridElement = dataGridRow1.parentElement
+  if (!gridElement) return []
+  const dataGridRows = gridElement.childNodes.length
+  const itemNumberList1: string[] = []
+  for (let i = 0; i < dataGridRows; i++) {
+    const itemNumberElement = document.querySelector(`#datagrid-row-r1-1-${i} > td:nth-child(3) > div > a`) as HTMLAnchorElement
+    if (itemNumberElement) itemNumberList1.push(itemNumberElement.innerText)
+  }
+  globalItemNumberList1 = itemNumberList1
+  return itemNumberList1
+}
+
+async function updateGlobalItemNumberList2(link: string) {
+  const response = await fetch(link)
+  if (!response.ok) return []
+  const data: EntrustList = await response.json()
+  const itemNumberList2: EntrustRow[] = data['rows']
+  globalItemNumberList2 = itemNumberList2
+}
+
+function observeItemNumberList1() {
+  setInterval(async () => {
+    updateGlobalItemNumberList1()
+    let length1 = globalItemNumberList1.length
+    let length2 = globalItemNumberList2.length
+    if (length1 !== length2) {
+      console.log('监听到长度变化', length1, length2)
+      insertInspectFormLink(length1)
+    }else {
+      for (let i = 0; i < (length1 > length2 ? length1 : length2); i++) {
+        if (globalItemNumberList1[i] !== globalItemNumberList2[i]['projectNo']) {
+          console.log('监听到变化', globalItemNumberList1[i], globalItemNumberList2[i]['projectNo'])
+          insertInspectFormLink(length1)
+          break
+        }
+      }
+    }
+  }, 1000)
 }
