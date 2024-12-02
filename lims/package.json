@@ -1,6 +1,6 @@
 {
   "name": "lims",
-  "version": "1.7.4",
+  "version": "1.7.5",
   "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
   "private": true,
   "workspaces": [
