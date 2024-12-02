@@ -174,7 +174,8 @@ async function assignSelectId(uid: string) {
   if (!taskIds) return
   console.log('taskIds:', taskIds)
   await assignTask(taskIds, uid)
-  document.location.reload()
+  const refreshButton = document.querySelector("body > div.panel.easyui-fluid > div.easyui-panel.panel-body.panel-noscroll > div > div > div.datagrid-pager.pagination > table > tbody > tr > td:nth-child(13) > a") as HTMLAnchorElement
+  if (refreshButton) refreshButton.click()
 }
 
 async function entrustSleep(ms: number) {

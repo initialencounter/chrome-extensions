@@ -57,7 +57,8 @@ async function rollbackOneKey(taskId: string) {
   }
   // @ts-expect-error: use Qmsg from assets
   Qmsg['success']('退回成功', { timeout: 1000 })
-  document.location.reload()
+  const refreshButton = document.querySelector("body > div.panel.easyui-fluid > div.easyui-panel.panel-body.panel-noscroll > div > div > div.datagrid-pager.pagination > table > tbody > tr > td:nth-child(13) > a") as HTMLAnchorElement
+  if (refreshButton) refreshButton.click()
 }
 
 // 检验页面
