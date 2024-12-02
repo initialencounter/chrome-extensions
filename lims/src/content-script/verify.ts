@@ -656,7 +656,7 @@ function getFormData<T>(systemId: 'pek' | 'sek'): T {
   const data: Partial<T> = {};
 
   // 遍历 FormData 并构建数据对象
-  for (const [name, value] of formData.entries()) {
+  formData.forEach((value, name) => {
     if (data[name as keyof Partial<T>]) {
       // 如果已存在该字段，添加逗号并附加新值
       data[name as keyof Partial<T>] = (data[name as keyof Partial<T>] + `,${value}`) as T[keyof T];
@@ -664,7 +664,7 @@ function getFormData<T>(systemId: 'pek' | 'sek'): T {
       // 如果是新字段，直接赋值
       data[name as keyof Partial<T>] = value as T[keyof T];
     }
-  }
+  })
 
   if (systemId === 'pek') {
     Object.keys(PekFullData).forEach(key => {
