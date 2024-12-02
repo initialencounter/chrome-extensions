@@ -40,6 +40,7 @@ const host = window.location.host
     const targetParent = targetChild.parentElement
     if (!targetParent) return
     const verifyButton = document.createElement('a')
+    verifyButton.id = 'lims-verifyButton'
     verifyButton.href = 'javascript:void(0);'
     verifyButton.className = 'easyui-linkbutton l-btn l-btn-small'
     verifyButton.style.background = '#ffffff'
@@ -54,16 +55,42 @@ const host = window.location.host
     verifyButton.innerHTML = `
     <span class="l-btn-left l-btn-icon-left">
       <span class="l-btn-text">验证</span>
-      <svg class="l-btn-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#78A75A"><path d="m344-60-76-128-144-32 14-148-98-112 98-112-14-148 144-32 76-128 136 58 136-58 76 128 144 32-14 148 98 112-98 112 14 148-144 32-76 128-136-58-136 58Zm34-102 102-44 104 44 56-96 110-26-10-112 74-84-74-86 10-112-110-24-58-96-102 44-104-44-56 96-110 24 10 112-74 86 74 84-10 114 110 24 58 96Zm102-318Zm-42 142 226-226-56-58-170 170-86-84-56 56 142 142Z"/></svg>
+      <svg class="l-btn-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#bbbbbb"><path d="m344-60-76-128-144-32 14-148-98-112 98-112-14-148 144-32 76-128 136 58 136-58 76 128 144 32-14 148 98 112-98 112 14 148-144 32-76 128-136-58-136 58Zm34-102 102-44 104 44 56-96 110-26-10-112 74-84-74-86 10-112-110-24-58-96-102 44-104-44-56 96-110 24 10 112-74 86 74 84-10 114 110 24 58 96Zm102-318Zm-42 142 226-226-56-58-170 170-86-84-56 56 142 142Z"/></svg>
     </span>
     `
     // verifyButton.onclick = testVerify
     verifyButton.onclick = lims_verify_inspect
+    const verifyButton2 = document.createElement('a')
+    verifyButton2.id = 'lims-verifyButton2'
+    verifyButton2.href = 'javascript:void(0);'
+    verifyButton2.className = 'easyui-linkbutton l-btn l-btn-small'
+    verifyButton2.style.background = '#ffffff'
+    verifyButton2.onmouseover = function () {
+      verifyButton2.style.background = '#54a124'
+    }
+    verifyButton2.onmouseout = function () {
+      verifyButton2.style.background = '#ffffff'
+    }
+    verifyButton2.innerHTML = `
+    <span class="l-btn-left l-btn-icon-left">
+      <span class="l-btn-text">验证</span>
+      <svg class="l-btn-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#bbbbbb"><path d="m344-60-76-128-144-32 14-148-98-112 98-112-14-148 144-32 76-128 136 58 136-58 76 128 144 32-14 148 98 112-98 112 14 148-144 32-76 128-136-58-136 58Zm34-102 102-44 104 44 56-96 110-26-10-112 74-84-74-86 10-112-110-24-58-96-102 44-104-44-56 96-110 24 10 112-74 86 74 84-10 114 110 24 58 96Zm102-318Zm-42 142 226-226-56-58-170 170-86-84-56 56 142 142Z"/></svg>
+    </span>
+    `
+    verifyButton2.onclick = lims_verify_inspect
+    const targetChild2 = document.getElementById('importBtn')
+    if (!targetChild2) return
+    const targetParent2 = targetChild2.parentElement
+    if (!targetParent2) return
+    targetParent2.appendChild(verifyButton2)
     const submit = document.getElementById('submitBtn0')
+    const submit2 = document.getElementById('submitBtn')
     if (isInspect && submit) {
       targetParent.insertBefore(verifyButton, submit)
+      targetParent2.insertBefore(verifyButton2, submit2)
     } else {
       targetParent.appendChild(verifyButton)
+      targetParent2.appendChild(verifyButton2)
     }
     console.log('验证按钮插入成功')
   })()
@@ -367,6 +394,10 @@ async function lims_verify_inspect() {
     ...(await checkAttchmentFiles(projectNo, currentProjectId))
   )
   if (!result.length) {
+    const verifyButton = document.getElementById('lims-verifyButton')?.children[0]?.children[1] as SVGAElement
+    const verifyButton2 = document.getElementById('lims-verifyButton2')?.children[0]?.children[1] as SVGAElement
+    if (verifyButton) verifyButton.setAttribute('fill', '#54a124')
+    if (verifyButton2) verifyButton2.setAttribute('fill', '#54a124')
     // @ts-expect-error: use Qmsg from assets
     Qmsg['success']('初步验证通过')
     return
