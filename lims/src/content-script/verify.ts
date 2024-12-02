@@ -3,6 +3,7 @@ declare global {
   function checkSekBtyType(data: SekData): Array<{ ok: boolean; result: string }>
 }
 
+const isInspect = new URLSearchParams(window.location.search).get('from') === null;
 const manifest = chrome.runtime.getManifest();
 const WASM_MOD_URL = chrome.runtime.getURL('js/wasm/validators.js');
 const WASM_ENABLE = JSON.stringify(manifest?.web_accessible_resources)?.includes('js/wasm/validators.js')
@@ -42,6 +43,7 @@ const host = window.location.host
     verifyButton.href = 'javascript:void(0);'
     verifyButton.className = 'easyui-linkbutton l-btn l-btn-small'
     verifyButton.style.background = '#ffffff'
+    // verifyButton.style.margin = '0 3px 0 3px'
     // hover
     verifyButton.onmouseover = function () {
       verifyButton.style.background = '#54a124'
@@ -50,13 +52,19 @@ const host = window.location.host
       verifyButton.style.background = '#ffffff'
     }
     verifyButton.innerHTML = `
-    <span class="l-btn-left" style="margin-top: 0px;">
-        <span class="l-btn-text">验证</span>
+    <span class="l-btn-left l-btn-icon-left">
+      <span class="l-btn-text">验证</span>
+      <svg class="l-btn-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#78A75A"><path d="m344-60-76-128-144-32 14-148-98-112 98-112-14-148 144-32 76-128 136 58 136-58 76 128 144 32-14 148 98 112-98 112 14 148-144 32-76 128-136-58-136 58Zm34-102 102-44 104 44 56-96 110-26-10-112 74-84-74-86 10-112-110-24-58-96-102 44-104-44-56 96-110 24 10 112-74 86 74 84-10 114 110 24 58 96Zm102-318Zm-42 142 226-226-56-58-170 170-86-84-56 56 142 142Z"/></svg>
     </span>
     `
     // verifyButton.onclick = testVerify
     verifyButton.onclick = lims_verify_inspect
-    targetParent.appendChild(verifyButton)
+    const submit = document.getElementById('submitBtn0')
+    if (isInspect && submit) {
+      targetParent.insertBefore(verifyButton, submit)
+    } else {
+      targetParent.appendChild(verifyButton)
+    }
     console.log('验证按钮插入成功')
   })()
 
