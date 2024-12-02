@@ -89,6 +89,7 @@ let globalCheckAssignUser = true
     setCategory()
     setAmountListener()
     insertReloadButton()
+    startFollow()
     chrome.storage.sync.get(['assignUser', 'saveAndAssign', 'checkAssignUser'], async function (data) {
       const assignUser = data.assignUser as string
       globalAssignUser = assignUser
@@ -172,7 +173,7 @@ function setTagNextYear() {
 }
 
 async function insertSaveAndAssignButton(uid: string) {
-  const parentElement = document.querySelector("body > div.panel.easyui-fluid > div.easyui-panel.panel-body")
+  const parentElement = document.querySelector("#entrustBottomFollower")
   if (!parentElement) return
 
   // select
@@ -448,6 +449,11 @@ async function assignTask(taskIds: string[], uid: string) {
 function insertReloadButton() {
   const parentElement = document.querySelector("body > div.panel.easyui-fluid > div.easyui-panel.panel-body")
   if (!parentElement) return
+  const bottomElement = document.createElement('div')
+  bottomElement.id = 'entrustBottomFollower'
+  bottomElement.style.cssText = `
+    position: relative;
+  `
   const reloadButton = document.createElement('a')
   reloadButton.href = 'javascript:void(0);'
   reloadButton.className = 'easyui-linkbutton l-btn l-btn-small'
@@ -461,7 +467,8 @@ function insertReloadButton() {
   reloadButton.onclick = () => {
     document.location.reload()
   }
-  parentElement.appendChild(reloadButton)
+  bottomElement.appendChild(reloadButton)
+  parentElement.appendChild(bottomElement)
 }
 
 function createMask() {
@@ -505,5 +512,30 @@ function hideMask() {
   const mask = document.getElementById('assignMask')
   if (mask) {
     mask.style.display = 'none'
+  }
+}
+
+function updatePosition(target: HTMLElement, follower: HTMLElement) {
+  const update = () => {
+    const targetRect = target.getBoundingClientRect();
+    follower.style.left = targetRect.left + 'px';
+    animationFrameId = requestAnimationFrame(update);
+  };
+  
+  let animationFrameId = requestAnimationFrame(update);
+  
+  return () => {
+    cancelAnimationFrame(animationFrameId);
+  };
+}
+
+function startFollow() {
+  const target = document.querySelector("#entrustEditForm > table > tbody") as HTMLElement;
+  const follower = document.querySelector("#entrustBottomFollower") as HTMLElement;
+  
+  if (target && follower) {
+    const cleanup = updatePosition(target, follower);
+    
+    window.addEventListener('unload', cleanup);
   }
 }
