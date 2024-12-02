@@ -32,9 +32,11 @@ interface User {
 }
 
 let globalAssignUser = ''
-chrome.storage.sync.get(['assignUser', 'nextYearColor', 'nextYearBgColor', 'onekeyAssign'], async function (data) {
+let globalCheckAssignUser = true
+chrome.storage.sync.get(['assignUser', 'nextYearColor', 'nextYearBgColor', 'onekeyAssign', 'checkAssignUser'], async function (data) {
   const assignUser = data.assignUser as string
   globalAssignUser = assignUser
+  globalCheckAssignUser = data.checkAssignUser === false ? false : true
   console.log('一键分配脚本运行中...', data)
   if (!(data.onekeyAssign === false)) await insertElement(assignUser)
   // 设置下一年报告颜色
@@ -72,6 +74,10 @@ async function getUsers(): Promise<User[]> {
 }
 
 async function assignSelectId(uid: string) {
+  if (uid === '2c91808478367c2801788230b248470e' && globalCheckAssignUser) {
+    let res = confirm('确定主检员是正确的吗？')
+    if (!res) return
+  }
   const ids = getIds()
   if (!ids.length) return
   console.log('assignSelectId:', ids)

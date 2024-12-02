@@ -43,6 +43,7 @@ export interface EntrustFormData {
 }
 let assignRunning = false
 let globalAssignUser = ''
+let globalCheckAssignUser = true
   ; (async () => {
     await sleep(500)
     if (localConfig.enableSetEntrust === false) {
@@ -55,9 +56,10 @@ let globalAssignUser = ''
     setCategory()
     setAmountListener()
     insertReloadButton()
-    chrome.storage.sync.get(['assignUser', 'saveAndAssign'], async function (data) {
+    chrome.storage.sync.get(['assignUser', 'saveAndAssign', 'checkAssignUser'], async function (data) {
       const assignUser = data.assignUser as string
       globalAssignUser = assignUser
+      globalCheckAssignUser = data.checkAssignUser === false ? false : true
       console.log('保存并分配脚本运行中...', data)
       if (!(data.saveAndAssign === false)) await insertSaveAndAssignButton(assignUser)
     })
@@ -306,6 +308,10 @@ async function saveFormData(data: EntrustFormData) {
 }
 
 async function okAssignTask(id: string, uid: string) {
+  if (uid === '2c91808478367c2801788230b248470e' && globalCheckAssignUser) {
+    let res = confirm('确定主检员是正确的吗？')
+    if (!res) return
+  }
   console.log('okAssignTask:', id)
   const receiveIds = await ReceiveSubmit([id], 'receive')
   if (!receiveIds.length) return

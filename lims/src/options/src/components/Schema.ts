@@ -25,12 +25,14 @@ export interface Config {
   nextYearBgColor?: string
   verify?: boolean
   verifyButtonOnMiddle?: boolean
+  checkAssignUser?: boolean
 }
 
 export const Config: Schema<Config> = Schema.intersect([
   // 业务受理 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   Schema.object({
     onekeyAssign: Schema.boolean().description('一键分配').default(true),
+    checkAssignUser: Schema.boolean().description('检查分配用户，如果未选择分配用户，则需要确认（强烈建议开启）').default(true),
   }).description("业务受理"),
 
   // 初验 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
