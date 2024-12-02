@@ -85,7 +85,7 @@ const host = window.location.host
     targetParent2.appendChild(verifyButton2)
     const submit = document.getElementById('submitBtn0')
     const submit2 = document.getElementById('submitBtn')
-    if (isInspect && submit) {
+    if (isInspect && submit && localConfig.verifyButtonOnMiddle === true) {
       targetParent.insertBefore(verifyButton, submit)
       targetParent2.insertBefore(verifyButton2, submit2)
     } else {

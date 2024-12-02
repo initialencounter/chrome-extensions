@@ -19,6 +19,7 @@ const localConfig = {
   moonPay: true,
   amount: '500.00',
   tagNextYear: true,
+  verifyButtonOnMiddle: false,
 }
 
 const configKeys: Array<keyof typeof localConfig> = [
@@ -40,6 +41,7 @@ const configKeys: Array<keyof typeof localConfig> = [
   'moonPay',
   'amount',
   'tagNextYear',
+  'verifyButtonOnMiddle',
 ]
 chrome.storage.sync.get(configKeys, function (data) {
   for (const key of Object.keys(data) as Array<keyof typeof localConfig>) {

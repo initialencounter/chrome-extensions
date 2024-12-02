@@ -24,6 +24,7 @@ export interface Config {
   nextYearColor?: string
   nextYearBgColor?: string
   verify?: boolean
+  verifyButtonOnMiddle?: boolean
 }
 
 export const Config: Schema<Config> = Schema.intersect([
@@ -65,6 +66,7 @@ export const Config: Schema<Config> = Schema.intersect([
   // 样品检验-主界面 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   Schema.object({
     verify: Schema.boolean().description('表单验证（仅限锂电池），验证规则详见[rule](https://lims.initenc.cn/rule.html)，欢迎补充').default(true),
+    verifyButtonOnMiddle: Schema.boolean().description('验证按钮放在提交按钮旁边').default(false),
     enableCopyProjectNo: Schema.boolean()
       .description(
         `复制项目编号 （点击项目编号，或者双击 *Ctrl*，即可将项目编号复制到剪切板）`
