@@ -184,7 +184,7 @@ function getEntrustFormData(): EntrustFormData | undefined {
   const data: Partial<EntrustFormData> = {};
 
   // 遍历 FormData 并构建数据对象
-  for (const [name, value] of formData.entries()) {
+  formData.forEach((value, name) => {
     if (data[name as keyof Partial<EntrustFormData>]) {
       // 如果已存在该字段，添加逗号并附加新值
       data[name as keyof Partial<EntrustFormData>] = (data[name as keyof Partial<EntrustFormData>] + `,${value}`) as EntrustFormData[keyof EntrustFormData];
@@ -192,7 +192,7 @@ function getEntrustFormData(): EntrustFormData | undefined {
       // 如果是新字段，直接赋值
       data[name as keyof Partial<EntrustFormData>] = value as EntrustFormData[keyof EntrustFormData];
     }
-  }
+  })
   var errorContents = [];
   if (isEmpty(data.itemCName)) errorContents.push("物品中文名称不能为空");
   if (isEmpty(data.itemEName)) errorContents.push("物品英文名称不能为空");
@@ -440,7 +440,7 @@ function createMask() {
     align-items: center;
     z-index: 9999;
   `
-  
+
   const loadingText = document.createElement('div')
   loadingText.style.cssText = `
     color: white;
@@ -450,7 +450,7 @@ function createMask() {
     border-radius: 8px;
   `
   loadingText.textContent = '正在处理中...'
-  
+
   mask.appendChild(loadingText)
   document.body.appendChild(mask)
 }
