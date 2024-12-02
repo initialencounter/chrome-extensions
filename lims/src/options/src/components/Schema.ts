@@ -34,7 +34,7 @@ export const Config: Schema<Config> = Schema.intersect([
   Schema.object({
     onekeyAssign: Schema.boolean().description('一键分配').default(true),
     checkAssignUser: Schema.boolean().description('检查分配用户，如果未选择分配用户，则需要确认（强烈建议开启）').default(true),
-    showInspectFormLink: Schema.boolean().description('在业务受理查看检验单').default(true),
+    showInspectFormLink: Schema.boolean().description('在业务受理查看检验单（点击物品名称或点击操作栏的“检验单”超链接）').default(true),
   }).description("业务受理"),
 
   // 初验 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

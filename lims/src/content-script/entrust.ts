@@ -354,7 +354,6 @@ async function insertInspectFormLink(length1: number) {
   let url = getInspectFormUpdateUrl()
   await updateGlobalItemNumberList2(url)
   if (!url) return
-  console.log(url)
   let projectIdMap: Record<string, number> = {}
   for (let j = 0; j < globalItemNumberList2.length; j++) {
     // @ts-ignore
@@ -370,10 +369,8 @@ async function insertInspectFormLink(length1: number) {
       from: 'query'
     })
     let link = `/pek/inspect?${params.toString()}`
-    console.log(link)
     const itemCNameElement = document.querySelector(`#datagrid-row-r1-2-${i} > td:nth-child(3) > div`) as HTMLDivElement
     if (!itemCNameElement) {
-      console.log('itemCNameElement not found', i)
       continue
     }
     const operateElement = document.querySelector(`#datagrid-row-r1-2-${i} > td:nth-child(14) > div`) as HTMLAnchorElement
@@ -447,16 +444,14 @@ function observeItemNumberList1() {
     let length1 = globalItemNumberList1.length
     let length2 = globalItemNumberList2.length
     if (length1 !== length2) {
-      console.log('监听到长度变化', length1, length2)
       insertInspectFormLink(length1)
     }else {
       for (let i = 0; i < (length1 > length2 ? length1 : length2); i++) {
         if (globalItemNumberList1[i] !== globalItemNumberList2[i]['projectNo']) {
-          console.log('监听到变化', globalItemNumberList1[i], globalItemNumberList2[i]['projectNo'])
           insertInspectFormLink(length1)
           break
         }
       }
     }
-  }, 1000)
+  }, 100)
 }
