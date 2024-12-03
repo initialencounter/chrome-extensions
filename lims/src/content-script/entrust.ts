@@ -368,7 +368,7 @@ async function insertInspectFormLink(length1: number) {
       category: 'battery',
       from: 'query'
     })
-    let link = `/pek/inspect?${params.toString()}`
+    let link = `/${globalItemNumberList2[targetIndex].projectNo?.startsWith('PEK') ? 'pek' : 'sek'}/inspect?${params.toString()}`
     const itemCNameElement = document.querySelector(`#datagrid-row-r1-2-${i} > td:nth-child(3) > div`) as HTMLDivElement
     if (!itemCNameElement) {
       continue
@@ -396,7 +396,7 @@ function getInspectFormUpdateUrl(): string {
   const endDate = (document.querySelector("#toolbar > form > table > tbody > tr:nth-child(2) > td:nth-child(4) > span:nth-child(4) > input.textbox-text.validatebox-text") as HTMLInputElement)?.value
   if (!startDate || !endDate) return ''
   const systemId = (document.querySelector("#toolbar > form > table > tbody > tr:nth-child(1) > td:nth-child(2) > span > input.textbox-value") as HTMLInputElement)?.value ?? ''
-  const reportTypeString =  (document.querySelector("#toolbar > form > table > tbody > tr:nth-child(1) > td:nth-child(4) > span > input.textbox-text.validatebox-text") as HTMLInputElement).value ?? ''
+  const reportTypeString = (document.querySelector("#toolbar > form > table > tbody > tr:nth-child(1) > td:nth-child(4) > span > input.textbox-text.validatebox-text") as HTMLInputElement).value ?? ''
   let reportType = ''
   if (reportTypeString === '全部') reportType = ''
   if (reportTypeString === '初验') reportType = '0'
@@ -416,7 +416,7 @@ function getInspectFormUpdateUrl(): string {
 }
 
 function updateGlobalItemNumberList1(): string[] {
-  const dataGridRow1 =  document.querySelector("#datagrid-row-r1-1-0")
+  const dataGridRow1 = document.querySelector("#datagrid-row-r1-1-0")
   if (!dataGridRow1) return []
   const gridElement = dataGridRow1.parentElement
   if (!gridElement) return []
@@ -445,7 +445,7 @@ function observeItemNumberList1() {
     let length2 = globalItemNumberList2.length
     if (length1 !== length2) {
       insertInspectFormLink(length1)
-    }else {
+    } else {
       for (let i = 0; i < (length1 > length2 ? length1 : length2); i++) {
         if (globalItemNumberList1[i] !== globalItemNumberList2[i]['projectNo']) {
           insertInspectFormLink(length1)
