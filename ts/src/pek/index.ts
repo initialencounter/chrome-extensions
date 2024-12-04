@@ -184,11 +184,10 @@ function checkPekBtyType(currentData: PekData): CheckResult[] {
 
   // 跌落和堆码检测
   if (String(inspectionItem6) === '0' && !otherDescribe.includes('2c9180849267773c0192dc73c77e5fb2')) {
-    if (inspectionItem1 === "2") {
+    if (pkgInfoSubType === '967, I' || pkgInfoSubType === '970, I' || pkgInfoSubType === '967, II' || pkgInfoSubType === '970, II') {
       result.push({ ok: false, result: '967/970 未勾选堆码，或堆码评估，如果是24年报告请忽略' })
     }
-    const conclusions = currentData['conclusions']
-    if (inspectionItem1 === "1" && String(conclusions) === "0") {
+    if (pkgInfoSubType === '966, II' || pkgInfoSubType === '969, II') {
       result.push({ ok: false, result: '966/969 第II部分未勾选堆码，或堆码评估，如果是24年报告请忽略' })
     }
   }
@@ -274,7 +273,11 @@ function checkPekBtyType(currentData: PekData): CheckResult[] {
       result.push({ ok: false, result: '结论错误，客货机禁止运输' })
     }
     if (unno !== UNNO) {
-      result.push({ ok: false, result: '结论错误，UN编号应为' + UNNO })
+      if (UNNO === "UN3556") {
+        result.push({ ok: false, result: '结论错误，UN编号应为UN3556, 如果是25年报告请忽略' })
+      } else {
+        result.push({ ok: false, result: '结论错误，UN编号应为' + UNNO })
+      }
     }
     if (String(classOrDiv) !== '9') {
       result.push({ ok: false, result: '结论错误，危险性类别应为9' })

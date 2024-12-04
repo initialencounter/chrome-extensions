@@ -8,7 +8,8 @@ use crate::models::{
 use super::{
     get_bty_type_code, get_is_cargo_only, get_is_single_cell, get_pkg_info,
     get_pkg_info_by_pack_cargo, get_pkg_info_subtype, get_un_no, is_battery_label,
-    pek_is_dangerous, pkg_info_is_ia, regex::{match_watt_hour, match_li_content_or_watt_hour}, parse_net_weight,
+    parse_net_weight, pek_is_dangerous, pkg_info_is_ia,
+    regex::{match_li_content_or_watt_hour, match_watt_hour},
 };
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -30,7 +31,9 @@ pub fn check_pek_bty_type(current_data: PekData) -> Vec<CheckResult> {
     let watt_hour: f32 = current_data
         .inspection_item3_text1
         .parse::<f32>()
-        .unwrap_or(match_li_content_or_watt_hour(&current_data.inspection_item3_text1));
+        .unwrap_or(match_li_content_or_watt_hour(
+            &current_data.inspection_item3_text1,
+        ));
 
     let watt_hour_from_name = match_watt_hour(&current_data.item_c_name);
 
@@ -38,7 +41,9 @@ pub fn check_pek_bty_type(current_data: PekData) -> Vec<CheckResult> {
     let li_content = current_data
         .inspection_item4_text1
         .parse::<f32>()
-        .unwrap_or(match_li_content_or_watt_hour(&current_data.inspection_item4_text1));
+        .unwrap_or(match_li_content_or_watt_hour(
+            &current_data.inspection_item4_text1,
+        ));
 
     // 电池数量转换
     let _bty_count = current_data.bty_count.parse::<f32>().unwrap_or(0.0);
@@ -307,14 +312,19 @@ pub fn check_pek_bty_type(current_data: PekData) -> Vec<CheckResult> {
 
     // 跌落和堆码检测
     if inspection_item6 == 0 && !other_describe.contains("2c9180849267773c0192dc73c77e5fb2") {
-        if matches!(inspection_item1, OtherDescribe::Two) {
+        if matches!(pkg_info_subtype, PkgInfoSubType::Pkg967I)
+            || matches!(pkg_info_subtype, PkgInfoSubType::Pkg967II)
+            || matches!(pkg_info_subtype, PkgInfoSubType::Pkg970I)
+            || matches!(pkg_info_subtype, PkgInfoSubType::Pkg970II)
+        {
             result.push(CheckResult {
                 ok: false,
                 result: "967/970 未勾选堆码，或堆码评估，如果是24年报告请忽略".to_string(),
             });
         }
-        let conclusions = current_data.conclusions;
-        if matches!(inspection_item1, OtherDescribe::One) && conclusions == 0 {
+        if matches!(pkg_info_subtype, PkgInfoSubType::Pkg966II)
+            || matches!(pkg_info_subtype, PkgInfoSubType::Pkg969II)
+        {
             result.push(CheckResult {
                 ok: false,
                 result: "966/969 第II部分未勾选堆码，或堆码评估，如果是24年报告请忽略".to_string(),
@@ -487,10 +497,17 @@ pub fn check_pek_bty_type(current_data: PekData) -> Vec<CheckResult> {
             });
         }
         if unno.clone() != un_no {
-            result.push(CheckResult {
-                ok: false,
-                result: format!("结论错误，UN编号应为{}", un_no),
-            });
+            if matches!(un_no, PekUNNO::UN3556) {
+                result.push(CheckResult {
+                    ok: false,
+                    result: "结论错误，UN编号应为UN3556, 如果是25年报告请忽略".to_string(),
+                });
+            } else {
+                result.push(CheckResult {
+                    ok: false,
+                    result: format!("结论错误，UN编号应为{}", un_no),
+                });
+            }
         }
 
         // 危险性类别验证
