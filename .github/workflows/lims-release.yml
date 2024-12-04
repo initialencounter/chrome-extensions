@@ -48,7 +48,7 @@ jobs:
         run: |
           rm -f dist/manifest.json
           mv docs/manifest.firefox.json dist/manifest.json
-          web-ext sign --api-key ${{ secrets.FIREFOX_JWT_ISSUER }} --api-secret ${{ secrets.FIREFOX_JWT_SECRET }} --channel unlisted -d dist
+          web-ext sign --api-key ${{ secrets.FIREFOX_JWT_ISSUER }} --api-secret ${{ secrets.FIREFOX_JWT_SECRET }} --channel unlisted -s dist
           mv web-ext-artifacts/*.xpi lims-${{ steps.get_version.outputs.VERSION }}.firefox.xpi
       - name: zip wasm extension
         run: |
