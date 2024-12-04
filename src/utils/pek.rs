@@ -8,7 +8,7 @@ use crate::models::{
 use super::{
     get_bty_type_code, get_is_cargo_only, get_is_single_cell, get_pkg_info,
     get_pkg_info_by_pack_cargo, get_pkg_info_subtype, get_un_no, is_battery_label,
-    pek_is_dangerous, pkg_info_is_ia, regex::match_watt_hour,
+    pek_is_dangerous, pkg_info_is_ia, regex::{match_watt_hour, match_li_content_or_watt_hour}, parse_net_weight,
 };
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -30,7 +30,7 @@ pub fn check_pek_bty_type(current_data: PekData) -> Vec<CheckResult> {
     let watt_hour: f32 = current_data
         .inspection_item3_text1
         .parse::<f32>()
-        .unwrap_or(0.0);
+        .unwrap_or(match_li_content_or_watt_hour(&current_data.inspection_item3_text1));
 
     let watt_hour_from_name = match_watt_hour(&current_data.item_c_name);
 
@@ -38,13 +38,13 @@ pub fn check_pek_bty_type(current_data: PekData) -> Vec<CheckResult> {
     let li_content = current_data
         .inspection_item4_text1
         .parse::<f32>()
-        .unwrap_or(0.0);
+        .unwrap_or(match_li_content_or_watt_hour(&current_data.inspection_item4_text1));
 
     // 电池数量转换
     let _bty_count = current_data.bty_count.parse::<f32>().unwrap_or(0.0);
 
     // 净重转换
-    let net_weight = current_data.net_weight.parse::<f32>().unwrap_or(0.0);
+    let net_weight = parse_net_weight(&current_data.net_weight);
     // 单芯电池或电芯
     let is_single_cell = get_is_single_cell(transfer_str_to_bty_type(&bty_type_string));
     // 电池形状
@@ -155,7 +155,7 @@ pub fn check_pek_bty_type(current_data: PekData) -> Vec<CheckResult> {
     }
 
     // 电池净重验证
-    if net_weight == 0.0 && !is_charge_box_or_related {
+    if net_weight == 0.0 {
         result.push(CheckResult {
             ok: false,
             result: "电池净重为空".to_string(),
@@ -538,11 +538,20 @@ pub fn check_pek_bty_type(current_data: PekData) -> Vec<CheckResult> {
     }
 
     // 数值验证
-    if watt_hour.is_nan() && li_content.is_nan() && net_weight.is_nan() {
-        result.push(CheckResult {
-            ok: false,
-            result: "瓦时数，锂含量，净重，三者中有非数字，表单验证可能不准确".to_string(),
-        });
+    if is_ion {
+        if watt_hour == 0.0 || net_weight == 0.0 {
+            result.push(CheckResult {
+                ok: false,
+                result: "瓦时数，净重，二者中有非数字，表单验证可能不准确".to_string(),
+            });
+        }
+    } else {
+        if li_content == 0.0 || net_weight == 0.0 {
+            result.push(CheckResult {
+                ok: false,
+                result: "锂含量，净重，二者中有非数字，表单验证可能不准确".to_string(),
+            });
+        }
     }
     // IA IB 验证
     if is_ia {

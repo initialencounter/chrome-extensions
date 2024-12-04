@@ -2,7 +2,9 @@ import { CheckResult, PekData, PekPkgInfo, PekUNNO, PkgInfoSubType } from "../ty
 import {
   matchWattHour, getBtyTypeCode, getIsSingleCell, pekIsDangerous,
   getPkgInfo, isBatteryLabel, getPkgInfoByPackCargo, getPkgInfoSubType,
-  getUNNO, getIsCargoOnly, pkgInfoIsIA
+  getUNNO, getIsCargoOnly, pkgInfoIsIA,
+  parseNetWeight,
+  matchLiContentOrWattHour
 } from "../utils/index"
 
 function checkPekBtyType(currentData: PekData): CheckResult[] {
@@ -14,14 +16,14 @@ function checkPekBtyType(currentData: PekData): CheckResult[] {
   // 型号
   const btyKind = currentData['model']
   // 瓦时
-  const wattHour = Number(currentData['inspectionItem3Text1'])
+  const wattHour = matchLiContentOrWattHour(currentData['inspectionItem3Text1'])
   const wattHourFromName = matchWattHour(currentData['itemCName'])
   // 锂含量
-  const liContent = Number(currentData['inspectionItem4Text1'])
+  const liContent = matchLiContentOrWattHour(currentData['inspectionItem4Text1'])
   // 电池数量
   const btyCount = Number(currentData['btyCount'])
   // 净重
-  const netWeight = Number(currentData['netWeight'])
+  const netWeight = parseNetWeight(currentData['netWeight'])
   // 单芯电池或电芯
   const isSingleCell = getIsSingleCell(btyType)
   // 电池形状
@@ -295,8 +297,14 @@ function checkPekBtyType(currentData: PekData): CheckResult[] {
       result.push({ ok: false, result: '结论错误，非限制性，UN编号应为空' })
     }
   }
-  if (isNaN(wattHour) && isNaN(liContent) && isNaN(netWeight)) {
-    result.push({ ok: false, result: '瓦时数，锂含量，净重，三者中有非数字，表单验证可能不准确' })
+  if (isIon) {
+    if (isNaN(wattHour) || isNaN(netWeight)) {
+      result.push({ ok: false, result: '瓦时数，净重，二者中有非数字，表单验证可能不准确' })
+    }
+  } else {
+    if (isNaN(liContent) || isNaN(netWeight)) {
+      result.push({ ok: false, result: '锂含量，净重，二者中有非数字，表单验证可能不准确' })
+    }
   }
 
   if (isIA) {

@@ -192,7 +192,33 @@ function pkgInfoIsIA(
   return false;
 }
 
+function parseNetWeight(net_weight: string) {
+  if (net_weight.length === 0) {
+      return NaN;
+  }
+  switch (net_weight) {
+      case "<5":
+          return 4.9;
+      case "＜5":
+          return 4.9;
+      case "<35":
+          return 34.9;
+      case "＜35":
+          return 34.9;
+      default:
+          return Number(net_weight);
+  }
+}
+
+function matchLiContentOrWattHour(num: string) {
+  let matches = [...num.matchAll(/[0-9]+(\.\d*)?/g)]
+  let results = matches.map((match) => match[0])
+  let result = Number(results[0])
+  if (isNaN(result)) return 0
+  return result
+}
+
 
 export { matchWattHour, getBtyTypeCode, getIsSingleCell, pekIsDangerous, 
   getPkgInfo, isBatteryLabel, getPkgInfoByPackCargo, getPkgInfoSubType, 
-  getUNNO, getIsCargoOnly, pkgInfoIsIA }
+  getUNNO, getIsCargoOnly, pkgInfoIsIA, parseNetWeight, matchLiContentOrWattHour }

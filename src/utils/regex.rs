@@ -3,6 +3,7 @@ use regex::Regex;
 
 lazy_static! {
     static ref WATT_HOUR_REGEX: Regex = Regex::new(r"\s(\d+\.{0,1}\d+)[Kk]?[Ww][Hh]").unwrap();
+    static ref LI_CONTENT_OR_WATT_HOUR_REGEX: Regex = Regex::new(r"[0-9]+(\.\d*)?").unwrap();
 }
 
 pub fn match_watt_hour(project_name: &str) -> f32 {
@@ -22,4 +23,12 @@ pub fn match_watt_hour(project_name: &str) -> f32 {
     }
 
     watt_hour
+}
+
+pub fn match_li_content_or_watt_hour(num: &str) -> f32 {
+    LI_CONTENT_OR_WATT_HOUR_REGEX
+        .captures_iter(num)
+        .filter_map(|cap| cap[0].parse::<f32>().ok())
+        .next()
+        .unwrap_or(0.0)
 }
