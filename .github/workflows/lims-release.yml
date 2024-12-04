@@ -27,7 +27,9 @@ jobs:
         env:
           DISABLE_V8_COMPILE_CACHE: 1
       - name: Install dependencies
-        run: npm install
+        run: |
+          npm install
+          npm install -g web-ext
       - name: Build
         run: npm run build
       - name: Query version number
@@ -46,7 +48,8 @@ jobs:
         run: |
           rm -f dist/manifest.json
           mv docs/manifest.firefox.json dist/manifest.json
-          zip -q -r lims-${{ steps.get_version.outputs.VERSION }}.firefox.zip dist
+          web-ext sign --api-key ${{ secrets.FIREFOX_JWT_ISSUER }} --api-secret ${{ secrets.FIREFOX_JWT_SECRET }} --channel unlisted -d dist
+          mv web-ext-artifacts/*.xpi lims-${{ steps.get_version.outputs.VERSION }}.firefox.xpi
       - name: zip wasm extension
         run: |
           mv docs/manifest.wasm.json dist/manifest.json
@@ -59,6 +62,6 @@ jobs:
         with:
           files: |
             lims/lims-${{ steps.get_version.outputs.VERSION }}.chrome.zip
-            lims/lims-${{ steps.get_version.outputs.VERSION }}.firefox.zip
+            lims/lims-${{ steps.get_version.outputs.VERSION }}.firefox.xpi
             lims/lims-${{ steps.get_version.outputs.VERSION }}.wasm.zip
           name: 'Lims ${{ steps.get_version.outputs.VERSION }}'
