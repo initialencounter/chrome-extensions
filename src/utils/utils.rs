@@ -242,10 +242,11 @@ pub fn get_bty_type_code(current_data: PekData) -> BtyType {
 }
 
 pub fn parse_net_weight(net_weight: &str) -> f32 {
+    let net_weight = net_weight.replace(|c: char| c == ' ' || c == '＜', "");
     if net_weight.is_empty() {
         return 0.0;
     }
-    match net_weight {
+    match net_weight.as_str() {
         "<5" => 4.9,
         "＜5" => 4.9,
         "<35" => 34.9,

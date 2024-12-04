@@ -193,6 +193,7 @@ function pkgInfoIsIA(
 }
 
 function parseNetWeight(net_weight: string) {
+  net_weight = net_weight.replace(/ /g, '')
   if (net_weight.length === 0) {
       return NaN;
   }
@@ -211,6 +212,7 @@ function parseNetWeight(net_weight: string) {
 }
 
 function matchLiContentOrWattHour(num: string) {
+  num = num.replace(/ /g, '')
   let matches = [...num.matchAll(/[0-9]+(\.\d*)?/g)]
   let results = matches.map((match) => match[0])
   let result = Number(results[0])
