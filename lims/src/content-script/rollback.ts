@@ -1,5 +1,11 @@
+let hiddenTimeInspectList: number | null = null;
+
 ; (async () => {
-  chrome.storage.sync.get(['onekeyRollback', 'nextYearColor', 'nextYearBgColor'], async function (result) {
+  chrome.storage.sync.get(['onekeyRollback', 'nextYearColor', 'nextYearBgColor', 'freshHotkey', 'autoRefreshDuration'], async function (result) {
+    if (!(result.freshHotkey === false)) {
+      listenFreshHotkeyInspectList()
+      listenVisibilityChangeInspectList(result?.autoRefreshDuration ?? 10000)
+    }
     removeOrangeRollBack(result.nextYearColor ?? '', result.nextYearBgColor ?? '#76EEC6')
     await sleepRollBack(500)
     // 替换橘黄色
@@ -57,8 +63,7 @@ async function rollbackOneKey(taskId: string) {
   }
   // @ts-expect-error: use Qmsg from assets
   Qmsg['success']('退回成功', { timeout: 1000 })
-  const refreshButton = document.querySelector("body > div.panel.easyui-fluid > div.easyui-panel.panel-body.panel-noscroll > div > div > div.datagrid-pager.pagination > table > tbody > tr > td:nth-child(13) > a") as HTMLAnchorElement
-  if (refreshButton) refreshButton.click()
+  doFreshInspectList()
 }
 
 // 检验页面
@@ -155,4 +160,41 @@ function removeOrangeRollBack(nextYearColor: string, nextYearBgColor: string) {
       }
     }
   }, 100)
+}
+
+
+async function listenFreshHotkeyInspectList() {
+  console.log('监听刷新快捷键')
+  // 监听 Ctrl+D 键的弹起事件
+  document.addEventListener('keydown', async function (event) {
+    if (!event.ctrlKey) {
+      return
+    }
+    if (event.key === 'd') {
+      event.preventDefault() // 阻止默认的保存行为
+      doFreshInspectList()
+    }
+  })
+}
+
+function doFreshInspectList() {
+  const refreshButton = document.querySelector("body > div.panel.easyui-fluid > div.easyui-panel.panel-body.panel-noscroll > div > div > div.datagrid-pager.pagination > table > tbody > tr > td:nth-child(13) > a") as HTMLAnchorElement
+  if (refreshButton) refreshButton.click()
+}
+
+function listenVisibilityChangeInspectList(autoRefreshDuration: number) {
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      // 页面隐藏时记录时间
+      hiddenTimeInspectList = Date.now();
+    } else if (hiddenTimeInspectList) {
+      // 页面显示时，检查是否超过10秒
+      const hiddenDuration = Date.now() - hiddenTimeInspectList;
+      if (hiddenDuration >= autoRefreshDuration) { // 10秒 = 10000毫秒
+        doFreshInspectList();
+        console.log('离开页面10秒，刷新列表')
+      }
+      hiddenTimeInspectList = null;
+    }
+  });
 }

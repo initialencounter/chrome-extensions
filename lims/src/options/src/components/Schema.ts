@@ -27,6 +27,8 @@ export interface Config {
   verifyButtonOnMiddle?: boolean
   checkAssignUser?: boolean
   showInspectFormLink?: boolean
+  freshHotkey?: boolean
+  autoRefreshDuration?: number
 }
 
 export const Config: Schema<Config> = Schema.intersect([
@@ -65,6 +67,8 @@ export const Config: Schema<Config> = Schema.intersect([
   // 样品检验 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   Schema.object({
     onekeyRollback: Schema.boolean().description('一键回退').default(true),
+    freshHotkey: Schema.boolean().description('刷新快捷键(ctrl+d)').default(true),
+    autoRefreshDuration: Schema.number().description('离开页面后，刷新列表的时间间隔，单位：毫秒').default(10000),
   }).description("样品检验"),
 
   // 样品检验-主界面 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

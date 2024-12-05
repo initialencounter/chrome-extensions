@@ -115,7 +115,13 @@ interface EntrustRow {
 
 let globalAssignUser = ''
 let globalCheckAssignUser = true
-chrome.storage.sync.get(['assignUser', 'nextYearColor', 'nextYearBgColor', 'onekeyAssign', 'checkAssignUser', 'showInspectFormLink'], async function (data) {
+let hiddenTimeEntrustList: number | null = null;
+
+chrome.storage.sync.get(['assignUser', 'nextYearColor', 'nextYearBgColor', 'onekeyAssign', 'checkAssignUser', 'showInspectFormLink', 'freshHotkey', 'autoRefreshDuration'], async function (data) {
+  if (!(data.freshHotkey === false)) {
+    listenFreshHotkeyEntrustList()
+    listenVisibilityChangeEntrustList(data?.autoRefreshDuration ?? 10000)
+  }
   const assignUser = data.assignUser as string
   globalAssignUser = assignUser
   globalCheckAssignUser = data.checkAssignUser === false ? false : true
@@ -174,8 +180,7 @@ async function assignSelectId(uid: string) {
   if (!taskIds) return
   console.log('taskIds:', taskIds)
   await assignTask(taskIds, uid)
-  const refreshButton = document.querySelector("body > div.panel.easyui-fluid > div.easyui-panel.panel-body.panel-noscroll > div > div > div.datagrid-pager.pagination > table > tbody > tr > td:nth-child(13) > a") as HTMLAnchorElement
-  if (refreshButton) refreshButton.click()
+  doFreshEntrustList()
 }
 
 async function entrustSleep(ms: number) {
@@ -454,4 +459,40 @@ function observeItemNumberList1() {
       }
     }
   }, 100)
+}
+
+async function listenFreshHotkeyEntrustList() {
+  console.log('监听刷新快捷键')
+  // 监听 Ctrl+D 键的弹起事件
+  document.addEventListener('keydown', async function (event) {
+    if (!event.ctrlKey) {
+      return
+    }
+    if (event.key === 'd') {
+      event.preventDefault() // 阻止默认的保存行为
+      doFreshEntrustList()
+    }
+  })
+}
+
+function doFreshEntrustList() {
+  const refreshButton = document.querySelector("body > div.panel.easyui-fluid > div.easyui-panel.panel-body.panel-noscroll > div > div > div.datagrid-pager.pagination > table > tbody > tr > td:nth-child(13) > a") as HTMLAnchorElement
+  if (refreshButton) refreshButton.click()
+}
+
+function listenVisibilityChangeEntrustList(autoRefreshDuration: number) {
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      // 页面隐藏时记录时间
+      hiddenTimeEntrustList = Date.now();
+    } else if (hiddenTimeEntrustList) {
+      // 页面显示时，检查是否超过10秒
+      const hiddenDuration = Date.now() - hiddenTimeEntrustList;
+      if (hiddenDuration >= autoRefreshDuration) { // 10秒 = 10000毫秒
+        doFreshEntrustList();
+        console.log('离开页面10秒，刷新列表')
+      }
+      hiddenTimeEntrustList = null;
+    }
+  });
 }
