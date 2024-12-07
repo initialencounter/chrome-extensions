@@ -75,8 +75,10 @@ function checkPekBtyType(currentData: PekData): CheckResult[] {
     result.push({ ok: false, result: '电池类型应为电芯' })
   if (!itemCName) result.push({ ok: false, result: '中文品名为空' })
   if (!itemEName) result.push({ ok: false, result: '英文品名为空' })
-  if (btySize.includes('m') && btySize.includes('M'))
-    result.push({ ok: false, result: '电池尺寸缺失单位' })
+  if (btySize.replace(/ /g, '').length > 0) {
+    if (!btySize.includes('m') && !btySize.includes('M'))
+      result.push({ ok: false, result: '电池尺寸缺失单位' })
+  }
   if (
     btySize.includes('Φ') ||
     btySize.includes('φ') ||

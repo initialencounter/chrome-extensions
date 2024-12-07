@@ -65,11 +65,13 @@ pub fn check_sek_bty_type(current_data: SekData) -> Vec<CheckResult> {
     let bty_shape = &current_data.bty_shape;
     let bty_size = &current_data.bty_size;
 
-    if bty_size.contains('m') && bty_size.contains('M') {
-        result.push(CheckResult {
-            ok: false,
-            result: "电池尺寸缺失单位".to_string(),
-        });
+    if String::from(bty_size).replace(" ", "").len() > 0 {
+        if !bty_size.contains("m") && !bty_size.contains("M") {
+            result.push(CheckResult {
+                ok: false,
+                result: "电池尺寸缺失单位".to_string(),
+            });
+        }
     }
 
     if bty_size.contains('Φ')

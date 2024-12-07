@@ -32,8 +32,10 @@ function checkSekBtyType(currentData: SekData): CheckResult[] {
   const btyShape = currentData['btyShape']
   const btySize = currentData['btySize']
   // 尺寸或形状
-  if (btySize.includes('m') && btySize.includes('M'))
-    result.push({ ok: false, result: '电池尺寸缺失单位' })
+  if (btySize.replace(/ /g, '').length > 0) {
+    if (!btySize.includes('m') && !btySize.includes('M'))
+      result.push({ ok: false, result: '电池尺寸缺失单位' })
+  }
   if (
     btySize.includes('Φ') ||
     btySize.includes('φ') ||

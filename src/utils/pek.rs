@@ -124,11 +124,13 @@ pub fn check_pek_bty_type(current_data: PekData) -> Vec<CheckResult> {
         });
     }
 
-    if bty_size.contains("m") && bty_size.contains("M") {
-        result.push(CheckResult {
-            ok: false,
-            result: "电池尺寸缺失单位".to_string(),
-        });
+    if String::from(bty_size).replace(" ", "").len() > 0 {
+        if !bty_size.contains("m") && !bty_size.contains("M") {
+            result.push(CheckResult {
+                ok: false,
+                result: "电池尺寸缺失单位".to_string(),
+            });
+        }
     }
 
     // 形状验证
