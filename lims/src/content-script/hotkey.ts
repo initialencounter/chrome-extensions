@@ -328,8 +328,8 @@ function setUnNo(projectName: string) {
     UnNo = '3481'
   }
   if (
-    !projectName.includes('(') &&
-    !projectName.includes('（') &&
+    !projectName.includes('包装') &&
+    !projectName.includes('内置') &&
     isLiIonBattery
   ) {
     UnNo = '3480'
