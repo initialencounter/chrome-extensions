@@ -8,7 +8,7 @@ let lastCtrlPressTime = 0
 let cPressCount = 0
 let lastCPressTime = 0
 
-// auto open document
+  // auto open document
 ;(async function () {
   await sleep(500)
   // 将项目编号设置为标题
@@ -79,10 +79,6 @@ let lastCPressTime = 0
     preventClose()
   }
 
-  // 导入检验单
-  if (localConfig.enableImportHotKey && !fromQuery) {
-    importTemplate()
-  }
   // 导入检验单时设置分类
   if (localConfig.enableSetImportClassification && !fromQuery) {
     importClassification()
@@ -183,7 +179,7 @@ function watchInput() {
     if (target) console.log('Changed tag name:', target.tagName)
     if (
       target instanceof HTMLInputElement ||
-      target instanceof HTMLSelectElement || 
+      target instanceof HTMLSelectElement ||
       target instanceof HTMLTextAreaElement
     ) {
       console.log('Changed value:', target.value)
@@ -216,45 +212,6 @@ function preventClose() {
   })
 }
 
-async function importTemplate() {
-  console.log('导入模板脚本运行中...')
-  await sleep(200)
-  const qProjectNo = document.getElementById('qProjectNo') as HTMLInputElement
-  const importBtn = document.getElementById('importBtn0')
-  if (importBtn) {
-    importBtn.addEventListener('click', handleImportBtnClick)
-  }
-  // qProjectNo.value = systemId
-  if (!localConfig.autoProjectNoPreset){
-    if (systemId.startsWith('PEK')) 
-      qProjectNo.value = localConfig.pekProjectNoPreset
-    else qProjectNo.value = localConfig.sekProjectNoPreset
-  } else qProjectNo.value = getMonthsAgoProjectNo()
-  
-  qProjectNo.addEventListener('input', function () {
-    // 项目编号
-    const input = qProjectNo.value.replace(/[^0-9A-Z]/g, '')
-    qProjectNo.value = input
-  })
-}
-
-async function handleImportBtnClick() {
-  const importBtn = document.getElementById('importBtn0')
-  const projectNo = await getClipboardText()
-  if (!checkProjectNo(projectNo)) {
-    if (importBtn) {
-      importBtn.removeEventListener('click', handleImportBtnClick)
-    }
-    return
-  }
-  ;(document.getElementById('qProjectNo') as HTMLInputElement).value = projectNo.replace(/[^0-9A-Z]/g, '')
-  ;(document.getElementById('qItemCName1') as HTMLInputElement).value = ''
-  ;(document.getElementById('qUnNo') as HTMLInputElement).value = ''
-  if (importBtn) {
-    importBtn.removeEventListener('click', handleImportBtnClick)
-  }
-}
-
 async function importClassification() {
   console.log('导入分类脚本运行中...')
   await sleep(200)
@@ -264,13 +221,27 @@ async function importClassification() {
   }
 }
 
-function classification() {
+async function classification() {
   const projectNameSpan = document.getElementById(
     'itemCName'
   ) as HTMLInputElement
   if (!projectNameSpan) {
     return
   }
+  let projectNo = await getClipboardText()
+  projectNo = projectNo.replace(/[^0-9A-Z]/g, '')
+  const qProjectNo = document.getElementById('qProjectNo') as HTMLInputElement
+  let currentProjectNo = qProjectNo.value
+  if (projectNo.startsWith(systemId) && projectNo.length === 17 && currentProjectNo !== projectNo) {
+    qProjectNo.value = projectNo
+    return
+  }
+  // qProjectNo.value = systemId
+  if (!localConfig.autoProjectNoPreset) {
+    if (systemId.startsWith('PEK'))
+      qProjectNo.value = localConfig.pekProjectNoPreset
+    else qProjectNo.value = localConfig.sekProjectNoPreset
+  } else qProjectNo.value = getMonthsAgoProjectNo()
   setQItemCName1Text(projectNameSpan.value)
   setUnNo(projectNameSpan.value)
   const importBtn = document.getElementById('importBtn0')
@@ -313,7 +284,23 @@ function setUnNo(projectName: string) {
   if (projectName.includes('电子烟')) {
     return
   }
-  if (projectName.includes('车')) {
+  if (projectName.includes('电动车') ||
+    projectName.includes('滑板车') ||
+    projectName.includes('平衡车') ||
+    projectName.includes('移动机器人') ||
+    projectName.includes('自动引导车') ||
+    projectName.includes('AGV') ||
+    projectName.includes('AMR') ||
+    projectName.includes('电动自行车') ||
+    projectName.includes('电动摩托车') ||
+    projectName.includes('快仓机器人') ||
+    projectName.includes('极智机器人') ||
+    projectName.includes('助力自行车') ||
+    projectName.includes('电摩') || 
+    projectName.includes('电动三轮车') ||
+    projectName.includes('电动滑板车') ||
+    projectName.includes('搬运车')
+  ) {
     UnNoInputItem.value = '3556'
     return
   }
@@ -338,10 +325,8 @@ function setUnNo(projectName: string) {
 }
 
 function isDangerousGoods(projectName: string) {
-  const matches = [...projectName.matchAll(/\s(\d+\.{0,1}\d+)[Ww]h/g)]
-  const results = matches.map((match) => match[1]) // 只获取捕获组
-  if (results.length) {
-    const wattHour = Number(results[0])
+  const wattHour = matchWattHour(projectName)
+  if (wattHour) {
     if (wattHour > 100) {
       return true
     }
@@ -350,6 +335,16 @@ function isDangerousGoods(projectName: string) {
     }
   }
   return false
+}
+
+function matchWattHour(projectName: string) {
+  const matches = [...projectName.matchAll(/\s(\d+\.?\d+)[Kk]?[Ww][Hh]/g)]
+  const results = matches.map((match) => match[1])
+  let wattHour = Number(results[0])
+  if (!results.length) return 0
+  if (isNaN(wattHour)) return 0
+  if (projectName.toLowerCase().includes('kwh')) wattHour *= 1000
+  return wattHour
 }
 
 function isLiIon(projectName: string) {
