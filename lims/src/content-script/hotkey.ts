@@ -234,6 +234,20 @@ async function classification() {
   let currentProjectNo = qProjectNo.value
   if (projectNo.startsWith(systemId) && projectNo.length === 17 && currentProjectNo !== projectNo) {
     qProjectNo.value = projectNo
+    const searchButton = document.getElementById("searchBtn") as HTMLButtonElement
+    if (searchButton) {
+      await sleep(100)
+      searchButton.click()
+      await sleep(200)
+      const reslutRow1 = document.querySelector("#datagrid-row-r10-2-0") as HTMLElement
+      if (reslutRow1) {
+        reslutRow1.click()
+      } else {
+        console.log('reslutRow1 not found')
+      }
+    } else {
+      console.log('searchButton not found')
+    }
     return
   }
   // qProjectNo.value = systemId
