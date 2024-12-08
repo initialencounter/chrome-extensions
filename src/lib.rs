@@ -24,20 +24,28 @@ pub fn check_sek_bty(data: JsValue) -> Result<JsValue, JsError> {
 
 #[cfg(test)]
 mod tests {
+    use colored::*;
+    use models::CheckResult;
     use std::fs;
 
     use super::*;
 
+    fn display_check_result(result: Vec<CheckResult>) {
+        for i in result {
+            println!("{}", i.result.red());
+        }
+    }
+
     #[test]
     fn it_works_single() {
-        let i = 67;
-        let data = fs::read_to_string(format!("tests/data/pek/data{}.json", i)).unwrap();
+        let i = 2;
+        let data = fs::read_to_string(format!("tests/data/pek/{}.json", i)).unwrap();
         let data: PekData = serde_json::from_str(&data).unwrap();
         let result = check_pek_bty_type(data);
         if result.len() > 0 {
             if result.len() == 1 {}
-            println!("id: ------------  {}", i);
-            println!("{:?}", result);
+            println!("id: ------------  {}", i.to_string().green());
+            display_check_result(result);
         }
 
         assert_eq!(0, 0);
@@ -48,7 +56,7 @@ mod tests {
             let data = fs::read_to_string(format!("tests/data/pek/data{}.json", i)).unwrap();
             let data: PekData = serde_json::from_str(&data).unwrap();
             if data.inspection_item3_text1.is_empty() {
-                println!("id: ------------  {}", i);
+                println!("id: ------------  {}", i.to_string().green());
             }
             let result = check_pek_bty_type(data);
             if result.len() > 0 {
@@ -57,8 +65,8 @@ mod tests {
                         continue;
                     }
                 }
-                println!("id: ------------  {}", i);
-                println!("{:?}", result);
+                println!("id: ------------  {}", i.to_string().green());
+                display_check_result(result);
             }
         }
         assert_eq!(0, 0);
@@ -70,8 +78,8 @@ mod tests {
             let data: SekData = serde_json::from_str(&data).unwrap();
             let result = check_sek_bty_type(data);
             if result.len() > 0 {
-                println!("id: ------------  {}", i);
-                println!("{:?}", result);
+                println!("id: ------------  {}", i.to_string().green());
+                display_check_result(result);
             }
         }
     }
