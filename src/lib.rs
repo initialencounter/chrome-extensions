@@ -31,7 +31,12 @@ mod tests {
     use super::*;
 
     fn display_check_result(result: Vec<CheckResult>) {
+        let mut id = 0;
         for i in result {
+            id += 1;
+            if id != 1 {
+                print!("     ");
+            }
             println!("{}", i.result.red());
         }
     }
@@ -44,7 +49,7 @@ mod tests {
         let result = check_pek_bty_type(data);
         if result.len() > 0 {
             if result.len() == 1 {}
-            println!("id: ------------  {}", i.to_string().green());
+            print!("{}: ", i.to_string().green());
             display_check_result(result);
         }
 
@@ -55,9 +60,6 @@ mod tests {
         for i in 1..=164 {
             let data = fs::read_to_string(format!("tests/data/pek/data{}.json", i)).unwrap();
             let data: PekData = serde_json::from_str(&data).unwrap();
-            if data.inspection_item3_text1.is_empty() {
-                println!("id: ------------  {}", i.to_string().green());
-            }
             let result = check_pek_bty_type(data);
             if result.len() > 0 {
                 if result.len() == 1 {
@@ -65,7 +67,7 @@ mod tests {
                         continue;
                     }
                 }
-                println!("id: ------------  {}", i.to_string().green());
+                print!("{}: ", i.to_string().green());
                 display_check_result(result);
             }
         }
@@ -78,7 +80,7 @@ mod tests {
             let data: SekData = serde_json::from_str(&data).unwrap();
             let result = check_sek_bty_type(data);
             if result.len() > 0 {
-                println!("id: ------------  {}", i.to_string().green());
+                print!("{}: ", i.to_string().green());
                 display_check_result(result);
             }
         }
