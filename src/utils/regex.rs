@@ -6,6 +6,7 @@ lazy_static! {
     static ref NUMBER_REGEX: Regex = Regex::new(r"[0-9]+(\.\d*)?").unwrap();
     static ref VOLTAGE_REGEX: Regex = Regex::new(r"(\d+\.{0,1}\d*)[Vv]").unwrap();
     static ref CAPACITY_REGEX: Regex = Regex::new(r"(\d+\.{0,1}\d*)[Mm]?[Aa][Hh]").unwrap();
+    static ref BATTERY_WEIGHT_REGEX: Regex = Regex::new(r"(\d+\.?\d*)[Kk]?[g]").unwrap();
 }
 
 pub fn match_watt_hour(project_name: &str) -> f32 {
@@ -61,4 +62,19 @@ pub fn match_capacity(project_name: &str) -> f32 {
         capacity *= 1000.0;
     }
     capacity
+}
+
+pub fn match_battery_weight(describe: &str) -> f32 {
+    let matches: Vec<f32> = BATTERY_WEIGHT_REGEX
+        .captures_iter(describe)
+        .filter_map(|cap| cap[1].parse::<f32>().ok())
+        .collect();
+    if matches.is_empty() {
+        return 0.0;
+    }
+    let mut weight = matches[matches.len() - 1];
+    if describe.to_lowercase().contains("kg") {
+        weight *= 1000.0;
+    }
+    weight
 }

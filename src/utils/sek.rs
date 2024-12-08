@@ -2,7 +2,10 @@ use std::collections::HashMap;
 
 use crate::models::{CheckResult, SekData};
 
-use super::regex::{match_capacity, match_number, match_voltage, match_watt_hour};
+use super::{
+    parse_net_weight,
+    regex::{match_battery_weight, match_capacity, match_number, match_voltage, match_watt_hour},
+};
 
 pub fn check_sek_bty_type(current_data: SekData) -> Vec<CheckResult> {
     let mut result = Vec::new();
@@ -29,6 +32,13 @@ pub fn check_sek_bty_type(current_data: SekData) -> Vec<CheckResult> {
     let item_ename = &current_data.item_e_name;
     let bty_kind = &current_data.bty_kind;
     let bty_type = &current_data.bty_type;
+    let bty_count = current_data.bty_count.parse::<f32>().unwrap_or(0.0);
+    // 净重转换
+    let _net_weight = parse_net_weight(&current_data.bty_net_weight);
+    // 真实显示净重数字 单位：g
+    let net_weight_display = match_number(&current_data.other_describe) * 1000.0;
+    // 电池净重
+    let battery_weight = match_battery_weight(&current_data.other_describe);
     let voltage = match_voltage(&current_data.item_c_name);
     let capacity = match_capacity(&current_data.item_c_name);
     let watt_hour = match_number(&current_data.inspection_item1_text1);
@@ -103,6 +113,18 @@ pub fn check_sek_bty_type(current_data: SekData) -> Vec<CheckResult> {
             result.push(CheckResult {
                 ok: false,
                 result: "电池形状或尺寸错误".to_string(),
+            });
+        }
+    }
+
+    // 电池净重验证
+    if battery_weight > 0.0 && bty_count > 0.0 && net_weight_display > 0.0 {
+        let expected_net_weight = battery_weight * bty_count;
+        let abs = (expected_net_weight - net_weight_display) / net_weight_display;
+        if abs > 0.05 && bty_count > 1.0 {
+            result.push(CheckResult {
+                ok: false,
+                result: "电池净重误差大于5%".to_string(),
             });
         }
     }

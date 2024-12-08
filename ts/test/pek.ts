@@ -45,3 +45,25 @@ for (let i = 1; i < 165; i++) {
 //         console.log(i, 'no voltage')
 //     }
 // }
+
+// function matchBatteryWeight(describe: string) {
+//     const matches = [...describe.matchAll(/(\d+\.?\d*)[Kk]?[g]/g)]
+//     const results = matches.map((match) => match[1])
+//     let weight = Number(results[0])
+//     if (!results.length) return 0
+//     if (isNaN(weight)) return 0
+//     if (describe.toLowerCase().includes("kg")) weight = weight * 1000
+//     return weight
+// }
+//
+// for (let i = 1; i < 165; i++) {
+//     const data: PekData = JSON.parse(readFileSync(path.resolve(cwd, `../../tests/data/pek/data${i}.json`), 'utf-8'))
+//     let otherDescribeCAddition = data['otherDescribeCAddition']
+//     const weight = matchBatteryWeight(otherDescribeCAddition)
+//     if (weight) {
+//         console.log(i, weight)
+//     } else {
+//         console.log(otherDescribeCAddition)
+//         console.log(i, 'no weight')
+//     }
+// }

@@ -8,7 +8,7 @@ use super::{
     get_bty_type_code, get_is_cargo_only, get_is_single_cell, get_pkg_info,
     get_pkg_info_by_pack_cargo, get_pkg_info_subtype, get_un_no, is_battery_label,
     parse_net_weight, pek_is_dangerous, pkg_info_is_ia,
-    regex::{match_number, match_watt_hour},
+    regex::{match_battery_weight, match_number, match_watt_hour},
 };
 
 pub fn check_pek_bty_type(current_data: PekData) -> Vec<CheckResult> {
@@ -36,10 +36,14 @@ pub fn check_pek_bty_type(current_data: PekData) -> Vec<CheckResult> {
         .unwrap_or(match_number(&current_data.inspection_item4_text1));
 
     // 电池数量转换
-    let _bty_count = current_data.bty_count.parse::<f32>().unwrap_or(0.0);
+    let bty_count = current_data.bty_count.parse::<f32>().unwrap_or(0.0);
 
     // 净重转换
     let net_weight = parse_net_weight(&current_data.net_weight);
+    // 真实显示净重数字 单位：g
+    let net_weight_display = match_number(&current_data.other_describe) * 1000.0;
+    // 电池净重
+    let battery_weight = match_battery_weight(&current_data.other_describe);
     // 单芯电池或电芯
     let is_single_cell = get_is_single_cell(transfer_str_to_bty_type(&bty_type_string));
     // 电池形状
@@ -157,6 +161,17 @@ pub fn check_pek_bty_type(current_data: PekData) -> Vec<CheckResult> {
             ok: false,
             result: "电池净重为空".to_string(),
         });
+    }
+
+    if battery_weight > 0.0 && bty_count > 0.0 && net_weight_display > 0.0 {
+        let expected_net_weight = battery_weight * bty_count;
+        let abs = (expected_net_weight - net_weight_display) / net_weight_display;
+        if abs > 0.05 && bty_count > 1.0 {
+            result.push(CheckResult {
+                ok: false,
+                result: "电池净重误差大于5%".to_string(),
+            });
+        }
     }
     // 包装说明验证
     if pkg_info_subtype == PkgInfoSubType::None {

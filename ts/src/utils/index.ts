@@ -29,6 +29,16 @@ function matchCapacity(projectName: string) {
   return result
 }
 
+function matchBatteryWeight(describe: string) {
+  const matches = [...describe.matchAll(/(\d+\.?\d*)[Kk]?[g]/g)]
+  const results = matches.map((match) => match[1])
+  let weight = Number(results[0])
+  if (!results.length) return 0
+  if (isNaN(weight)) return 0
+  if (describe.toLowerCase().includes("kg")) weight = weight * 1000
+  return weight
+}
+
 function getBtyTypeCode(
   currentData: PekData
 ): '500' | '501' | '502' | '503' | '504' | '505' {
@@ -243,5 +253,6 @@ function matchNumber(num: string) {
 export {
   matchWattHour, getBtyTypeCode, getIsSingleCell, pekIsDangerous,
   getPkgInfo, isBatteryLabel, getPkgInfoByPackCargo, getPkgInfoSubType,
-  getUNNO, getIsCargoOnly, pkgInfoIsIA, parseNetWeight, matchNumber, matchVoltage, matchCapacity
+  getUNNO, getIsCargoOnly, pkgInfoIsIA, parseNetWeight, matchNumber,
+  matchVoltage, matchCapacity, matchBatteryWeight
 }

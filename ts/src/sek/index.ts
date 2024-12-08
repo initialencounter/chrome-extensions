@@ -1,5 +1,5 @@
 import { CheckResult, SekData } from "../types/index"
-import { matchCapacity, matchNumber, matchVoltage, matchWattHour } from "../utils/index"
+import { matchBatteryWeight, matchCapacity, matchNumber, matchVoltage, matchWattHour } from "../utils/index"
 
 function checkSekBtyType(currentData: SekData): CheckResult[] {
   const result = []
@@ -25,6 +25,10 @@ function checkSekBtyType(currentData: SekData): CheckResult[] {
   const btyKind = currentData['btyKind']
   // 锂离子电池 锂离子电芯 锂金属电池 锂金属电芯 单芯锂离子电池 单芯锂金属电池
   // '500'    | '501'    | '504'  |  '502'   | '503'       | '505'
+  const batteryWeight = matchBatteryWeight(currentData['otherDescribeCAddition'])
+  const btyCount = matchNumber(currentData['btyCount'])
+  const netWeight = matchNumber(currentData['btyNetWeight'])
+  const netWeightDisplay = matchNumber(currentData['btyNetWeight']) * 1000
   const voltage = matchVoltage(itemCName)
   const capacity = matchCapacity(itemCName)
   const wattHour = matchNumber(currentData['inspectionItem1Text1'])
@@ -79,6 +83,14 @@ function checkSekBtyType(currentData: SekData): CheckResult[] {
   }
   const otherDescribe = currentData['otherDescribe']
   const btyGrossWeight = currentData['btyGrossWeight']
+  // 电池净重计算
+  if (batteryWeight && btyCount && netWeightDisplay) {
+    let expectedNetWeight = batteryWeight * btyCount
+    let abs = Math.abs((expectedNetWeight - netWeightDisplay) / netWeightDisplay)
+    if (abs > 0.05 && btyCount > 1) {
+      result.push({ ok: false, result: '电池净重误差大于5%' })
+    }
+  }
   if (!otherDescribe) result.push({ ok: false, result: '其他描述包装方式为空' })
   if (otherDescribe.length > 3)
     result.push({ ok: false, result: '其他描述包装方式不唯一' })

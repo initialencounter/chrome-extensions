@@ -4,7 +4,8 @@ import {
   getPkgInfo, isBatteryLabel, getPkgInfoByPackCargo, getPkgInfoSubType,
   getUNNO, getIsCargoOnly, pkgInfoIsIA,
   parseNetWeight,
-  matchNumber
+  matchNumber,
+  matchBatteryWeight
 } from "../utils/index"
 
 function checkPekBtyType(currentData: PekData): CheckResult[] {
@@ -25,9 +26,13 @@ function checkPekBtyType(currentData: PekData): CheckResult[] {
   // 锂含量
   const liContent = matchNumber(currentData['inspectionItem4Text1'])
   // 电池数量
-  const btyCount = Number(currentData['btyCount'])
-  // 净重
+  const btyCount = matchNumber(currentData['btyCount'])
+  // 净重 单位：g
   const netWeight = parseNetWeight(currentData['netWeight'])
+  // 真实显示净重数字 单位：g
+  const netWeightDisplay = matchNumber(currentData['netWeight']) * 1000
+  // 电池重量
+  const batteryWeight = matchBatteryWeight(currentData['otherDescribeCAddition'])
   // 单芯电池或电芯
   const isSingleCell = getIsSingleCell(btyType)
   // 电池形状
@@ -104,6 +109,13 @@ function checkPekBtyType(currentData: PekData): CheckResult[] {
   if (!btyKind) result.push({ ok: false, result: '电池型号为空' })
   // 电池净重
   if (netWeight === 0) result.push({ ok: false, result: '电池净重为空' })
+  if (batteryWeight && btyCount && netWeightDisplay) {
+    let expectedNetWeight = batteryWeight * btyCount
+    let abs = Math.abs((expectedNetWeight - netWeightDisplay) / netWeightDisplay)
+    if (abs > 0.05 && btyCount > 1) {
+      result.push({ ok: false, result: '电池净重误差大于5%' })
+    }
+  }
   if (pkgInfoSubType === '') {
     result.push({ ok: false, result: '包装说明为空' })
   }
