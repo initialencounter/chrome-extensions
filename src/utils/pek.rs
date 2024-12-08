@@ -1,22 +1,15 @@
-use serde::{Deserialize, Serialize};
-
 use crate::models::{
     transfer_i64_to_other_describe, transfer_str_to_bty_type, transfer_str_to_pek_pkg_info,
-    transfer_str_to_pek_unno, OtherDescribe, PekData, PekPkgInfo, PekUNNO, PkgInfoSubType,
+    transfer_str_to_pek_unno, CheckResult, OtherDescribe, PekData, PekPkgInfo, PekUNNO,
+    PkgInfoSubType,
 };
 
 use super::{
     get_bty_type_code, get_is_cargo_only, get_is_single_cell, get_pkg_info,
     get_pkg_info_by_pack_cargo, get_pkg_info_subtype, get_un_no, is_battery_label,
     parse_net_weight, pek_is_dangerous, pkg_info_is_ia,
-    regex::{match_li_content_or_watt_hour, match_watt_hour},
+    regex::{match_number, match_watt_hour},
 };
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct CheckResult {
-    pub(crate) ok: bool,
-    pub(crate) result: String,
-}
 
 pub fn check_pek_bty_type(current_data: PekData) -> Vec<CheckResult> {
     let mut result = Vec::new();
@@ -27,13 +20,12 @@ pub fn check_pek_bty_type(current_data: PekData) -> Vec<CheckResult> {
     let item_ename = &current_data.item_e_name;
     let bty_kind = current_data.model.as_str();
 
+    // 电压
+    let voltage: f32 = match_number(&current_data.inspection_item2_text1);
+    // 容量
+    let capacity: f32 = match_number(&current_data.inspection_item2_text2);
     // 瓦时数转换
-    let watt_hour: f32 = current_data
-        .inspection_item3_text1
-        .parse::<f32>()
-        .unwrap_or(match_li_content_or_watt_hour(
-            &current_data.inspection_item3_text1,
-        ));
+    let watt_hour: f32 = match_number(&current_data.inspection_item3_text1);
 
     let watt_hour_from_name = match_watt_hour(&current_data.item_c_name);
 
@@ -41,9 +33,7 @@ pub fn check_pek_bty_type(current_data: PekData) -> Vec<CheckResult> {
     let li_content = current_data
         .inspection_item4_text1
         .parse::<f32>()
-        .unwrap_or(match_li_content_or_watt_hour(
-            &current_data.inspection_item4_text1,
-        ));
+        .unwrap_or(match_number(&current_data.inspection_item4_text1));
 
     // 电池数量转换
     let _bty_count = current_data.bty_count.parse::<f32>().unwrap_or(0.0);
@@ -426,6 +416,24 @@ pub fn check_pek_bty_type(current_data: PekData) -> Vec<CheckResult> {
             ok: false,
             result: "检查项目6错误，附有随机文件应为：否".to_string(),
         });
+    }
+    // 电压大于7V，可能为电池组
+    if voltage > 7.0 && (bty_type_string == "503" || bty_type_string == "501") {
+        result.push(CheckResult {
+            ok: false,
+            result: "电压大于7V，可能为电池组".to_string(),
+        });
+    }
+    // 电压*容量 与 瓦时数 误差大于5%
+    if voltage > 0.0 && capacity > 0.0 && watt_hour > 0.0 && watt_hour_from_name == watt_hour {
+        let expected_watt_hour = voltage * capacity / 1000.0;
+        let abs = (expected_watt_hour - watt_hour) / watt_hour;
+        if abs > 0.05 {
+            result.push(CheckResult {
+                ok: false,
+                result: "容量*电压 与 瓦时数 误差大于5%".to_string(),
+            });
+        }
     }
     // 鉴别项目1
     let inspection_item3_text1 = current_data.inspection_item3_text1;

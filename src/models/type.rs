@@ -1,3 +1,4 @@
+use serde::{Deserialize, Serialize};
 use std::fmt;
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -225,4 +226,10 @@ pub fn transfer_str_to_bty_type(bty_type_string: &str) -> BtyType {
         "505" => BtyType::Bty505,
         _ => BtyType::Bty500,
     }
+}
+
+#[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
+pub struct CheckResult {
+    pub ok: bool,
+    pub result: String,
 }

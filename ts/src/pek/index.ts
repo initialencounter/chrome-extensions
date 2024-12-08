@@ -4,7 +4,7 @@ import {
   getPkgInfo, isBatteryLabel, getPkgInfoByPackCargo, getPkgInfoSubType,
   getUNNO, getIsCargoOnly, pkgInfoIsIA,
   parseNetWeight,
-  matchLiContentOrWattHour
+  matchNumber
 } from "../utils/index"
 
 function checkPekBtyType(currentData: PekData): CheckResult[] {
@@ -15,11 +15,15 @@ function checkPekBtyType(currentData: PekData): CheckResult[] {
   const itemEName = currentData['itemEName']
   // 型号
   const btyKind = currentData['model']
+  // 电压
+  const voltage = matchNumber(currentData['inspectionItem2Text1'])
+  // 容量
+  const capacity = matchNumber(currentData['inspectionItem2Text2'])
   // 瓦时
-  const wattHour = matchLiContentOrWattHour(currentData['inspectionItem3Text1'])
+  const wattHour = matchNumber(currentData['inspectionItem3Text1'])
   const wattHourFromName = matchWattHour(currentData['itemCName'])
   // 锂含量
-  const liContent = matchLiContentOrWattHour(currentData['inspectionItem4Text1'])
+  const liContent = matchNumber(currentData['inspectionItem4Text1'])
   // 电池数量
   const btyCount = Number(currentData['btyCount'])
   // 净重
@@ -238,6 +242,25 @@ function checkPekBtyType(currentData: PekData): CheckResult[] {
   // 检查项目6 是否含随附文件
   if (Number(currentData['inspectionItem5']) !== 0)
     result.push({ ok: false, result: '检查项目6错误，附有随机文件应为：否' })
+  // 电压大于7V，可能为电池组
+  if (voltage > 7 && (btyType === '503' || btyType === '501')) {
+    result.push({ ok: false, result: '电压大于7V，可能为电池组' })
+  }
+  // 容量*电压 与 瓦时数 误差大于5%
+  if (capacity && voltage && wattHour && wattHourFromName === wattHour) {
+    let expectedWattHour = capacity * voltage / 1000
+    let abs = Math.abs((expectedWattHour - wattHour) / wattHour)
+    //     console.log(`
+    // projectName: ${itemCName}
+    // voltage: ${voltage}
+    // capacity: ${capacity}
+    // expectedWattHour: ${expectedWattHour}
+    // wattHour: ${wattHour}
+    // abs: ${abs}`)
+    if (abs > 0.05) {
+      result.push({ ok: false, result: '容量*电压 与 瓦时数 误差大于5%' })
+    }
+  }
   // 鉴别项目1
   if (isIon) {
     if (currentData['inspectionItem3Text1'] === '')

@@ -3,11 +3,30 @@ import { PekData, PekPkgInfo, PekUNNO, PkgInfoSubType } from "../types/index"
 function matchWattHour(projectName: string) {
   const matches = [...projectName.matchAll(/\s(\d+\.?\d+)[Kk]?[Ww][Hh]/g)]
   const results = matches.map((match) => match[1])
-  let wattHour = Number(results[0])
+  let wattHour = Number(results[results.length - 1])
   if (!results.length) return 0
   if (isNaN(wattHour)) return 0
   if (projectName.toLowerCase().includes('kwh')) wattHour *= 1000
   return wattHour
+}
+
+function matchVoltage(projectName: string) {
+  const matches = [...projectName.matchAll(/(\d+\.?\d*)[Vv]/g)]
+  const results = matches.map((match) => match[1])
+  let voltage = Number(results[results.length - 1])
+  if (!results.length) return 0
+  if (isNaN(voltage)) return 0
+  return voltage
+}
+
+function matchCapacity(projectName: string) {
+  let matches = [...projectName.matchAll(/(\d+\.?\d*)[Mm]?[Aa][Hh]/g)]
+  let results = matches.map((match) => match[1])
+  let result = Number(results[results.length - 1])
+  if (!results.length) return 0
+  if (isNaN(result)) return 0
+  if (!projectName.toLowerCase().includes('mah')) result *= 1000
+  return result
 }
 
 function getBtyTypeCode(
@@ -168,25 +187,25 @@ function pkgInfoIsIA(
   isSingleCell: boolean
 ): boolean {
   if (pkgInfo === '965') {
-      if (wattHour > 100) {
-          return true;
-      }
-      if (isSingleCell && wattHour > 20) {
-          return true;
-      }
-      if (netWeight > 10) {
-          return true;
-      }
-      return false;
+    if (wattHour > 100) {
+      return true;
+    }
+    if (isSingleCell && wattHour > 20) {
+      return true;
+    }
+    if (netWeight > 10) {
+      return true;
+    }
+    return false;
   }
   if (pkgInfo === '968') {
-      if (liContent > 2) {
-          return true;
-      }
-      if (isSingleCell && liContent > 1) {
-          return true;
-      }
-      return netWeight > 2.5;
+    if (liContent > 2) {
+      return true;
+    }
+    if (isSingleCell && liContent > 1) {
+      return true;
+    }
+    return netWeight > 2.5;
 
   }
   return false;
@@ -195,23 +214,23 @@ function pkgInfoIsIA(
 function parseNetWeight(net_weight: string) {
   net_weight = net_weight.replace(/ /g, '')
   if (net_weight.length === 0) {
-      return NaN;
+    return NaN;
   }
   switch (net_weight) {
-      case "<5":
-          return 4.9;
-      case "＜5":
-          return 4.9;
-      case "<35":
-          return 34.9;
-      case "＜35":
-          return 34.9;
-      default:
-          return Number(net_weight);
+    case "<5":
+      return 4.9;
+    case "＜5":
+      return 4.9;
+    case "<35":
+      return 34.9;
+    case "＜35":
+      return 34.9;
+    default:
+      return Number(net_weight);
   }
 }
 
-function matchLiContentOrWattHour(num: string) {
+function matchNumber(num: string) {
   num = num.replace(/ /g, '')
   let matches = [...num.matchAll(/[0-9]+(\.\d*)?/g)]
   let results = matches.map((match) => match[0])
@@ -221,6 +240,8 @@ function matchLiContentOrWattHour(num: string) {
 }
 
 
-export { matchWattHour, getBtyTypeCode, getIsSingleCell, pekIsDangerous, 
-  getPkgInfo, isBatteryLabel, getPkgInfoByPackCargo, getPkgInfoSubType, 
-  getUNNO, getIsCargoOnly, pkgInfoIsIA, parseNetWeight, matchLiContentOrWattHour }
+export {
+  matchWattHour, getBtyTypeCode, getIsSingleCell, pekIsDangerous,
+  getPkgInfo, isBatteryLabel, getPkgInfoByPackCargo, getPkgInfoSubType,
+  getUNNO, getIsCargoOnly, pkgInfoIsIA, parseNetWeight, matchNumber, matchVoltage, matchCapacity
+}

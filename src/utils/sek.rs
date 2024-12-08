@@ -1,16 +1,8 @@
 use std::collections::HashMap;
 
-use serde::{Deserialize, Serialize};
+use crate::models::{CheckResult, SekData};
 
-use crate::models::SekData;
-
-use super::regex::match_watt_hour;
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct CheckResult {
-    pub ok: bool,
-    pub result: String,
-}
+use super::regex::{match_capacity, match_number, match_voltage, match_watt_hour};
 
 pub fn check_sek_bty_type(current_data: SekData) -> Vec<CheckResult> {
     let mut result = Vec::new();
@@ -37,6 +29,10 @@ pub fn check_sek_bty_type(current_data: SekData) -> Vec<CheckResult> {
     let item_ename = &current_data.item_e_name;
     let bty_kind = &current_data.bty_kind;
     let bty_type = &current_data.bty_type;
+    let voltage = match_voltage(&current_data.item_c_name);
+    let capacity = match_capacity(&current_data.item_c_name);
+    let watt_hour = match_number(&current_data.inspection_item1_text1);
+    let watt_hour_from_name = match_watt_hour(&current_data.item_c_name);
 
     // 电池类型验证
     if item_cname.contains("芯") && !["501", "503"].contains(&bty_type.as_str()) {
@@ -46,6 +42,24 @@ pub fn check_sek_bty_type(current_data: SekData) -> Vec<CheckResult> {
         });
     }
 
+    // 电压大于7V，可能为电池组
+    if voltage > 7.0 && (bty_type == "503" || bty_type == "501") {
+        result.push(CheckResult {
+            ok: false,
+            result: "电压大于7V，可能为电池组".to_string(),
+        });
+    }
+    // 电压*容量 与 瓦时数 误差大于5%
+    if voltage > 0.0 && capacity > 0.0 && watt_hour > 0.0 && watt_hour_from_name == watt_hour {
+        let expected_watt_hour = voltage * capacity / 1000.0;
+        let abs = (expected_watt_hour - watt_hour) / watt_hour;
+        if abs > 0.05 {
+            result.push(CheckResult {
+                ok: false,
+                result: "容量*电压 与 瓦时数 误差大于5%".to_string(),
+            });
+        }
+    }
     // 基本验证
     if item_cname.is_empty() {
         result.push(CheckResult {
