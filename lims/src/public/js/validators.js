@@ -1,14 +1,143 @@
 "use strict";
 (() => {
-  // src/utils/index.ts
+  // src/shared/btySizeBtyShape.ts
+  function btySizeBtyShape(btySize, btyShape) {
+    if (btySize.includes("Φ") || btySize.includes("φ") || btySize.includes("Ø") || btySize.includes("ø")) {
+      if (![
+        "8aad92b65aae82c3015ab094788a0026",
+        "8aad92b65d7a7078015d7e1bb1a2245d",
+        "521",
+        "2c9180838b90642e018bf132f37f5a60"
+      ].includes(btyShape)) {
+        return [{ ok: false, result: "电池形状或尺寸错误，应为扣式 近圆柱体 圆柱体 球形" }];
+      }
+    }
+    return [];
+  }
+
+  // src/shared/btySizeUnit.ts
+  function btySizeUnit(btySize) {
+    if (btySize.replace(/ /g, "").length > 0) {
+      if (!btySize.includes("m") && !btySize.includes("M"))
+        return [{ ok: false, result: "电池尺寸缺失单位" }];
+    }
+    return [];
+  }
+
+  // src/shared/btyWeightCalculate.ts
+  function btyWeightCalculate(batteryWeight, btyCount, netWeightDisplay) {
+    if (batteryWeight && btyCount && netWeightDisplay) {
+      let expectedNetWeight = batteryWeight * btyCount;
+      let abs = Math.abs((expectedNetWeight - netWeightDisplay) / netWeightDisplay);
+      if (abs > 0.05 && btyCount > 1) {
+        return [{ ok: false, result: "电池净重误差大于5%" }];
+      }
+    }
+    return [];
+  }
+
+  // src/shared/cellOrBattery.ts
+  function cellOrBattery(isCell, otherDescribeCAddition, isChargeBoxOrRelated) {
+    let result = [];
+    if (isCell && !otherDescribeCAddition.includes("单块电芯") && !isChargeBoxOrRelated)
+      result.push({ ok: false, result: "物品为电芯时，描述中不应该出现单块电池" });
+    if (!isCell && !otherDescribeCAddition.includes("单块电池") && !isChargeBoxOrRelated)
+      result.push({ ok: false, result: "物品为电池时，描述中不应该出现单块电芯" });
+    return result;
+  }
+
+  // src/shared/itemCNameBtyType.ts
+  function itemCNameBtyType(itemCName, btyType) {
+    if (itemCName.includes("芯") && !["501", "503"].includes(btyType))
+      return [{ ok: false, result: "电池类型应为电芯" }];
+    return [];
+  }
+
+  // src/shared/itemNameModel.ts
+  function itemNameModel(itemCName, itemEName, btyKind) {
+    let result = [];
+    if (!itemCName.includes(btyKind))
+      result.push({
+        ok: false,
+        result: "型号或中文品名错误，电池型号不在项目中文名称中"
+      });
+    if (!itemEName.includes(btyKind))
+      result.push({
+        ok: false,
+        result: "型号或英文品名错误，电池型号不在项目英文名称中"
+      });
+    return result;
+  }
+
+  // src/shared/voltageBtyType.ts
+  function voltageBtyType(voltage, btyType) {
+    if (voltage > 7 && (btyType === "503" || btyType === "501")) {
+      return [{ ok: false, result: "电压大于7V，可能为电池组" }];
+    }
+    return [];
+  }
+
+  // src/shared/wattHourCalculate.ts
+  function wattHourCalculate(capacity, voltage, wattHour, wattHourFromName) {
+    if (capacity && voltage && wattHour && wattHourFromName === wattHour) {
+      let expectedWattHour = capacity * voltage / 1e3;
+      let abs = Math.abs((expectedWattHour - wattHour) / wattHour);
+      if (abs > 0.05) {
+        return [{ ok: false, result: "容量*电压 与 瓦时数 误差大于5%" }];
+      }
+    }
+    return [];
+  }
+
+  // src/shared/index.ts
+  function baseCheck(btySize, btyShape, batteryWeight, btyCount, netWeightDisplay, btyType, otherDescribeCAddition, isChargeBoxOrRelated, isCell, itemCName, itemEName, btyKind, voltage, capacity, wattHour, wattHourFromName) {
+    let result = [];
+    result.push(...btySizeUnit(btySize));
+    result.push(...btySizeBtyShape(btySize, btyShape));
+    result.push(...btyWeightCalculate(batteryWeight, btyCount, netWeightDisplay));
+    result.push(...cellOrBattery(isCell, otherDescribeCAddition, isChargeBoxOrRelated));
+    result.push(...itemCNameBtyType(itemCName, btyType));
+    result.push(...itemNameModel(itemCName, itemEName, btyKind));
+    result.push(...voltageBtyType(voltage, btyType));
+    result.push(...wattHourCalculate(capacity, voltage, wattHour, wattHourFromName));
+    return result;
+  }
+
+  // src/shared/utils/index.ts
   function matchWattHour(projectName) {
     const matches = [...projectName.matchAll(/\s(\d+\.?\d+)[Kk]?[Ww][Hh]/g)];
     const results = matches.map((match) => match[1]);
-    let wattHour = Number(results[0]);
+    let wattHour = Number(results[results.length - 1]);
     if (!results.length) return 0;
     if (isNaN(wattHour)) return 0;
     if (projectName.toLowerCase().includes("kwh")) wattHour *= 1e3;
     return wattHour;
+  }
+  function matchVoltage(projectName) {
+    const matches = [...projectName.matchAll(/(\d+\.?\d*)[Vv]/g)];
+    const results = matches.map((match) => match[1]);
+    let voltage = Number(results[results.length - 1]);
+    if (!results.length) return 0;
+    if (isNaN(voltage)) return 0;
+    return voltage;
+  }
+  function matchCapacity(projectName) {
+    let matches = [...projectName.matchAll(/(\d+\.?\d*)[Mm]?[Aa][Hh]/g)];
+    let results = matches.map((match) => match[1]);
+    let result = Number(results[results.length - 1]);
+    if (!results.length) return 0;
+    if (isNaN(result)) return 0;
+    if (!projectName.toLowerCase().includes("mah")) result *= 1e3;
+    return result;
+  }
+  function matchBatteryWeight(describe) {
+    const matches = [...describe.matchAll(/(\d+\.?\d*)[Kk]?[g]/g)];
+    const results = matches.map((match) => match[1]);
+    let weight = Number(results[0]);
+    if (!results.length) return 0;
+    if (isNaN(weight)) return 0;
+    if (describe.toLowerCase().includes("kg")) weight = weight * 1e3;
+    return weight;
   }
   function getBtyTypeCode(currentData) {
     const isIon = String(currentData["type1"]) === "1";
@@ -21,6 +150,12 @@
       if (isCell) return "503";
       else return isSingleCell ? "505" : "502";
     }
+  }
+  function getIsIon(btyType) {
+    return btyType === "500" || btyType === "501" || btyType === "504";
+  }
+  function getIsCell(btyType) {
+    return btyType === "501" || btyType === "503";
   }
   function getIsSingleCell(btyType) {
     return !["500", "502"].includes(btyType);
@@ -161,7 +296,7 @@
         return Number(net_weight);
     }
   }
-  function matchLiContentOrWattHour(num) {
+  function matchNumber(num) {
     num = num.replace(/ /g, "");
     let matches = [...num.matchAll(/[0-9]+(\.\d*)?/g)];
     let results = matches.map((match) => match[0]);
@@ -170,191 +305,9 @@
     return result;
   }
 
-  // src/pek/index.ts
-  function checkPekBtyType(currentData) {
-    const result = [];
-    const btyType = getBtyTypeCode(currentData);
-    const itemCName = currentData["itemCName"];
-    const itemEName = currentData["itemEName"];
-    const btyKind = currentData["model"];
-    const wattHour = matchLiContentOrWattHour(currentData["inspectionItem3Text1"]);
-    const wattHourFromName = matchWattHour(currentData["itemCName"]);
-    const liContent = matchLiContentOrWattHour(currentData["inspectionItem4Text1"]);
-    const btyCount = Number(currentData["btyCount"]);
-    const netWeight = parseNetWeight(currentData["netWeight"]);
-    const isSingleCell = getIsSingleCell(btyType);
-    const btyShape = currentData["shape"];
-    const btySize = currentData["size"];
-    const unno = currentData["unno"];
-    const isCell = String(currentData["type2"]) === "1";
-    const classOrDiv = currentData["classOrDiv"];
-    const otherDescribe = currentData["otherDescribe"];
-    const packPassengerCargo = currentData["packPassengerCargo"];
-    const packCargo = currentData["packCargo"];
-    const inspectionItem1 = String(currentData["inspectionItem1"]);
-    const isIon = String(currentData["type1"]) === "1";
-    const pkgInfo = getPkgInfo(unno, isIon, inspectionItem1);
-    const inspectionItem5Text1 = currentData["inspectionItem5Text1"];
-    const pkgInfoByPackCargo = getPkgInfoByPackCargo(inspectionItem5Text1, packCargo);
-    const pkgInfoSubType = getPkgInfoSubType(inspectionItem5Text1, packCargo);
-    const inspectionItem6 = currentData["inspectionItem6"];
-    const inspectionItem2 = currentData["inspectionItem2"];
-    const according = currentData["according"];
-    const isChargeBoxOrRelated = currentData["otherDescribeCAddition"].includes("总净重");
-    const isDangerous = pekIsDangerous(
-      wattHour,
-      pkgInfo,
-      liContent,
-      netWeight,
-      isSingleCell
-    );
-    const isIA = pkgInfoIsIA(wattHour, pkgInfo, liContent, netWeight, isSingleCell);
-    if (itemCName.includes("芯") && !["501", "503"].includes(btyType))
-      result.push({ ok: false, result: "电池类型应为电芯" });
-    if (!itemCName) result.push({ ok: false, result: "中文品名为空" });
-    if (!itemEName) result.push({ ok: false, result: "英文品名为空" });
-    if (btySize.includes("m") && btySize.includes("M"))
-      result.push({ ok: false, result: "电池尺寸缺失单位" });
-    if (btySize.includes("Φ") || btySize.includes("φ") || btySize.includes("Ø") || btySize.includes("ø")) {
-      if (![
-        "8aad92b65aae82c3015ab094788a0026",
-        "8aad92b65d7a7078015d7e1bb1a2245d",
-        "521",
-        "2c9180838b90642e018bf132f37f5a60"
-      ].includes(btyShape)) {
-        result.push({ ok: false, result: "电池形状或尺寸错误，应为扣式 近圆柱体 圆柱体 球形" });
-      }
-    }
-    if (!btyKind) result.push({ ok: false, result: "电池型号为空" });
-    if (netWeight === 0) result.push({ ok: false, result: "电池净重为空" });
-    if (pkgInfoSubType === "") {
-      result.push({ ok: false, result: "包装说明为空" });
-    }
-    if (!isNaN(netWeight)) {
-      if (netWeight > 2.5) {
-        if (pkgInfoSubType === "968, IB") {
-          result.push({ ok: false, result: "968，IB 电池净重超过2.5kg" });
-        }
-      } else if (netWeight > 5) {
-        if (pkgInfoSubType === "966, II" || pkgInfoSubType === "967, II" || pkgInfoSubType === "969, II" || pkgInfoSubType === "970, II") {
-          result.push({ ok: false, result: `${pkgInfoSubType} 电池净重超过5kg` });
-        }
-      } else if (netWeight > 10) {
-        if (pkgInfoSubType === "965, IB") {
-          result.push({ ok: false, result: `${pkgInfoSubType} 电池净重超过10kg` });
-        }
-      } else if (netWeight > 35) {
-        if (pkgInfoSubType === "965, IA" || pkgInfoSubType === "966, I" || pkgInfoSubType === "967, I" || pkgInfoSubType === "968, IA" || pkgInfoSubType === "969, I" || pkgInfoSubType === "970, I") {
-          result.push({ ok: false, result: `${pkgInfoSubType} 电池净重超过35kg` });
-        }
-      }
-    }
-    if (isCell) {
-      if (otherDescribe.includes("1791") || otherDescribe.includes("1794")) {
-        result.push({ ok: false, result: "物品为电芯，不应勾选: 该电池已经做好防短路...或该锂电池不属于召回电芯..." });
-      }
-    } else {
-      if (otherDescribe.includes("1792") || otherDescribe.includes("1795")) {
-        result.push({ ok: false, result: "物品为电池，不应勾选: 该电芯已经做好防短路...或该锂电芯不属于召回电芯..." });
-      }
-    }
-    if (pkgInfo === "965" && !otherDescribe.includes("8aad92b65887a3a8015889d0cd7d0093")) {
-      result.push({ ok: false, result: "965 应勾选: 荷电状态≤30%" });
-    }
-    if (pkgInfo !== "965" && otherDescribe.includes("8aad92b65887a3a8015889d0cd7d0093")) {
-      result.push({ ok: false, result: "非 965 不应勾选: 荷电状态≤30%" });
-    }
-    if (isCell && !currentData["otherDescribeCAddition"].includes("单块电芯") && !currentData["otherDescribeCAddition"].includes("总净重"))
-      result.push({ ok: false, result: "物品为电芯时，描述中不应该出现单块电池" });
-    if (!isCell && !currentData["otherDescribeCAddition"].includes("单块电池") && !currentData["otherDescribeCAddition"].includes("总净重"))
-      result.push({ ok: false, result: "物品为电池时，描述中不应该出现单块电芯" });
-    if (pkgInfo !== pkgInfoByPackCargo) {
-      console.log(pkgInfo, pkgInfoByPackCargo);
-      result.push({ ok: false, result: `${pkgInfo}包装，但结论是${pkgInfoByPackCargo}` });
-    }
-    if ((pkgInfo === "966" || pkgInfo === "969") && !currentData["otherDescribeCAddition"].includes("包装在一起") && !isChargeBoxOrRelated)
-      result.push({ ok: false, result: "与设备包装在一起，其他描述中没有包装在一起5个字" });
-    if ((pkgInfo === "967" || pkgInfo === "970") && !currentData["otherDescribeCAddition"].includes("设备内置") && !isChargeBoxOrRelated)
-      result.push({ ok: false, result: "安装在设备上，其他描述中没有设备内置4个字" });
-    if (currentData["otherDescribeChecked"] !== "1")
-      result.push({ ok: false, result: "应勾选附加操作信息" });
-    if (!itemCName.includes(btyKind))
-      result.push({
-        ok: false,
-        result: "型号或中文品名错误，电池型号不在项目中文名称中"
-      });
-    if (!itemEName.includes(btyKind))
-      result.push({
-        ok: false,
-        result: "型号或英文品名错误，电池型号不在项目英文名称中"
-      });
-    if (String(inspectionItem6) === "0" && !otherDescribe.includes("2c9180849267773c0192dc73c77e5fb2")) {
-      if (pkgInfoSubType === "967, I" || pkgInfoSubType === "970, I" || pkgInfoSubType === "967, II" || pkgInfoSubType === "970, II") {
-        result.push({ ok: false, result: "967/970 未勾选堆码，或堆码评估，如果是24年报告请忽略" });
-      }
-      if (pkgInfoSubType === "966, II" || pkgInfoSubType === "969, II") {
-        result.push({ ok: false, result: "966/969 第II部分未勾选堆码，或堆码评估，如果是24年报告请忽略" });
-      }
-    }
-    if (pkgInfoSubType === "965, IB") {
-      if (String(inspectionItem6) === "0") {
-        result.push({ ok: false, result: "965，IB未勾选堆码" });
-      }
-      if (String(inspectionItem2) === "0") {
-        result.push({ ok: false, result: "965，IB未勾选跌落" });
-      }
-    }
-    if ((pkgInfoSubType === "966, II" || inspectionItem5Text1 === "966") && String(inspectionItem2) === "0") {
-      result.push({ ok: false, result: "966，II未勾选跌落" });
-    }
-    if (Number(currentData["inspectionItem3"]) !== 1)
-      result.push({
-        ok: false,
-        result: "检验项目4错误，未勾选锂电池已通过 UN38.3 测试"
-      });
-    if (isBatteryLabel(pkgInfoSubType, btyShape)) {
-      if (Number(currentData["inspectionItem4"]) !== 1)
-        if (pkgInfoSubType === "970, II")
-          result.push({ ok: false, result: `检验项目5错误，970, II，非纽扣电池，应勾选加贴锂电池标记` });
-        else
-          result.push({ ok: false, result: `检验项目5错误，${pkgInfoSubType}应勾选加贴锂电池标记` });
-    } else {
-      if (Number(currentData["inspectionItem4"]) !== 0)
-        if (pkgInfoSubType === "970, II" && btyShape === "8aad92b65aae82c3015ab094788a0026")
-          result.push({ ok: false, result: `检验项目5错误，设备内置纽扣电池不应勾选加贴锂电池标记` });
-        else
-          result.push({ ok: false, result: `检验项目5错误，${pkgInfoSubType}不应勾选加贴锂电池标记` });
-    }
-    if (isDangerous) {
-      if (inspectionItem5Text1 !== "") {
-        result.push({ ok: false, result: "危险品，参见包装说明应为空" });
-      }
-    } else {
-      if (isNaN(Number(inspectionItem5Text1))) {
-        result.push({ ok: false, result: "非限制性，包装说明应为数字" });
-      }
-    }
-    if (Number(currentData["inspectionItem5"]) !== 0)
-      result.push({ ok: false, result: "检查项目6错误，附有随机文件应为：否" });
-    if (isIon) {
-      if (currentData["inspectionItem3Text1"] === "")
-        result.push({ ok: false, result: "鉴别项目1错误，瓦时数为空" });
-      if (currentData["inspectionItem4Text1"] !== "")
-        result.push({ ok: false, result: "鉴别项目1错误，锂含量不为空" });
-    } else {
-      if (currentData["inspectionItem3Text1"] !== "")
-        result.push({ ok: false, result: "鉴别项目1错误，瓦时数不为空" });
-      if (currentData["inspectionItem4Text1"] === "")
-        result.push({ ok: false, result: "鉴别项目1错误，锂含量为空" });
-    }
-    if (wattHourFromName > 0 && !isNaN(wattHour) && isIon) {
-      if (wattHour !== wattHourFromName)
-        result.push({ ok: false, result: "瓦时数与项目名称不匹配" });
-    }
-    const conclusions = Number(currentData["conclusions"]);
-    const result1 = currentData["result1"];
-    if (result1 !== "DGR规定,资料核实")
-      result.push({ ok: false, result: "DGR规定，资料核实错误，未勾选错误" });
+  // src/pek/conclusionsCheck.ts
+  function conclusionsCheck(conclusions, isDangerous, pkgInfoByPackCargo, pkgInfo, unno, netWeight, packPassengerCargo, classOrDiv, pkgInfoReference, isIon, packCargo) {
+    let result = [];
     if (conclusions === 1) {
       if (!isDangerous) {
         result.push({ ok: false, result: "结论错误，经包装、电池瓦时、锂含量、净重、电芯类型判断，物品为非限制性货物" });
@@ -374,7 +327,7 @@
       if (String(classOrDiv) !== "9") {
         result.push({ ok: false, result: "结论错误，危险性类别应为9" });
       }
-      if (inspectionItem5Text1 !== "") {
+      if (pkgInfoReference !== "") {
         result.push({ ok: false, result: "结论错误，危险品，参见包装说明应为空" });
       }
     } else if (conclusions === 0) {
@@ -391,15 +344,53 @@
         result.push({ ok: false, result: "结论错误，非限制性，UN编号应为空" });
       }
     }
-    if (isIon) {
-      if (isNaN(wattHour) || isNaN(netWeight)) {
-        result.push({ ok: false, result: "瓦时数，净重，二者中有非数字，表单验证可能不准确" });
+    return result;
+  }
+
+  // src/pek/dropStackTest.ts
+  function dropStackTest(pkgInfoSubType, stackTest, dropTest, stackTestEvaluation) {
+    let result = [];
+    if (!stackTest && !stackTestEvaluation) {
+      if (pkgInfoSubType === "967, I" || pkgInfoSubType === "970, I" || pkgInfoSubType === "967, II" || pkgInfoSubType === "970, II") {
+        result.push({ ok: false, result: "967/970 未勾选堆码，或堆码评估，如果是24年报告请忽略" });
       }
-    } else {
-      if (isNaN(liContent) || isNaN(netWeight)) {
-        result.push({ ok: false, result: "锂含量，净重，二者中有非数字，表单验证可能不准确" });
+      if (pkgInfoSubType === "966, II" || pkgInfoSubType === "969, II") {
+        result.push({ ok: false, result: "966/969 第II部分未勾选堆码，或堆码评估，如果是24年报告请忽略" });
       }
     }
+    if (stackTest && stackTestEvaluation) {
+      result.push({ ok: false, result: "重复勾选堆码和堆码评估" });
+    }
+    if (pkgInfoSubType === "965, IB") {
+      if (!stackTest) {
+        result.push({ ok: false, result: "965，IB未勾选堆码" });
+      }
+      if (!dropTest) {
+        result.push({ ok: false, result: "965，IB未勾选跌落" });
+      }
+    }
+    if (pkgInfoSubType === "965, IA" || pkgInfoSubType === "966, I" || pkgInfoSubType === "969, I") {
+      if (dropTest) {
+        result.push({ ok: false, result: "965，IA不应勾选跌落" });
+      }
+      if (stackTest) {
+        result.push({ ok: false, result: "965，IA不应勾选堆码" });
+      }
+    }
+    if (pkgInfoSubType === "967, II" || pkgInfoSubType === "969, II") {
+      if (dropTest) {
+        result.push({ ok: false, result: "967，II不应勾选跌落" });
+      }
+    }
+    if (pkgInfoSubType === "966, II" && !dropTest) {
+      result.push({ ok: false, result: "966，II未勾选跌落" });
+    }
+    return result;
+  }
+
+  // src/pek/IAIBCheck.ts
+  function IAIBCheck(isIA, pkgInfoSubType) {
+    let result = [];
     if (isIA) {
       if (pkgInfoSubType === "965, IB" || pkgInfoSubType === "968, IB") {
         result.push({ ok: false, result: "应为IA" });
@@ -409,169 +400,317 @@
         result.push({ ok: false, result: "应为IB" });
       }
     }
-    if (currentData["market"] === "") {
-      result.push({ ok: false, result: "技术备注为空" });
+    return result;
+  }
+
+  // src/pek/ionOrMetal.ts
+  function ionOrMetal(isIon, inspectionItem3Text1, inspectionItem4Text1) {
+    let result = [];
+    if (isIon) {
+      if (inspectionItem3Text1 === "")
+        result.push({ ok: false, result: "鉴别项目1错误，瓦时数为空" });
+      if (inspectionItem4Text1 !== "")
+        result.push({ ok: false, result: "鉴别项目1错误，锂含量不为空" });
+    } else {
+      if (inspectionItem3Text1 !== "")
+        result.push({ ok: false, result: "鉴别项目1错误，瓦时数不为空" });
+      if (inspectionItem4Text1 === "")
+        result.push({ ok: false, result: "鉴别项目1错误，锂含量为空" });
     }
     return result;
   }
 
-  // src/sek/index.ts
-  function checkSekBtyType(currentData) {
-    const result = [];
-    const checkMap = {
-      "500": ["≤100Wh", ">100Wh"],
-      "501": ["≤20Wh", ">20Wh"],
-      "504": ["≤20Wh", ">20Wh"],
-      "502": [">2g", "≤2g"],
-      "503": [">1g", "≤1g"],
-      "505": [">1g", "≤1g"]
-    };
-    const btyType = currentData["btyType"];
-    if (!checkMap[btyType]) result.push({ ok: false, result: "不适用的电池类型" });
-    const itemCName = currentData["itemCName"];
-    const itemEName = currentData["itemEName"];
-    const btyKind = currentData["btyKind"];
-    if (itemCName.includes("芯") && !["501", "503"].includes(btyType))
-      result.push({ ok: false, result: "电池类型应为电芯" });
-    if (!itemCName) result.push({ ok: false, result: "中文品名为空" });
-    if (!itemEName) result.push({ ok: false, result: "英文品名为空" });
-    const btyShape = currentData["btyShape"];
-    const btySize = currentData["btySize"];
-    if (btySize.includes("m") && btySize.includes("M"))
-      result.push({ ok: false, result: "电池尺寸缺失单位" });
-    if (btySize.includes("Φ") || btySize.includes("φ") || btySize.includes("Ø") || btySize.includes("ø")) {
-      if (![
-        "8aad92b65aae82c3015ab094788a0026",
-        "8aad92b65d7a7078015d7e1bb1a2245d",
-        "521",
-        "2c9180838b90642e018bf132f37f5a60"
-      ].includes(btyShape)) {
-        result.push({ ok: false, result: "电池形状或尺寸错误" });
+  // src/pek/isNaNCheck.ts
+  function isNaNCheck(isIon, wattHour, liContent, netWeight) {
+    let result = [];
+    if (isIon) {
+      if (isNaN(wattHour) || isNaN(netWeight)) {
+        result.push({ ok: false, result: "瓦时数，净重，二者中有非数字，表单验证可能不准确" });
       }
-    }
-    const otherDescribe = currentData["otherDescribe"];
-    const btyGrossWeight = currentData["btyGrossWeight"];
-    if (!otherDescribe) result.push({ ok: false, result: "其他描述包装方式为空" });
-    if (otherDescribe.length > 3)
-      result.push({ ok: false, result: "其他描述包装方式不唯一" });
-    if (["501", "503"].includes(btyType) && !currentData["otherDescribeCAddition"].includes("单块电芯") && !currentData["otherDescribeCAddition"].includes("总净重"))
-      result.push({ ok: false, result: "其他描述不为电芯" });
-    if (!["501", "503"].includes(btyType) && !currentData["otherDescribeCAddition"].includes("单块电池") && !currentData["otherDescribeCAddition"].includes("总净重"))
-      result.push({ ok: false, result: "其他描述不为电池" });
-    if (otherDescribe === "541" && !currentData["otherDescribeCAddition"].includes("包装") && !currentData["otherDescribeCAddition"].includes("总净重"))
-      result.push({ ok: false, result: "与设备包装在一起，其他描述错误" });
-    if (otherDescribe === "542" && !currentData["otherDescribeCAddition"].includes("设备内置") && !currentData["otherDescribeCAddition"].includes("总净重"))
-      result.push({ ok: false, result: "安装在设备上，其他描述错误" });
-    if (currentData["otherDescribeChecked"] !== "1")
-      result.push({ ok: false, result: "未勾选其他描述" });
-    if (!btyKind) result.push({ ok: false, result: "电池型号为空" });
-    if (!itemCName.includes(btyKind))
-      result.push({
-        ok: false,
-        result: "型号或中文品名错误，电池型号不在项目中文名称中"
-      });
-    if (!itemEName.includes(btyKind))
-      result.push({
-        ok: false,
-        result: "型号或英文品名错误，电池型号不在项目英文名称中"
-      });
-    const inspectionResult2 = currentData["inspectionResult2"];
-    if (inspectionResult2 !== "0")
-      result.push({
-        ok: false,
-        result: "检验结果2错误，未勾选锂电池已通过 UN38.3 测试"
-      });
-    const inspectionResult3 = currentData["inspectionResult3"];
-    if (inspectionResult3 !== "0")
-      result.push({
-        ok: false,
-        result: "检验结果3错误，未勾选电池按照规定的质量管理体系进行制造。"
-      });
-    const inspectionResult4 = currentData["inspectionResult4"];
-    if (inspectionResult4 !== "0")
-      result.push({
-        ok: false,
-        result: "检验结果4错误，未勾选该锂电池不属于召回电池，不属于废弃和回收电池。"
-      });
-    const inspectionResult5 = currentData["inspectionResult5"];
-    const conclusions = currentData["conclusions"];
-    if (String(inspectionResult5) !== "0") {
-      if (otherDescribe.includes("540") && String(conclusions) === "0") {
-        result.push({ ok: false, result: "单独运输非限制性，未通过1.2米跌落" });
-      }
-    }
-    if (currentData["inspectionResult7"] !== "2")
-      result.push({ ok: false, result: "随附文件错误，未勾选不适用" });
-    if (currentData["inspectionResult8"] !== "2" || currentData["inspectionResult9"] !== "2")
-      result.push({ ok: false, result: "鉴别项目8，9 错误，未勾选不适用" });
-    if (currentData["inspectionItem8Cn"] !== "" || currentData["inspectionItem8En"] !== "" || currentData["inspectionItem9Cn"] !== "" || currentData["inspectionItem9En"] !== "")
-      result.push({ ok: false, result: "鉴别项目8，9 不为空" });
-    if (["500", "501", "504"].includes(btyType)) {
-      result.push(...checkSekIonBtyType(currentData, checkMap, btyType));
     } else {
-      result.push(...checkSekMetalBtyType(currentData, checkMap, btyType));
+      if (isNaN(liContent) || isNaN(netWeight)) {
+        result.push({ ok: false, result: "锂含量，净重，二者中有非数字，表单验证可能不准确" });
+      }
     }
     return result;
   }
-  function checkSekIonBtyType(currentData, checkMap, btyType) {
-    const result = [];
-    if (currentData["inspectionItem1"] !== "1111")
-      result.push({ ok: false, result: "鉴别项目1错误，未勾选瓦时数" });
-    if (currentData["inspectionItem1Text1"] === "")
-      result.push({ ok: false, result: "鉴别项目1错误，瓦时数为空" });
-    if (currentData["inspectionItem1Text2"] !== "")
-      result.push({ ok: false, result: "鉴别项目1错误，锂含量不为空" });
-    const wattHourFromName = matchWattHour(currentData["itemCName"]);
-    const inspectionResult1 = currentData["inspectionResult1"];
-    if (!checkMap[btyType].includes(inspectionResult1))
-      result.push({ ok: false, result: "检验结果1错误，瓦时数取值范围错误" });
-    if (wattHourFromName > 0 && !isNaN(Number(currentData["inspectionItem1Text1"]))) {
-      if (Number(currentData["inspectionItem1Text1"]) !== wattHourFromName)
-        result.push({ ok: false, result: "瓦时数与项目名称不匹配" });
+
+  // src/pek/liBtyLabelCheck.ts
+  function liBtyLabelCheck(pkgInfoSubType, btyShape, liBtyLabel) {
+    let result = [];
+    if (isBatteryLabel(pkgInfoSubType, btyShape)) {
+      if (!liBtyLabel)
+        if (pkgInfoSubType === "970, II")
+          result.push({ ok: false, result: `检验项目5错误，970, II，非纽扣电池，应勾选加贴锂电池标记` });
+        else
+          result.push({ ok: false, result: `检验项目5错误，${pkgInfoSubType}应勾选加贴锂电池标记` });
+    } else {
+      if (liBtyLabel)
+        if (pkgInfoSubType === "970, II" && btyShape === "8aad92b65aae82c3015ab094788a0026")
+          result.push({ ok: false, result: `检验项目5错误，设备内置纽扣电池不应勾选加贴锂电池标记` });
+        else
+          result.push({ ok: false, result: `检验项目5错误，${pkgInfoSubType}不应勾选加贴锂电池标记` });
     }
-    if (["501", "504"].includes(btyType)) {
-      if (wattHourFromName > 20) {
-        if (inspectionResult1 !== ">20Wh")
-          result.push({ ok: false, result: "瓦时数结果错误，应为>20Wh" });
-      } else {
-        if (inspectionResult1 !== "≤20Wh")
-          result.push({ ok: false, result: "瓦时数结果错误，应为≤20Wh" });
+    return result;
+  }
+
+  // src/pek/netWeighLimit.ts
+  function netWeighLimit(netWeight, pkgInfoSubType) {
+    let result = [];
+    if (!isNaN(netWeight)) {
+      if (netWeight > 2.5) {
+        if (pkgInfoSubType === "968, IB") {
+          result.push({ ok: false, result: "968，IB 电池净重超过2.5kg" });
+        }
+      } else if (netWeight > 5) {
+        if (pkgInfoSubType === "966, II" || pkgInfoSubType === "967, II" || pkgInfoSubType === "969, II" || pkgInfoSubType === "970, II") {
+          result.push({ ok: false, result: `${pkgInfoSubType} 电池净重超过5kg` });
+        }
+      } else if (netWeight > 10) {
+        if (pkgInfoSubType === "965, IB") {
+          result.push({ ok: false, result: `${pkgInfoSubType} 电池净重超过10kg` });
+        }
+      } else if (netWeight > 35) {
+        if (pkgInfoSubType === "965, IA" || pkgInfoSubType === "966, I" || pkgInfoSubType === "967, I" || pkgInfoSubType === "968, IA" || pkgInfoSubType === "969, I" || pkgInfoSubType === "970, I") {
+          result.push({ ok: false, result: `${pkgInfoSubType} 电池净重超过35kg` });
+        }
+      }
+    }
+    return result;
+  }
+
+  // src/pek/otherDescribeIsCell.ts
+  function otherDescribeIsCell(isCell, otherDescribe) {
+    let result = [];
+    if (isCell) {
+      if (otherDescribe.includes("1791") || otherDescribe.includes("1794")) {
+        result.push({ ok: false, result: "物品为电芯，不应勾选: 该电池已经做好防短路...或该锂电池不属于召回电芯..." });
       }
     } else {
-      if (wattHourFromName > 100) {
-        if (inspectionResult1 !== ">100Wh")
-          result.push({ ok: false, result: "瓦时数结果错误，应为>100Wh" });
-      } else {
-        if (inspectionResult1 !== "≤100Wh")
-          result.push({ ok: false, result: "瓦时数结果错误，应为≤100Wh" });
+      if (otherDescribe.includes("1792") || otherDescribe.includes("1795")) {
+        result.push({ ok: false, result: "物品为电池，不应勾选: 该电芯已经做好防短路...或该锂电芯不属于召回电芯..." });
       }
     }
-    if (currentData["inspectionItem7"] !== "1125")
-      result.push({ ok: false, result: "随附文件错误，未勾选锂离子电池" });
-    const otherDescribe = currentData["otherDescribe"];
-    const btyGrossWeight = Number(currentData["btyGrossWeight"]);
+    return result;
+  }
+
+  // src/pek/packetOrContain.ts
+  function packetOrContain(pkgInfo, pkgInfoByPackCargo, otherDescribeCAddition, isChargeBoxOrRelated) {
+    let result = [];
+    if (pkgInfo !== pkgInfoByPackCargo) {
+      console.log(pkgInfo, pkgInfoByPackCargo);
+      result.push({ ok: false, result: `${pkgInfo}包装，但结论是${pkgInfoByPackCargo}` });
+    }
+    if ((pkgInfo === "966" || pkgInfo === "969") && !otherDescribeCAddition.includes("包装在一起") && !isChargeBoxOrRelated)
+      result.push({ ok: false, result: "与设备包装在一起，其他描述中没有包装在一起5个字" });
+    if ((pkgInfo === "967" || pkgInfo === "970") && !otherDescribeCAddition.includes("设备内置") && !isChargeBoxOrRelated)
+      result.push({ ok: false, result: "安装在设备上，其他描述中没有设备内置4个字" });
+    return result;
+  }
+
+  // src/pek/stateOfCharge.ts
+  function stateOfCharge(pkgInfo, otherDescribe) {
+    let result = [];
+    if (pkgInfo === "965" && !otherDescribe.includes("8aad92b65887a3a8015889d0cd7d0093")) {
+      result.push({ ok: false, result: "965 应勾选: 荷电状态≤30%" });
+    }
+    if (pkgInfo !== "965" && otherDescribe.includes("8aad92b65887a3a8015889d0cd7d0093")) {
+      result.push({ ok: false, result: "非 965 不应勾选: 荷电状态≤30%" });
+    }
+    return result;
+  }
+
+  // src/pek/index.ts
+  function checkPekBtyType(currentData) {
+    const result = [];
+    const btyType = getBtyTypeCode(currentData);
+    const {
+      // 品名
+      itemCName,
+      // 品名
+      itemEName,
+      // 操作信息
+      otherDescribe,
+      // 危险性类别
+      classOrDiv,
+      // 仅限货机
+      packCargo,
+      // 技术备注
+      market
+    } = currentData;
+    const btyKind = currentData["model"];
+    const voltage = matchNumber(currentData["inspectionItem2Text1"]);
+    const capacity = matchNumber(currentData["inspectionItem2Text2"]);
+    const wattHour = matchNumber(currentData["inspectionItem3Text1"]);
+    const wattHourFromName = matchWattHour(currentData["itemCName"]);
+    const liContent = matchNumber(currentData["inspectionItem4Text1"]);
+    const btyCount = matchNumber(currentData["btyCount"]);
+    const netWeight = parseNetWeight(currentData["netWeight"]);
+    const netWeightDisplay = matchNumber(currentData["netWeight"]) * 1e3;
+    const otherDescribeCAddition = currentData["otherDescribeCAddition"];
+    const batteryWeight = matchBatteryWeight(otherDescribeCAddition);
+    const isSingleCell = getIsSingleCell(btyType);
+    const btyShape = currentData["shape"];
+    const btySize = currentData["size"];
+    const inspectionItem3Text1 = currentData["inspectionItem3Text1"];
+    const inspectionItem4Text1 = currentData["inspectionItem4Text1"];
+    const unno = currentData["unno"];
+    const isCell = String(currentData["type2"]) === "1";
+    const packPassengerCargo = currentData["packPassengerCargo"];
+    const inspectionItem1 = String(currentData["inspectionItem1"]);
+    const isIon = String(currentData["type1"]) === "1";
+    const pkgInfo = getPkgInfo(unno, isIon, inspectionItem1);
+    const pkgInfoReference = currentData["inspectionItem5Text1"];
+    const pkgInfoByPackCargo = getPkgInfoByPackCargo(pkgInfoReference, packCargo);
+    const pkgInfoSubType = getPkgInfoSubType(pkgInfoReference, packCargo);
+    const stackTest = String(currentData["inspectionItem6"]) === "1";
+    const stackTestEvaluation = otherDescribe.includes("2c9180849267773c0192dc73c77e5fb2");
+    const dropTest = String(currentData["inspectionItem2"]) === "1";
+    const liBtyLabel = String(currentData["inspectionItem4"]) === "1";
+    const unTest = String(currentData["inspectionItem3"]) === "1";
+    const randomFile = String(currentData["inspectionItem5"]) === "1";
+    const isChargeBoxOrRelated = otherDescribeCAddition.includes("总净重");
+    const isDangerous = pekIsDangerous(
+      wattHour,
+      pkgInfo,
+      liContent,
+      netWeight,
+      isSingleCell
+    );
+    const isIA = pkgInfoIsIA(wattHour, pkgInfo, liContent, netWeight, isSingleCell);
+    if (!itemCName) result.push({ ok: false, result: "中文品名为空" });
+    if (!itemEName) result.push({ ok: false, result: "英文品名为空" });
+    if (!btyKind) result.push({ ok: false, result: "电池型号为空" });
+    if (netWeight === 0) result.push({ ok: false, result: "电池净重为空" });
+    if (!unTest) result.push({ ok: false, result: "未勾选通过 UN38.3 测试" });
+    if (pkgInfoSubType === "") result.push({ ok: false, result: "包装说明为空" });
+    if (!market) result.push({ ok: false, result: "技术备注为空" });
+    if (randomFile) result.push({ ok: false, result: "检查项目6错误，附有随机文件应为：否" });
+    if (currentData["otherDescribeChecked"] !== "1")
+      result.push({ ok: false, result: "应勾选附加操作信息" });
+    result.push(...baseCheck(
+      btySize,
+      btyShape,
+      batteryWeight,
+      btyCount,
+      netWeightDisplay,
+      btyType,
+      otherDescribeCAddition,
+      isChargeBoxOrRelated,
+      isCell,
+      itemCName,
+      itemEName,
+      btyKind,
+      voltage,
+      capacity,
+      wattHour,
+      wattHourFromName
+    ));
+    result.push(...netWeighLimit(netWeight, pkgInfoSubType));
+    result.push(...stateOfCharge(pkgInfo, otherDescribe));
+    result.push(...otherDescribeIsCell(isCell, otherDescribe));
+    result.push(...packetOrContain(pkgInfo, pkgInfoByPackCargo, otherDescribeCAddition, isChargeBoxOrRelated));
+    result.push(...dropStackTest(pkgInfoSubType, stackTest, dropTest, stackTestEvaluation));
+    result.push(...liBtyLabelCheck(pkgInfoSubType, btyShape, liBtyLabel));
+    if (isDangerous) {
+      if (pkgInfoReference !== "") {
+        result.push({ ok: false, result: "危险品，参见包装说明应为空" });
+      }
+    } else {
+      if (isNaN(Number(pkgInfoReference))) {
+        result.push({ ok: false, result: "非限制性，包装说明应为数字" });
+      }
+    }
+    result.push(...ionOrMetal(isIon, inspectionItem3Text1, inspectionItem4Text1));
+    if (wattHourFromName > 0 && !isNaN(wattHour) && isIon) {
+      if (wattHour !== wattHourFromName)
+        result.push({ ok: false, result: "瓦时数与项目名称不匹配" });
+    }
     const conclusions = Number(currentData["conclusions"]);
+    const result1 = currentData["result1"];
+    if (result1 !== "DGR规定,资料核实")
+      result.push({ ok: false, result: "【DGR规定，资料核实】栏错误，勾选错误" });
+    result.push(...conclusionsCheck(
+      conclusions,
+      isDangerous,
+      pkgInfoByPackCargo,
+      pkgInfo,
+      unno,
+      netWeight,
+      packPassengerCargo,
+      classOrDiv,
+      pkgInfoReference,
+      isIon,
+      packCargo
+    ));
+    result.push(...isNaNCheck(isIon, wattHour, liContent, netWeight));
+    result.push(...IAIBCheck(isIA, pkgInfoSubType));
+    return result;
+  }
+
+  // src/sek/metalConclusionsCheck.ts
+  function metalConclusionsCheck(conclusions, otherDescribe, inspectionResult1, btyGrossWeight, unno, comment) {
+    let result = [];
+    if ([">2g", ">1g"].includes(inspectionResult1)) {
+      if (conclusions !== 1)
+        result.push({
+          ok: false,
+          result: "结论错误，锂含量大于1g或2g，应为危险物品"
+        });
+      if (otherDescribe === "540" && unno !== "UN3090")
+        result.push({
+          ok: false,
+          result: "结论错误，单独运输，UN编号应为UN3090"
+        });
+      if (otherDescribe !== "540" && unno !== "UN3091")
+        result.push({ ok: false, result: "结论错误，UN编号应为UN3091" });
+      if (["540", "541"].includes(otherDescribe) && comment !== "1200") {
+        result.push({
+          ok: false,
+          result: "结论错误，危险品，单独运输或与设备包装在一起，应达到II级包装性能"
+        });
+      }
+    }
+    if (["≤100Wh", "≤20Wh"].includes(inspectionResult1)) {
+      if (otherDescribe === "540" && btyGrossWeight > 30)
+        result.push({
+          ok: false,
+          result: "结论错误，单独运输，毛重大于30kg，应为危险品"
+        });
+      if (conclusions !== 0 && unno !== "UN3557") {
+        result.push({
+          ok: false,
+          result: "结论错误，锂含量小于1g或2g，应为非限制性"
+        });
+      }
+    }
+    return result;
+  }
+
+  // src/sek/ionConclusionsCheck.ts
+  function ionConclusionsCheck(conclusions, unno, otherDescribe, inspectionResult1, btyGrossWeight, comment) {
+    let result = [];
     if ([">100Wh", ">20Wh"].includes(inspectionResult1)) {
       if (conclusions !== 1)
         result.push({
           ok: false,
           result: "结论错误，瓦时数大于100Wh或者20Wh，应为危险物品"
         });
-      if (otherDescribe === "540" && currentData["unno"] !== "UN3480")
+      if (otherDescribe === "540" && unno !== "UN3480")
         result.push({
           ok: false,
           result: "结论错误，单独运输，UN编号应为UN3480"
         });
-      if (otherDescribe !== "540" && currentData["unno"] !== "UN3481" && currentData["unno"] !== "UN3171")
+      if (otherDescribe !== "540" && unno !== "UN3481" && unno !== "UN3171")
         result.push({ ok: false, result: "结论错误，UN编号应为UN3481" });
-      if (["540", "541"].includes(otherDescribe) && currentData["comment"] !== "1200") {
+      if (["540", "541"].includes(otherDescribe) && comment !== "1200") {
         result.push({
           ok: false,
           result: "结论错误，危险品物品，单独运输或与设备包装在一起，应达到II级包装性能"
         });
       }
     }
-    if (["≤100Wh", "≤20Wh"].includes(inspectionResult1) && currentData["unno"] !== "UN3171") {
+    if (["≤100Wh", "≤20Wh"].includes(inspectionResult1) && unno !== "UN3171") {
       if (otherDescribe === "540" && btyGrossWeight > 30)
         result.push({
           ok: false,
@@ -584,23 +723,12 @@
         });
       }
     }
-    if (currentData["market"] === "") {
-      result.push({ ok: false, result: "技术备注为空" });
-    }
     return result;
   }
-  function checkSekMetalBtyType(currentData, checkMap, btyType) {
-    const result = [];
-    if (currentData["inspectionItem1"] !== "1112")
-      result.push({ ok: false, result: "鉴别项目1错误，未勾选锂含量" });
-    if (currentData["inspectionItem1Text2"] === "")
-      result.push({ ok: false, result: "鉴别项目1错误，锂含量为空" });
-    if (currentData["inspectionItem1Text1"] !== "")
-      result.push({ ok: false, result: "鉴别项目1错误，瓦时数不为空" });
-    const inspectionResult1 = currentData["inspectionResult1"];
-    const liContent = Number(currentData["inspectionItem1Text2"]);
-    if (!checkMap[btyType].includes(inspectionResult1))
-      result.push({ ok: false, result: "检验结果1错误，锂含量取值范围错误" });
+
+  // src/sek/liContentScope.ts
+  function liContentScope(btyType, inspectionResult1, liContent) {
+    let result = [];
     if (isNaN(liContent)) {
       if (["503", "505"].includes(btyType)) {
         if (liContent > 1) {
@@ -620,46 +748,212 @@
         }
       }
     }
+    return result;
+  }
+
+  // src/sek/wattHourScope.ts
+  function wattHourScope(btyType, inspectionResult1, wattHourFromName) {
+    let result = [];
+    if (["501", "504"].includes(btyType)) {
+      if (wattHourFromName > 20) {
+        if (inspectionResult1 !== ">20Wh")
+          result.push({ ok: false, result: "瓦时数结果错误，应为>20Wh" });
+      } else {
+        if (inspectionResult1 !== "≤20Wh")
+          result.push({ ok: false, result: "瓦时数结果错误，应为≤20Wh" });
+      }
+    } else {
+      if (wattHourFromName > 100) {
+        if (inspectionResult1 !== ">100Wh")
+          result.push({ ok: false, result: "瓦时数结果错误，应为>100Wh" });
+      } else {
+        if (inspectionResult1 !== "≤100Wh")
+          result.push({ ok: false, result: "瓦时数结果错误，应为≤100Wh" });
+      }
+    }
+    return result;
+  }
+
+  // src/sek/packetOrContain.ts
+  function packetOrContain2(otherDescribe, otherDescribeCAddition, isChargeBoxOrRelated) {
+    let result = [];
+    if (otherDescribe === "541" && !otherDescribeCAddition.includes("包装") && !isChargeBoxOrRelated)
+      result.push({ ok: false, result: "与设备包装在一起，其他描述错误" });
+    if (otherDescribe === "542" && !otherDescribeCAddition.includes("设备内置") && !isChargeBoxOrRelated)
+      result.push({ ok: false, result: "安装在设备上，其他描述错误" });
+    return result;
+  }
+
+  // src/sek/index.ts
+  function checkSekBtyType(currentData) {
+    const result = [];
+    const checkMap = {
+      "500": ["≤100Wh", ">100Wh"],
+      "501": ["≤20Wh", ">20Wh"],
+      "504": ["≤20Wh", ">20Wh"],
+      "502": [">2g", "≤2g"],
+      "503": [">1g", "≤1g"],
+      "505": [">1g", "≤1g"]
+    };
+    const btyType = currentData["btyType"];
+    const {
+      // 中文品名
+      itemCName,
+      // 英文品名
+      itemEName,
+      // 电池尺寸
+      btySize,
+      // 电池形状
+      // 锂离子电池 锂离子电芯 锂金属电池 锂金属电芯 单芯锂离子电池 单芯锂金属电池
+      // '500'    | '501'    | '504'  |  '502'   | '503'       | '505'
+      btyShape,
+      // 电池型号
+      btyKind,
+      // 其他描述
+      otherDescribe,
+      // 备注
+      comment,
+      // 技术备注
+      market
+    } = currentData;
+    const btyCount = matchNumber(currentData["btyCount"]);
+    const voltage = matchVoltage(itemCName);
+    const capacity = matchCapacity(itemCName);
+    const wattHour = matchNumber(currentData["inspectionItem1Text1"]);
+    const wattHourFromName = matchWattHour(itemCName);
+    const liContent = matchNumber(currentData["inspectionItem1Text2"]);
+    const netWeight = matchNumber(currentData["btyNetWeight"]);
+    const netWeightDisplay = matchNumber(currentData["btyNetWeight"]) * 1e3;
+    const otherDescribeCAddition = currentData["otherDescribeCAddition"];
+    const batteryWeight = matchBatteryWeight(currentData["otherDescribeCAddition"]);
+    const isSingleCell = getIsSingleCell(btyType);
+    const unno = currentData["unno"];
+    const isCell = getIsCell(btyType);
+    const inspectionItem1 = String(currentData["inspectionItem1"]);
+    const isIon = getIsIon(btyType);
+    const pkgInfo = getPkgInfo(unno, isIon, inspectionItem1);
+    const unTest = String(currentData["inspectionResult2"]) === "0";
+    const dropTest = String(currentData["inspectionResult5"]) === "0";
+    const according = currentData["according"];
+    const otherDescribeChecked = currentData["otherDescribeChecked"] === "1";
+    const isChargeBoxOrRelated = otherDescribeCAddition.includes("总净重");
+    if (!itemCName) result.push({ ok: false, result: "中文品名为空" });
+    if (!itemEName) result.push({ ok: false, result: "英文品名为空" });
+    if (!btyKind) result.push({ ok: false, result: "电池型号为空" });
+    if (!otherDescribe) result.push({ ok: false, result: "其他描述包装方式为空" });
+    if (!otherDescribeChecked) result.push({ ok: false, result: "未勾选其他描述" });
+    if (!unTest) result.push({ ok: false, result: "未勾选通过 UN38.3 测试" });
+    if (!market) result.push({ ok: false, result: "技术备注为空" });
+    if (otherDescribe.length > 3)
+      result.push({ ok: false, result: "其他描述包装方式不唯一" });
+    result.push(...baseCheck(
+      btySize,
+      btyShape,
+      batteryWeight,
+      btyCount,
+      netWeightDisplay,
+      btyType,
+      otherDescribeCAddition,
+      isChargeBoxOrRelated,
+      isCell,
+      itemCName,
+      itemEName,
+      btyKind,
+      voltage,
+      capacity,
+      wattHour,
+      wattHourFromName
+    ));
+    result.push(...packetOrContain2(otherDescribe, otherDescribeCAddition, isChargeBoxOrRelated));
+    const inspectionResult3 = currentData["inspectionResult3"];
+    if (inspectionResult3 !== "0")
+      result.push({
+        ok: false,
+        result: "检验结果3错误，未勾选电池按照规定的质量管理体系进行制造。"
+      });
+    const inspectionResult4 = currentData["inspectionResult4"];
+    if (inspectionResult4 !== "0")
+      result.push({
+        ok: false,
+        result: "检验结果4错误，未勾选该锂电池不属于召回电池，不属于废弃和回收电池。"
+      });
+    const conclusions = currentData["conclusions"];
+    if (!dropTest) {
+      if (otherDescribe.includes("540") && String(conclusions) === "0") {
+        result.push({ ok: false, result: "单独运输非限制性，未通过1.2米跌落" });
+      }
+    }
+    if (currentData["inspectionResult7"] !== "2")
+      result.push({ ok: false, result: "随附文件错误，未勾选不适用" });
+    if (currentData["inspectionResult8"] !== "2" || currentData["inspectionResult9"] !== "2")
+      result.push({ ok: false, result: "鉴别项目8，9 错误，未勾选不适用" });
+    if (currentData["inspectionItem8Cn"] !== "" || currentData["inspectionItem8En"] !== "" || currentData["inspectionItem9Cn"] !== "" || currentData["inspectionItem9En"] !== "")
+      result.push({ ok: false, result: "鉴别项目8，9 不为空" });
+    if (isIon) {
+      result.push(...checkSekIonBtyType(currentData, checkMap, btyType, unno, comment));
+    } else {
+      result.push(...checkSekMetalBtyType(currentData, checkMap, btyType, unno, comment));
+    }
+    return result;
+  }
+  function checkSekIonBtyType(currentData, checkMap, btyType, unno, comment) {
+    const result = [];
+    if (currentData["inspectionItem1"] !== "1111")
+      result.push({ ok: false, result: "鉴别项目1错误，未勾选瓦时数" });
+    if (currentData["inspectionItem1Text1"] === "")
+      result.push({ ok: false, result: "鉴别项目1错误，瓦时数为空" });
+    if (currentData["inspectionItem1Text2"] !== "")
+      result.push({ ok: false, result: "鉴别项目1错误，锂含量不为空" });
+    const wattHourFromName = matchWattHour(currentData["itemCName"]);
+    const inspectionResult1 = currentData["inspectionResult1"];
+    if (!checkMap[btyType].includes(inspectionResult1))
+      result.push({ ok: false, result: "检验结果1错误，瓦时数取值范围错误" });
+    if (wattHourFromName > 0 && !isNaN(Number(currentData["inspectionItem1Text1"]))) {
+      if (Number(currentData["inspectionItem1Text1"]) !== wattHourFromName)
+        result.push({ ok: false, result: "瓦时数与项目名称不匹配" });
+    }
+    result.push(...wattHourScope(btyType, inspectionResult1, wattHourFromName));
+    if (currentData["inspectionItem7"] !== "1125")
+      result.push({ ok: false, result: "随附文件错误，未勾选锂离子电池" });
+    const otherDescribe = currentData["otherDescribe"];
+    const btyGrossWeight = Number(currentData["btyGrossWeight"]);
+    const conclusions = Number(currentData["conclusions"]);
+    result.push(...ionConclusionsCheck(
+      conclusions,
+      unno,
+      otherDescribe,
+      inspectionResult1,
+      btyGrossWeight,
+      comment
+    ));
+    return result;
+  }
+  function checkSekMetalBtyType(currentData, checkMap, btyType, unno, comment) {
+    const result = [];
+    if (currentData["inspectionItem1"] !== "1112")
+      result.push({ ok: false, result: "鉴别项目1错误，未勾选锂含量" });
+    if (currentData["inspectionItem1Text2"] === "")
+      result.push({ ok: false, result: "鉴别项目1错误，锂含量为空" });
+    if (currentData["inspectionItem1Text1"] !== "")
+      result.push({ ok: false, result: "鉴别项目1错误，瓦时数不为空" });
+    const inspectionResult1 = currentData["inspectionResult1"];
+    const liContent = Number(currentData["inspectionItem1Text2"]);
+    if (!checkMap[btyType].includes(inspectionResult1))
+      result.push({ ok: false, result: "检验结果1错误，锂含量取值范围错误" });
+    result.push(...liContentScope(btyType, inspectionResult1, liContent));
     if (currentData["inspectionItem7"] !== "1126")
       result.push({ ok: false, result: "随附文件错误，未勾选锂金属电池" });
     const otherDescribe = currentData["otherDescribe"];
     const btyGrossWeight = Number(currentData["btyGrossWeight"]);
     const conclusions = Number(currentData["conclusions"]);
-    if ([">2g", ">1g"].includes(inspectionResult1)) {
-      if (conclusions !== 1)
-        result.push({
-          ok: false,
-          result: "结论错误，锂含量大于1g或2g，应为危险物品"
-        });
-      if (otherDescribe === "540" && currentData["unno"] !== "UN3090")
-        result.push({
-          ok: false,
-          result: "结论错误，单独运输，UN编号应为UN3090"
-        });
-      if (otherDescribe !== "540" && currentData["unno"] !== "UN3091")
-        result.push({ ok: false, result: "结论错误，UN编号应为UN3091" });
-      if (["540", "541"].includes(otherDescribe) && currentData["comment"] !== "1200") {
-        result.push({
-          ok: false,
-          result: "结论错误，危险品，单独运输或与设备包装在一起，应达到II级包装性能"
-        });
-      }
-    }
-    if (["≤100Wh", "≤20Wh"].includes(inspectionResult1)) {
-      if (otherDescribe === "540" && btyGrossWeight > 30)
-        result.push({
-          ok: false,
-          result: "结论错误，单独运输，毛重大于30kg，应为危险品"
-        });
-      if (conclusions !== 0 && currentData["unno"] !== "UN3171") {
-        result.push({
-          ok: false,
-          result: "结论错误，锂含量小于1g或2g，应为非限制性"
-        });
-      }
-    }
-    if (currentData["market"] === "")
-      result.push({ ok: false, result: "技术备注为空" });
+    result.push(...metalConclusionsCheck(
+      conclusions,
+      otherDescribe,
+      inspectionResult1,
+      btyGrossWeight,
+      unno,
+      comment
+    ));
     return result;
   }
 
