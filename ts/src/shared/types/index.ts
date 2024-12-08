@@ -1,3 +1,4 @@
+export type SekBtyType = '500' | '501' | '504' | '502' | '503' | '505'
 export type PekUNNO = '' | 'UN3480' | 'UN3481' | 'UN3090' | 'UN3091' | 'UN3171' | 'UN3556' | 'UN3557' | 'UN3558'
 export type PekPkgInfo = '' | '965' | '966' | '967' | '968' | '969' | '970' | '952'
 export type PkgInfoSubType = '' | '968, IB' | '966, II' | '967, II' | '969, II' | '970, II' | '965, IB' | '965, IA' | '966, I' | '967, I' | '968, IA' | '969, I' | '970, I' | '952'

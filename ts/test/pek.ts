@@ -1,7 +1,7 @@
-import {checkPekBtyType} from '../src/pek/index'
-import {PekData} from "../src/types/index";
+import { checkPekBtyType } from '../src/pek/index'
+import { PekData } from "../src/shared/types/index";
 // @ts-ignore
-import {readFileSync} from 'fs'
+import { readFileSync } from 'fs'
 // @ts-ignore
 import path from 'path'
 // @ts-ignore

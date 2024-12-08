@@ -1,4 +1,4 @@
-import { PekData, PekPkgInfo, PekUNNO, PkgInfoSubType } from "../types/index"
+import { PekData, PekPkgInfo, PekUNNO, PkgInfoSubType, SekBtyType } from "../types"
 
 function matchWattHour(projectName: string) {
   const matches = [...projectName.matchAll(/\s(\d+\.?\d+)[Kk]?[Ww][Hh]/g)]
@@ -41,7 +41,7 @@ function matchBatteryWeight(describe: string) {
 
 function getBtyTypeCode(
   currentData: PekData
-): '500' | '501' | '502' | '503' | '504' | '505' {
+): SekBtyType {
   const isIon: boolean = String(currentData['type1']) === '1'
   const isCell: boolean = String(currentData['type2']) === '1'
   const isSingleCell: boolean = currentData['otherDescribe'].includes('1790')
@@ -54,10 +54,18 @@ function getBtyTypeCode(
   }
 }
 
+function getIsIon(btyType: SekBtyType) {
+  return btyType === '500' || btyType === '501' || btyType === '504'
+}
+
+function getIsCell(btyType: SekBtyType) {
+  return btyType === '501' || btyType === '503'
+}
+
 function getIsSingleCell(
   // 锂离子电池 锂离子电芯 锂金属电池 锂金属电芯 单芯锂离子电池 单芯锂金属电池
   // '500'     | '501'   | '502'   | '503'   | '504'       | '505'
-  btyType: '500' | '501' | '502' | '503' | '504' | '505'
+  btyType: SekBtyType
 ) {
   return !['500', '502'].includes(btyType)
 }
@@ -254,5 +262,5 @@ export {
   matchWattHour, getBtyTypeCode, getIsSingleCell, pekIsDangerous,
   getPkgInfo, isBatteryLabel, getPkgInfoByPackCargo, getPkgInfoSubType,
   getUNNO, getIsCargoOnly, pkgInfoIsIA, parseNetWeight, matchNumber,
-  matchVoltage, matchCapacity, matchBatteryWeight
+  matchVoltage, matchCapacity, matchBatteryWeight, getIsCell, getIsIon
 }
