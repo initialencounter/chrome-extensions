@@ -11,8 +11,7 @@ import {
   matchVoltage,
   matchWattHour
 } from "../shared/utils/index"
-import { metalConclusionsCheck } from "./metalConclusionsCheck"
-import { ionConclusionsCheck } from "./ionConclusionsCheck"
+import { conclusionsCheck } from "./conclusionsCheck"
 import { liContentScope } from "./liContentScope"
 import { wattHourScope } from "./wattHourScope"
 import { packetOrContain } from "./packetOrContain"
@@ -46,7 +45,9 @@ function checkSekBtyType(currentData: SekData): CheckResult[] {
     // 备注
     comment,
     // 技术备注
-    market
+    market,
+    // 危险性
+    classOrDiv,
   } = currentData
   const btyCount = matchNumber(currentData['btyCount'])
   // 电压
@@ -62,10 +63,14 @@ function checkSekBtyType(currentData: SekData): CheckResult[] {
   const netWeight = matchNumber(currentData['btyNetWeight'])
   // 真实显示净重数字 单位：g
   const netWeightDisplay = matchNumber(currentData['btyNetWeight']) * 1000
+  // 毛重
+  const btyGrossWeight = Number(currentData['btyGrossWeight'])
   // 描述
   const otherDescribeCAddition = currentData['otherDescribeCAddition']
   // 电池重量
   const batteryWeight = matchBatteryWeight(currentData['otherDescribeCAddition'])
+  // 瓦时数或锂含量范围
+  const inspectionResult1 = currentData['inspectionResult1']
   // 单芯电池或电芯
   const isSingleCell = getIsSingleCell(btyType)
   // UN编号
@@ -84,6 +89,12 @@ function checkSekBtyType(currentData: SekData): CheckResult[] {
   // 参见包装说明，可能为空，通常来自于模板
   const unTest = String(currentData['inspectionResult2']) === '0'// UN38.3 测试
   const dropTest = String(currentData['inspectionResult5']) === "0"// 跌落
+  // 包装等级
+  const packageGrade = currentData['pg']
+  // 结论
+  const conclusions = Number(currentData['conclusions'])
+  // 运输专有名称
+  const properShippingName = currentData['psn']
   const according = currentData['according'] // 鉴定依据
   const otherDescribeChecked = currentData['otherDescribeChecked'] === '1'
   // 是否为充电盒或关联报告
@@ -136,7 +147,6 @@ function checkSekBtyType(currentData: SekData): CheckResult[] {
     })
 
   // 检验结果5 1.2米跌落
-  const conclusions = currentData['conclusions']
   if (!dropTest) {
     if (otherDescribe.includes('540') && String(conclusions) === "0") {
       result.push({ ok: false, result: '单独运输非限制性，未通过1.2米跌落' })
@@ -158,10 +168,23 @@ function checkSekBtyType(currentData: SekData): CheckResult[] {
     currentData['inspectionItem9En'] !== ''
   )
     result.push({ ok: false, result: '鉴别项目8，9 不为空' })
+  // 结论
+  result.push(...conclusionsCheck(
+    conclusions,
+    unno,
+    otherDescribe,
+    inspectionResult1,
+    btyGrossWeight,
+    comment,
+    packageGrade,
+    classOrDiv,
+    isIon,
+    properShippingName,
+  ))
   if (isIon) {
-    result.push(...checkSekIonBtyType(currentData, checkMap, btyType, unno, comment))
+    result.push(...checkSekIonBtyType(currentData, checkMap, btyType))
   } else {
-    result.push(...checkSekMetalBtyType(currentData, checkMap, btyType, unno, comment))
+    result.push(...checkSekMetalBtyType(currentData, checkMap, btyType))
   }
   return result
 }
@@ -170,8 +193,6 @@ function checkSekIonBtyType(
   currentData: SekData,
   checkMap: Record<string, string[]>,
   btyType: string,
-  unno: string,
-  comment: string
 ) {
   const result = []
   // 鉴别项目1
@@ -198,18 +219,6 @@ function checkSekIonBtyType(
   // 随附文件 Ion 1125 metal 1126
   if (currentData['inspectionItem7'] !== '1125')
     result.push({ ok: false, result: '随附文件错误，未勾选锂离子电池' })
-  // 结论
-  const otherDescribe = currentData['otherDescribe']
-  const btyGrossWeight = Number(currentData['btyGrossWeight'])
-  const conclusions = Number(currentData['conclusions'])
-  result.push(...ionConclusionsCheck(
-    conclusions,
-    unno,
-    otherDescribe,
-    inspectionResult1,
-    btyGrossWeight,
-    comment
-  ))
   return result
 }
 
@@ -217,8 +226,6 @@ function checkSekMetalBtyType(
   currentData: SekData,
   checkMap: Record<string, string[]>,
   btyType: string,
-  unno: string,
-  comment: string
 ) {
   const result = []
   // 鉴别项目1
@@ -238,19 +245,6 @@ function checkSekMetalBtyType(
   // 随附文件 Ion 1125 metal 1126
   if (currentData['inspectionItem7'] !== '1126')
     result.push({ ok: false, result: '随附文件错误，未勾选锂金属电池' })
-  // 结论
-  const otherDescribe = currentData['otherDescribe']
-  const btyGrossWeight = Number(currentData['btyGrossWeight'])
-  const conclusions = Number(currentData['conclusions'])
-  result.push(...metalConclusionsCheck(
-    conclusions,
-    otherDescribe,
-    inspectionResult1,
-    btyGrossWeight,
-    unno,
-    comment
-  ))
-
   return result
 }
 
