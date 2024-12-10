@@ -75,6 +75,10 @@ function checkPekBtyType(currentData: PekData): CheckResult[] {
   const unno = currentData['unno'] as PekUNNO
   // 电芯
   const isCell: boolean = String(currentData['type2']) === '1'
+  // 运输专有名称
+  const properShippingName = currentData['psn']
+  // 包装类型
+  const packageGrade = currentData['pg']
   // 客货机
   const packPassengerCargo = currentData['packPassengerCargo']
   // 包装类型 0 965 1 966 2 967
@@ -188,7 +192,10 @@ function checkPekBtyType(currentData: PekData): CheckResult[] {
     classOrDiv,
     pkgInfoReference,
     isIon,
-    packCargo
+    packCargo,
+    inspectionItem1,
+    properShippingName,
+    packageGrade
   ))
   // 瓦时数、净重、锂含量、电芯类型是否为数字
   result.push(...isNaNCheck(isIon, wattHour, liContent, netWeight))

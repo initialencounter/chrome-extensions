@@ -1,7 +1,9 @@
 import { CheckResult, PekPkgInfo, PkgInfoSubType } from "../shared/types/index"
 import { getIsCargoOnly } from "../shared/utils/index"
 import { getUNNO } from "../shared/utils/index"
+import { properShippingNameMap } from "../shared/consts/properShippingNameMap"
 
+type UnnoKey = keyof typeof properShippingNameMap
 /**
  * 结论检测
  * @param conclusions 结论
@@ -28,11 +30,29 @@ export function conclusionsCheck(
   classOrDiv: string,
   pkgInfoReference: string,
   isIon: boolean,
-  packCargo: string
+  packCargo: string,
+  inspectionItem1: '0' | '1' | '2', // 0 965 1 966 2 967
+  properShippingName: string,
+  packageGrade: string,
 ): CheckResult[] {
+  properShippingName = properShippingName.trim()
+  packageGrade = packageGrade.trim()
+  classOrDiv = classOrDiv.trim()
   let result: CheckResult[] = []
   // 危险品
   if (conclusions === 1) {
+    let unKey: UnnoKey = unno as UnnoKey
+    if (unno === 'UN3481' || unno === 'UN3091') {
+      // 内置
+      if (inspectionItem1 === '2') {
+        unKey = unno + '-C' as UnnoKey
+      } else if (inspectionItem1 === '1') { // 包装
+        unKey = unno + '-P' as UnnoKey
+      }
+    }
+    if (properShippingNameMap[unKey] !== properShippingName) {
+      result.push({ ok: false, result: `结论错误，运输专有名称错误，应为${properShippingNameMap[unKey]}` })
+    }
     if (!isDangerous) {
       result.push({ ok: false, result: '结论错误，经包装、电池瓦时、锂含量、净重、电芯类型判断，物品为非限制性货物' })
     }
@@ -54,6 +74,9 @@ export function conclusionsCheck(
     if (pkgInfoReference !== '') {
       result.push({ ok: false, result: '结论错误，危险品，参见包装说明应为空' })
     }
+    if (packageGrade !== '/') {
+      result.push({ ok: false, result: '结论错误，危险品，包装等级应为斜杠' })
+    }
   } else if (conclusions === 0) {
     // 非限制性
     if (packCargo !== '') {
@@ -67,6 +90,9 @@ export function conclusionsCheck(
     }
     if (unno !== '') {
       result.push({ ok: false, result: '结论错误，非限制性，UN编号应为空' })
+    }
+    if (packageGrade !== '') {
+      result.push({ ok: false, result: '结论错误，非限制性，包装等级应为空' })
     }
   }
   return result
