@@ -305,10 +305,38 @@
     return result;
   }
 
+  // src/shared/consts/properShippingNameMap.ts
+  var properShippingNameMap = {
+    "UN3480": "Lithium ion batteries",
+    "UN3481-C": "Lithium ion batteries contained in equipment",
+    "UN3481-P": "Lithium ion batteries packed with equipment",
+    "UN3090": "Lithium metal batteries",
+    "UN3091-C": "Lithium metal batteries contained in equipment",
+    "UN3091-P": "Lithium metal batteries packed with equipment",
+    "UN3171": "Battery-powered vehicle",
+    "UN3556": "Vehicle,lithium ion battery powered",
+    "UN3557": "Vehicle,lithium metal battery powered",
+    "UN3558": "Vehicle,sodium ion battery powered"
+  };
+
   // src/pek/conclusionsCheck.ts
-  function conclusionsCheck(conclusions, isDangerous, pkgInfoByPackCargo, pkgInfo, unno, netWeight, packPassengerCargo, classOrDiv, pkgInfoReference, isIon, packCargo) {
+  function conclusionsCheck(conclusions, isDangerous, pkgInfoByPackCargo, pkgInfo, unno, netWeight, packPassengerCargo, classOrDiv, pkgInfoReference, isIon, packCargo, inspectionItem1, properShippingName, packageGrade) {
+    properShippingName = properShippingName.trim();
+    packageGrade = packageGrade.trim();
+    classOrDiv = classOrDiv.trim();
     let result = [];
     if (conclusions === 1) {
+      let unKey = unno;
+      if (unno === "UN3481" || unno === "UN3091") {
+        if (inspectionItem1 === "2") {
+          unKey = unno + "-C";
+        } else if (inspectionItem1 === "1") {
+          unKey = unno + "-P";
+        }
+      }
+      if (properShippingNameMap[unKey] !== properShippingName) {
+        result.push({ ok: false, result: `结论错误，运输专有名称错误，应为${properShippingNameMap[unKey]}` });
+      }
       if (!isDangerous) {
         result.push({ ok: false, result: "结论错误，经包装、电池瓦时、锂含量、净重、电芯类型判断，物品为非限制性货物" });
       }
@@ -330,6 +358,9 @@
       if (pkgInfoReference !== "") {
         result.push({ ok: false, result: "结论错误，危险品，参见包装说明应为空" });
       }
+      if (packageGrade !== "/") {
+        result.push({ ok: false, result: "结论错误，危险品，包装等级应为斜杠" });
+      }
     } else if (conclusions === 0) {
       if (packCargo !== "") {
         result.push({ ok: false, result: "结论错误，仅限货机应为空" });
@@ -342,6 +373,9 @@
       }
       if (unno !== "") {
         result.push({ ok: false, result: "结论错误，非限制性，UN编号应为空" });
+      }
+      if (packageGrade !== "") {
+        result.push({ ok: false, result: "结论错误，非限制性，包装等级应为空" });
       }
     }
     return result;
@@ -508,6 +542,42 @@
     return result;
   }
 
+  // src/pek/remarksCheck.ts
+  function remarksCheck(remarks, pkgInfoSubType) {
+    switch (pkgInfoSubType) {
+      case "952":
+      case "967, I":
+      case "970, I":
+      case "967, II":
+      case "970, II":
+        if (remarks !== "1435") {
+          return [{ ok: false, result: "注意事项错误，应为：电池或电芯必须加以保护,防止短路.设备必须采取措施防止意外启动." }];
+        }
+        break;
+      case "965, IB":
+      case "968, IB":
+        if (remarks !== "1518") {
+          return [{ ok: false, result: "注意事项错误，应为：本物品仅限货机运输." }];
+        }
+        break;
+      case "966, II":
+      case "969, II":
+        if (remarks !== "1402") {
+          return [{ ok: false, result: "注意事项错误，应为：每一单电池必须做好防短路措施，并装入坚固外包装内。" }];
+        }
+        break;
+      case "965, IA":
+      case "968, IA":
+      case "966, I":
+      case "969, I":
+        if (remarks !== "1401") {
+          return [{ ok: false, result: "注意事项错误，应为：包装必须达到II级包装的性能标准" }];
+        }
+        break;
+    }
+    return [];
+  }
+
   // src/pek/stateOfCharge.ts
   function stateOfCharge(pkgInfo, otherDescribe) {
     let result = [];
@@ -531,6 +601,8 @@
       itemEName,
       // 操作信息
       otherDescribe,
+      // 注意事项
+      remarks,
       // 危险性类别
       classOrDiv,
       // 仅限货机
@@ -556,6 +628,8 @@
     const inspectionItem4Text1 = currentData["inspectionItem4Text1"];
     const unno = currentData["unno"];
     const isCell = String(currentData["type2"]) === "1";
+    const properShippingName = currentData["psn"];
+    const packageGrade = currentData["pg"];
     const packPassengerCargo = currentData["packPassengerCargo"];
     const inspectionItem1 = String(currentData["inspectionItem1"]);
     const isIon = String(currentData["type1"]) === "1";
@@ -626,6 +700,7 @@
       if (wattHour !== wattHourFromName)
         result.push({ ok: false, result: "瓦时数与项目名称不匹配" });
     }
+    result.push(...remarksCheck(remarks, pkgInfoSubType));
     const conclusions = Number(currentData["conclusions"]);
     const result1 = currentData["result1"];
     if (result1 !== "DGR规定,资料核实")
@@ -641,7 +716,10 @@
       classOrDiv,
       pkgInfoReference,
       isIon,
-      packCargo
+      packCargo,
+      inspectionItem1,
+      properShippingName,
+      packageGrade
     ));
     result.push(...isNaNCheck(isIon, wattHour, liContent, netWeight));
     result.push(...IAIBCheck(isIA, pkgInfoSubType));
@@ -649,18 +727,6 @@
   }
 
   // src/sek/conclusionsCheck.ts
-  var properShippingNameMap = {
-    "UN3480": "Lithium ion batteries",
-    "UN3481-C": "Lithium ion batteries contained in equipment",
-    "UN3481-P": "Lithium ion batteries packed with equipment",
-    "UN3090": "Lithium metal batteries",
-    "UN3091-C": "Lithium metal batteries contained in equipment",
-    "UN3091-P": "Lithium metal batteries packed with equipment",
-    "UN3171": "Battery-powered vehicle",
-    "UN3556": "Vehicle,lithium ion battery powered",
-    "UN3557": "Vehicle,lithium metal battery powered",
-    "UN3558": "Vehicle,sodium ion battery powered"
-  };
   function conclusionsCheck2(conclusions, unno, otherDescribe, inspectionResult1, btyGrossWeight, comment, packageGrade, classOrDiv, isIon, properShippingName) {
     let result = [];
     unno = unno.trim();
