@@ -22,6 +22,7 @@ import { liBtyLabelCheck } from "./liBtyLabelCheck"
 import { netWeighLimit } from "./netWeighLimit"
 import { otherDescribeIsCell } from "./otherDescribeIsCell"
 import { packetOrContain } from "./packetOrContain"
+import { remarksCheck } from "./remarksCheck"
 import { stateOfCharge } from "./stateOfCharge"
 
 function checkPekBtyType(currentData: PekData): CheckResult[] {
@@ -35,6 +36,8 @@ function checkPekBtyType(currentData: PekData): CheckResult[] {
     itemEName,
     // 操作信息
     otherDescribe,
+    // 注意事项
+    remarks,
     // 危险性类别
     classOrDiv,
     // 仅限货机
@@ -172,6 +175,9 @@ function checkPekBtyType(currentData: PekData): CheckResult[] {
     if (wattHour !== wattHourFromName)
       result.push({ ok: false, result: '瓦时数与项目名称不匹配' })
   }
+
+  // 注意事项
+  result.push(...remarksCheck(remarks, pkgInfoSubType))
 
   // 结论 非限制性 0 危险品 1
   const conclusions = Number(currentData['conclusions'])
