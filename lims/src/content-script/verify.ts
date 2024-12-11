@@ -665,7 +665,9 @@ function getFormData<T>(systemId: 'pek' | 'sek'): T {
       data[name as keyof Partial<T>] = value as T[keyof T];
     }
   })
-
+  if (!(data['unno' as keyof Partial<T>] as string) .startsWith('UN')) {
+    (data['unno' as keyof Partial<T> ] as string) = 'UN' + data['unno' as keyof Partial<T>]
+  }
   if (systemId === 'pek') {
     Object.keys(PekFullData).forEach(key => {
       if (data[key as keyof Partial<T>] === undefined) {
