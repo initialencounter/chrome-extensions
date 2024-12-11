@@ -353,71 +353,49 @@ function removeOrange(nextYearColor: string, nextYearBgColor: string) {
 }
 
 let globalItemNumberList1: string[] = []
-let globalItemNumberList2: EntrustRow[] = []
 
 async function insertInspectFormLink(length1: number) {
-  let url = getInspectFormUpdateUrl()
-  await updateGlobalItemNumberList2(url)
-  if (!url) return
-  let projectIdMap: Record<string, number> = {}
-  for (let j = 0; j < globalItemNumberList2.length; j++) {
-    // @ts-ignore
-    projectIdMap[globalItemNumberList2[j]['projectNo']] = j
-  }
   for (let i = 0; i < length1; i++) {
-    let targetIndex: number | undefined = projectIdMap[globalItemNumberList1[i]]
-    if (targetIndex === undefined) continue
-    const params = new URLSearchParams({
-      projectId: globalItemNumberList2[targetIndex]['projectId'] ?? '',
-      entrustId: globalItemNumberList2[targetIndex]['id'] ?? '',
-      category: 'battery',
-      from: 'query'
-    })
-    let link = `/${globalItemNumberList2[targetIndex].projectNo?.startsWith('PEK') ? 'pek' : 'sek'}/inspect?${params.toString()}`
+    const projectNo = globalItemNumberList1[i]
     const itemCNameElement = document.querySelector(`#datagrid-row-r1-2-${i} > td:nth-child(3) > div`) as HTMLDivElement
     if (!itemCNameElement) {
       continue
     }
+    if (itemCNameElement.innerHTML === '') {
+      continue
+    }
     const operateElement = document.querySelector(`#datagrid-row-r1-2-${i} > td:nth-child(14) > div`) as HTMLAnchorElement
     if (operateElement) {
+      if (operateElement.innerHTML.includes('检验单')) {
+        continue
+      }
       const inspectElement = document.createElement('a')
-      inspectElement.href = link
-      inspectElement.target = '_blank'
+      inspectElement.role = 'button'
       inspectElement.innerHTML = '检验单'
+      inspectElement.onclick = () => openWindow(projectNo)
+      inspectElement.style.cursor = 'pointer'
       operateElement.appendChild(document.createTextNode(' '))
       operateElement.appendChild(inspectElement)
     }
     let itemCName = itemCNameElement.innerHTML
-    const innerHTML = `<a href="${link}" target="_blank" style="text-decoration: none; color: inherit;"
-    onmouseover="this.style.textDecoration='underline'; this.style.color='blue';" 
-    onmouseout="this.style.textDecoration='none'; this.style.color='inherit';">${itemCName}</a>`
-    itemCNameElement.innerHTML = innerHTML
+    itemCNameElement.innerHTML = ''
+    const inspectElement0 = document.createElement('a')
+    inspectElement0.role = 'button'
+    inspectElement0.innerHTML = itemCName
+    inspectElement0.style.textDecoration = 'none'
+    inspectElement0.style.color = 'inherit'
+    itemCNameElement.onmouseover = () => {
+      inspectElement0.style.textDecoration = 'underline'
+      inspectElement0.style.color = 'blue'
+    }
+    itemCNameElement.onmouseout = () => {
+      inspectElement0.style.textDecoration = 'none'
+      inspectElement0.style.color = 'inherit'
+    }
+    itemCNameElement.onclick = () => openWindow(globalItemNumberList1[i])
+    itemCNameElement.style.cursor = 'pointer'
+    itemCNameElement.appendChild(inspectElement0)
   }
-}
-
-
-function getInspectFormUpdateUrl(): string {
-  const startDate = (document.querySelector("#toolbar > form > table > tbody > tr:nth-child(2) > td:nth-child(4) > span:nth-child(2) > input.textbox-text.validatebox-text") as HTMLInputElement)?.value
-  const endDate = (document.querySelector("#toolbar > form > table > tbody > tr:nth-child(2) > td:nth-child(4) > span:nth-child(4) > input.textbox-text.validatebox-text") as HTMLInputElement)?.value
-  if (!startDate || !endDate) return ''
-  const systemId = (document.querySelector("#toolbar > form > table > tbody > tr:nth-child(1) > td:nth-child(2) > span > input.textbox-value") as HTMLInputElement)?.value ?? ''
-  const reportTypeString = (document.querySelector("#toolbar > form > table > tbody > tr:nth-child(1) > td:nth-child(4) > span > input.textbox-text.validatebox-text") as HTMLInputElement).value ?? ''
-  let reportType = ''
-  if (reportTypeString === '全部') reportType = ''
-  if (reportTypeString === '初验') reportType = '0'
-  if (reportTypeString === '换证') reportType = '1'
-  const principal = (document.querySelector("#principal") as HTMLInputElement)?.value ?? ''
-  const itemCEName = (document.querySelector("#itemCEName") as HTMLInputElement)?.value ?? ''
-  let pyType = (document.querySelector("#toolbar > form > table > tbody > tr:nth-child(2) > td:nth-child(2) > span > input.textbox-text.validatebox-text") as HTMLInputElement)?.value ?? ''
-  if (pyType === '全部') pyType = ''
-  if (pyType === '现结') pyType = '0'
-  if (pyType === '月结') pyType = '1'
-  const rows = (document.querySelector("body > div.panel.easyui-fluid > div.easyui-panel.panel-body.panel-noscroll > div > div > div.datagrid-pager.pagination > table > tbody > tr > td:nth-child(1) > select") as HTMLInputElement)?.value ?? '10'
-  let pages = (document.querySelector("body > div.panel.easyui-fluid > div.easyui-panel.panel-body.panel-noscroll > div > div > div.datagrid-pager.pagination > table > tbody > tr > td:nth-child(7) > input") as HTMLInputElement)?.value ?? '1'
-  if (pages === '0') pages = '1'
-  const url = `${window.location.origin}/rest/sales/entrust?systemId=${systemId}&reportType=${reportType
-    }&principal=${principal}&itemCEName=${itemCEName}&payType=${pyType}&startDate=${startDate}&endDate=${endDate}&page=${pages}&rows=${rows}`
-  return url
 }
 
 function updateGlobalItemNumberList1(): string[] {
@@ -435,29 +413,10 @@ function updateGlobalItemNumberList1(): string[] {
   return itemNumberList1
 }
 
-async function updateGlobalItemNumberList2(link: string) {
-  const response = await fetch(link)
-  if (!response.ok) return []
-  const data: EntrustList = await response.json()
-  const itemNumberList2: EntrustRow[] = data['rows']
-  globalItemNumberList2 = itemNumberList2
-}
-
 function observeItemNumberList1() {
   setInterval(async () => {
     updateGlobalItemNumberList1()
-    let length1 = globalItemNumberList1.length
-    let length2 = globalItemNumberList2.length
-    if (length1 !== length2) {
-      insertInspectFormLink(length1)
-    } else {
-      for (let i = 0; i < (length1 > length2 ? length1 : length2); i++) {
-        if (globalItemNumberList1[i] !== globalItemNumberList2[i]['projectNo']) {
-          insertInspectFormLink(length1)
-          break
-        }
-      }
-    }
+    insertInspectFormLink(globalItemNumberList1.length)
   }, 100)
 }
 
@@ -495,4 +454,116 @@ function listenVisibilityChangeEntrustList(autoRefreshDuration: number) {
       hiddenTimeEntrustList = null;
     }
   });
+}
+interface LinkParams {
+  systemId: string
+  projectId: string
+  entrustId: string
+  category: string
+  from: 'query'
+}
+async function getCategory(projectNo: string): Promise<LinkParams | undefined> {
+  if (!projectNo) return undefined
+  try {
+    const [startDate, endDate] = parseDateEntrust(projectNo)
+    const response = await fetch(
+      `https://${window.location.host}/rest/inspect/query?projectNo=${projectNo}&startDate=${startDate}&endDate=${endDate}&page=1&rows=10`,
+      {
+        method: 'GET',
+        credentials: 'include' // 包含 cookies
+      }
+    )
+    if (!response.ok) {
+      console.log('请求失败1')
+      return undefined
+    }
+    const { rows }: QueryResultData =
+      await response.json()
+    if (rows.length < 1) return undefined
+    return {
+      systemId: rows[0]['systemId'],
+      projectId: rows[0]['projectId'],
+      entrustId: rows[0]['entrustId'],
+      category: rows[0]['category'],
+      from: 'query'
+    } as LinkParams
+  } catch (error) {
+    console.log('请求失败2')
+    return undefined
+  }
+}
+
+
+interface QueryResultData {
+  rows: QueryResultDataRow[];
+  total: number;
+}
+
+export interface QueryResultDataRow {
+  according?: string;
+  appraiseDate?: string;
+  appraiser?: string;
+  appraiserName?: string;
+  attchmentFiles?: string[];
+  category?: string;
+  checkDate?: string;
+  checked?: boolean;
+  checker?: string;
+  checkerName?: string;
+  checkLocation?: string;
+  checkLocationName?: string;
+  classOrDiv?: string;
+  component?: null;
+  conclusions?: number;
+  createdBy?: string;
+  createdByName?: string;
+  createdDate?: string;
+  editStatus?: number;
+  entrustId?: string;
+  id?: string;
+  itemCName?: string;
+  itemEName?: string;
+  market?: string;
+  modifiedBy?: string;
+  modifiedByName?: string;
+  modifiedDate?: string;
+  pg?: string;
+  principalName?: string;
+  projectId?: string;
+  projectNo?: string;
+  psn?: string;
+  repeat?: boolean;
+  systemId?: string;
+  unno?: string;
+}
+
+async function openWindow(projectNo: string) {
+  const linkParams = await getCategory(projectNo)
+  if (!linkParams) return
+  const params = new URLSearchParams({
+    projectId: linkParams.projectId,
+    entrustId: linkParams.entrustId,
+    category: linkParams.category,
+    from: linkParams.from
+  })
+  let link = `/${linkParams.systemId}/inspect?${params.toString()}`
+  console.log(link)
+  window.open(link, '_blank')
+}
+
+function parseDateEntrust(dateText: string) {
+  dateText = dateText.replace(/[^0-9]/g, '')
+  if (dateText.length < 9) {
+    return ['', '']
+  }
+  const year = dateText.slice(0, 4)
+  const month = dateText.slice(4, 6)
+  const day = dateText.slice(6, 8)
+  if (month.length < 2) {
+    return [`${year}-01-01`, `${year}-12-31`]
+  }
+  if (day.length < 2) {
+    return [`${year}-${month}-01`, `${year}-${month}-31`]
+  }
+  return [`${year}-${month}-${day}`, `${year}-${month}-${day}`]
 }
