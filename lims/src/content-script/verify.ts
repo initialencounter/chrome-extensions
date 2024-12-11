@@ -473,29 +473,34 @@ async function testVerify() {
   }
   const { total, rows }: { total: number; rows: PekData[] } =
     await response.json()
-  const output: Record<string, Array<{ ok: boolean; result: string }>> = {}
-  for (let i = 0; i < total; i++) {
+  for (let i = 0; i < 100; i++) {
     await verifySleep(100)
-    if (rows[i]['editStatus'] !== 3) continue
-    const projectId = rows[i]['projectId']
-    console.log(rows[i]['projectNo'])
-    const currentData = await getData(projectId)
-    if (currentData === null) {
-      console.log(projectId)
-      console.log('请求失败2')
-      continue
-    }
-    let result = []
-    if (systemIdLowercase === 'pek') {
-      result = window.checkPekBtyType(currentData as PekData)
-    } else {
-      result = window.checkSekBtyType(currentData as SekData)
-    }
-    if (result.length) {
-      output[rows[i]['projectNo']] = result
+    // if (rows[i]['editStatus'] !== 3) continue
+    try {
+      const projectId = rows[i]['projectId']
+      console.log(rows[i]['projectNo'])
+      const currentData = await getData(projectId)
+      if (currentData === null) {
+        console.log(projectId)
+        console.log('请求失败2')
+        continue
+      }
+      let result = []
+      if (systemIdLowercase === 'pek') {
+        result = window.checkPekBtyType(currentData as PekData)
+      } else {
+        result = window.checkSekBtyType(currentData as SekData)
+      }
+      if (result.length) {
+        if (result.length === 1 && result[0].result.includes("请忽略")) {
+        } else {
+          console.log(result)
+        }
+      }
+    } catch (e) {
+      console.log(e)
     }
   }
-  console.log(output)
 }
 
 const PekFullData = {
@@ -665,8 +670,8 @@ function getFormData<T>(systemId: 'pek' | 'sek'): T {
       data[name as keyof Partial<T>] = value as T[keyof T];
     }
   })
-  if (!(data['unno' as keyof Partial<T>] as string ).startsWith('UN') && (data['unno' as keyof Partial<T>] as string).trim().length > 0) {
-    (data['unno' as keyof Partial<T> ] as string) = 'UN' + data['unno' as keyof Partial<T>]
+  if (!(data['unno' as keyof Partial<T>] as string).startsWith('UN') && (data['unno' as keyof Partial<T>] as string).trim().length > 0) {
+    (data['unno' as keyof Partial<T>] as string) = 'UN' + data['unno' as keyof Partial<T>]
   }
   if (systemId === 'pek') {
     Object.keys(PekFullData).forEach(key => {
