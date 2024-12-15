@@ -48,8 +48,9 @@ def docx_to_json(docx_path):
 
 # 使用示例
 if __name__ == '__main__':
-    file_path = ' 概要.docx'
+    file_path = 'SEKGZ202410296743 概要.docx'
     
     # 转换为JSON
     json_content = docx_to_json(file_path)
-    print("JSON内容:", json_content)
+    with open('test.json', 'w', encoding='utf-8') as f:
+        f.write(json_content)

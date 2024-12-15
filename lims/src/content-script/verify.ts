@@ -1,6 +1,8 @@
 declare global {
   function checkPekBtyType(data: PekData): Array<{ ok: boolean; result: string }>
   function checkSekBtyType(data: SekData): Array<{ ok: boolean; result: string }>
+  function checkPekSummary(data: PekData, summary: SummaryModelDocx): Array<{ ok: boolean; result: string }>
+  function checkSekSummary(data: SekData, summary: SummaryModelDocx): Array<{ ok: boolean; result: string }>
 }
 
 const isInspect = new URLSearchParams(window.location.search).get('from') === null;
@@ -30,6 +32,7 @@ const host = window.location.host
       window.checkSekBtyType = mod.check_sek_bty
     }
     await verifySleep(500)
+    insertCheckSummaryButton()
     if (category !== "battery") return
     if (localConfig.verify === false) {
       console.log('未启用验证，退出脚本')
@@ -699,4 +702,128 @@ function getFormData<T>(systemId: 'pek' | 'sek'): T {
     })
   }
   return data as T;
+}
+
+export interface SummaryModelDocx {
+  // 标题
+  title: string,
+  // 项目编号
+  project_no: string,
+  // 签发日期
+  issue_date: string,
+  capacity: string;
+  classification: string;
+  cnName: string;
+  color: string;
+  consignor: string;
+  consignorInfo: string;
+  enName: string;
+  id: string;
+  licontent: string;
+  manufacturer: string;
+  manufacturerInfo: string;
+  mass: string;
+  note: string;
+  projectId: string;
+  shape: string;
+  test1: string;
+  test2: string;
+  test3: string;
+  test4: string;
+  test5: string;
+  test6: string;
+  test7: string;
+  test8: string;
+  testDate: string;
+  testlab: string;
+  testlabInfo: string;
+  testManual: string;
+  testReportNo: string;
+  trademark: string;
+  type: string;
+  un38f: string;
+  un38g: string;
+  voltage: string;
+  watt: string;
+}
+
+async function getProjectSummary(projectNo: string) {
+  const response = await fetch(
+    `http://127.0.0.1:25455/get-summary-info/${projectNo}`,
+    {
+      method: 'GET',
+      mode: 'cors',
+    }
+  )
+  if (!response.ok) {
+    return null
+  }
+  return await response.json()
+  // try {
+  //   const response = await chrome.runtime.sendMessage({
+  //     action: 'getSummaryInfo',
+  //     projectNo: projectNo
+  //   });
+  //   return response;
+  // } catch (error) {
+  //   console.error('获取项目信息失败:', error);
+  //   return null;
+  // }
+}
+
+function insertCheckSummaryButton() {
+  const targetChild = document.getElementById('openDocumentsBtn0')
+  if (!targetChild) return
+  const targetParent = targetChild.parentElement
+  if (!targetParent) return
+  const verifyButton = document.createElement('a')
+  verifyButton.id = 'lims-verifyButton3'
+  verifyButton.href = 'javascript:void(0);'
+  verifyButton.className = 'easyui-linkbutton l-btn l-btn-small'
+  verifyButton.style.background = '#ffffff'
+  // verifyButton.style.margin = '0 3px 0 3px'
+  // hover
+  verifyButton.onmouseover = function () {
+    verifyButton.style.background = '#54a124'
+  }
+  verifyButton.onmouseout = function () {
+    verifyButton.style.background = '#ffffff'
+  }
+  verifyButton.innerHTML = `
+    <span class="l-btn-left l-btn-icon-left">
+      <span class="l-btn-text">Summary</span>
+      <svg class="l-btn-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffbbab"><path d="m344-60-76-128-144-32 14-148-98-112 98-112-14-148 144-32 76-128 136 58 136-58 76 128 144 32-14 148 98 112-98 112 14 148-144 32-76 128-136-58-136 58Zm34-102 102-44 104 44 56-96 110-26-10-112 74-84-74-86 10-112-110-24-58-96-102 44-104-44-56 96-110 24 10 112-74 86 74 84-10 114 110 24 58 96Zm102-318Zm-42 142 226-226-56-58-170 170-86-84-56 56 142 142Z"/></svg>
+    </span>
+    `
+  verifyButton.onclick = async () => {
+    const projectNo = getCurrentProjectNo()
+    if (!projectNo) return
+    const summaryInfo: SummaryModelDocx = await getProjectSummary(projectNo)
+    if (!summaryInfo) return
+    checkSummary(summaryInfo)
+  }
+  targetParent.appendChild(verifyButton)
+}
+
+function checkSummary(summaryData: SummaryModelDocx) {
+  let result = []
+  let dataFromForm: PekData | SekData
+  if (systemIdLowercase === 'pek') {
+    dataFromForm = getFormData<PekData>(systemIdLowercase)
+    result = window.checkPekSummary(dataFromForm, summaryData)
+  } else {
+    dataFromForm = getFormData<SekData>(systemIdLowercase)
+    result = window.checkSekSummary(dataFromForm, summaryData)
+  }
+  if (!result.length) {
+    const verifyButton2 = document.getElementById('lims-verifyButton3')?.children[0]?.children[1] as SVGAElement
+    if (verifyButton2) verifyButton2.setAttribute('fill', '#54a124')
+    // @ts-expect-error: use Qmsg from assets
+    Qmsg['success']('初步验证通过')
+    return
+  }
+  // @ts-expect-error: use Qmsg from assets
+  Qmsg['warning']('初步验证未通过' + JSON.stringify(result, null, 2), {
+    timeout: 4000
+  })
 }

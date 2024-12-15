@@ -1074,7 +1074,567 @@
     return result;
   }
 
+  // src/summary/checkBatteryType.ts
+  var batteryTypeMap = {
+    "500": "锂离子电池",
+    "501": "锂离子电芯",
+    "502": "锂金属电池",
+    "503": "锂金属电芯",
+    "504": "单芯锂离子电池",
+    "505": "单芯锂金属电池"
+  };
+  function matchBatteryType(summaryBatteryType) {
+    if (summaryBatteryType.includes("单芯锂离子电池")) return "504";
+    if (summaryBatteryType.includes("单芯锂金属电池")) return "505";
+    if (summaryBatteryType.includes("锂离子电芯")) return "501";
+    if (summaryBatteryType.includes("锂金属电池")) return "502";
+    if (summaryBatteryType.includes("锂金属电芯")) return "503";
+    if (summaryBatteryType.includes("锂离子电池")) return "500";
+    return "";
+  }
+  function checkBatteryType(formBatteryType, summaryBatteryType) {
+    let summaryBatteryTypeCode = matchBatteryType(summaryBatteryType.trim());
+    if (summaryBatteryTypeCode === "") return [];
+    if (formBatteryType !== summaryBatteryTypeCode) {
+      return [{
+        ok: false,
+        result: `电池类型不一致, 系统上为${batteryTypeMap[formBatteryType]}, 概要上为${summaryBatteryType}`
+      }];
+    }
+    return [];
+  }
+
+  // src/summary/checkCapacity.ts
+  function checkCapacity(formCapacity, summaryCapacity) {
+    let summaryCapacityNumber = matchCapacity(summaryCapacity.trim());
+    if (summaryCapacityNumber !== formCapacity) {
+      return [{
+        ok: false,
+        result: `容量不一致, 系统上为${formCapacity}, 概要上为${summaryCapacityNumber}`
+      }];
+    }
+    return [];
+  }
+
+  // src/summary/checkIssueDate.ts
+  function checkIssueDate(issue_date) {
+    const inputDate = new Date(issue_date);
+    const today = /* @__PURE__ */ new Date();
+    today.setHours(0, 0, 0, 0);
+    const diffTime = inputDate.getTime() - today.getTime();
+    const diffDays = diffTime / (1e3 * 60 * 60 * 24);
+    if (diffDays >= 1 || diffDays < -1) {
+      return [{
+        ok: false,
+        result: `概要签发日期可能错误, 概要上为${issue_date}`
+      }];
+    }
+    return [];
+  }
+
+  // src/summary/checkLiContent.ts
+  function checkLiContent(formLiContent, summaryLiContent) {
+    let summaryLiContentNumber = matchBatteryWeight(summaryLiContent.trim());
+    if (isNaN(summaryLiContentNumber) || isNaN(formLiContent)) return [];
+    if (summaryLiContentNumber !== formLiContent) {
+      return [{
+        ok: false,
+        result: `锂含量不一致, 系统上为${formLiContent}g, 概要上为${summaryLiContentNumber}g`
+      }];
+    }
+    return [];
+  }
+
+  // src/summary/checkMass.ts
+  function checkMass(formMass, summaryMass) {
+    let summaryMassNumber = matchBatteryWeight(summaryMass.trim());
+    if (summaryMassNumber !== formMass) {
+      return [{
+        ok: false,
+        result: `净重不一致, 系统上为${formMass}g, 概要上为${summaryMassNumber}g`
+      }];
+    }
+    return [];
+  }
+
+  // src/summary/checkModel.ts
+  function checkModel(formModel, summaryModel) {
+    if (formModel.trim() !== summaryModel.trim()) {
+      return [{
+        ok: false,
+        result: `型号不一致, 系统上为${formModel}, 概要上为${summaryModel}`
+      }];
+    }
+    return [];
+  }
+
+  // src/summary/checkName.ts
+  function checkName(packageType, formEName, formCName, model, summaryCName) {
+    console.log("inspectionItem1", packageType);
+    console.log("formEName", formEName);
+    console.log("formCName", formCName);
+    console.log("model", model);
+    console.log("summaryCName", summaryCName);
+    console.log("--------------------------------");
+    formCName = formCName.trim();
+    formEName = formEName.trim();
+    summaryCName = summaryCName.trim();
+    model = model.trim();
+    let formCNameText = "";
+    let formENameText = "";
+    let keyWord = "";
+    switch (packageType) {
+      case "0":
+        formCNameText = formCName.split(model)[0];
+        formENameText = formEName.split(model)[0];
+        break;
+      case "1":
+        keyWord = "包装";
+        break;
+      case "2":
+        keyWord = "内置";
+        break;
+    }
+    if (keyWord === "内置") {
+      let indexKeyWord = formCName.indexOf("内置");
+      let indexKeyEWord = formEName.indexOf("Containing");
+      let indexModel = formCName.indexOf(model);
+      let indexEModel = formEName.indexOf(model);
+      console.log("indexKeyWord", indexKeyWord);
+      console.log("indexModel", indexModel);
+      if (indexKeyWord < indexModel) {
+        formCNameText = formCName.substring(indexKeyWord + 2, indexModel);
+        formENameText = formEName.substring(indexKeyEWord + 10, indexEModel);
+      } else {
+        formCNameText = formCName.substring(0, indexModel);
+        formENameText = formEName.substring(0, indexModel);
+      }
+    } else if (keyWord === "包装") {
+      let indexKeyWord = formCName.indexOf("与");
+      let indexKeyEWord = formEName.indexOf("Packed With");
+      let indexModel = formCName.indexOf(model);
+      let indexEModel = formEName.indexOf(model);
+      if (indexKeyWord < indexModel) {
+        formCNameText = formCName.substring(0, indexModel);
+        formENameText = formEName.substring(0, indexEModel);
+      } else {
+        formCNameText = formCName.substring(indexKeyWord + 1, indexModel);
+        formENameText = formEName.substring(indexKeyEWord + 1, indexEModel);
+      }
+    }
+    formCNameText = formCNameText.trim();
+    formENameText = formENameText.trim();
+    console.log("keyWord", keyWord);
+    console.log("formCNameText", formCNameText);
+    console.log("formENameText", formENameText);
+    console.log("--------------------------------");
+    let result = [];
+    if (!summaryCName.includes(formCNameText)) {
+      result.push({
+        ok: false,
+        result: `中文电池名称不一致, 系统上为${formCNameText}, 概要上为${summaryCName}`
+      });
+    }
+    if (!summaryCName.includes(formENameText)) {
+      result.push({
+        ok: false,
+        result: `英文电池名称不一致, 系统上为${formENameText}, 概要上为${summaryCName}`
+      });
+    }
+    return result;
+  }
+
+  // src/shared/appearence/shape.ts
+  var shapeMap = [
+    {
+      "createdBy": "40287f81563efffb01563f05aaa2000a",
+      "createdDate": "2023-11-21 17:25:30",
+      "modifiedBy": "40287f81563efffb01563f05aaa2000a",
+      "modifiedDate": "2023-11-21 17:25:30",
+      "id": "2c9180838b90642e018bf132f37f5a60",
+      "type": "libattery-shape",
+      "chineseName": "球形",
+      "englishName": "spherical",
+      "sn": 0,
+      "disable": false
+    },
+    {
+      "createdBy": "40287f81563efffb01563f05aaa2000a",
+      "createdDate": "2020-03-12 14:16:27",
+      "modifiedBy": "40287f81563efffb01563f05aaa2000a",
+      "modifiedDate": "2020-03-12 14:16:27",
+      "id": "2c918084700d8fb20170cd63120008f7",
+      "type": "libattery-shape",
+      "chineseName": "棱柱形",
+      "englishName": "prismatic",
+      "sn": 0,
+      "disable": false
+    },
+    {
+      "createdBy": "1",
+      "createdDate": "2016-09-11 21:52:40",
+      "modifiedBy": null,
+      "modifiedDate": null,
+      "id": "520",
+      "type": "libattery-shape",
+      "chineseName": "长方体",
+      "englishName": "cuboid",
+      "sn": 0,
+      "disable": false
+    },
+    {
+      "createdBy": "1",
+      "createdDate": "2016-09-11 21:52:40",
+      "modifiedBy": null,
+      "modifiedDate": null,
+      "id": "521",
+      "type": "libattery-shape",
+      "chineseName": "圆柱体",
+      "englishName": "cylinder",
+      "sn": 0,
+      "disable": false
+    },
+    {
+      "createdBy": "40287f81563efffb01563f05aaa2000a",
+      "createdDate": "2017-03-09 09:00:05",
+      "modifiedBy": "40287f81563efffb01563f05aaa2000a",
+      "modifiedDate": "2017-03-09 09:00:05",
+      "id": "8aad92b65aae82c3015ab094788a0026",
+      "type": "libattery-shape",
+      "chineseName": "扣式",
+      "englishName": "button",
+      "sn": 0,
+      "disable": false
+    },
+    {
+      "createdBy": "40287f81563efffb01563f05aaa2000a",
+      "createdDate": "2017-06-05 15:10:33",
+      "modifiedBy": "40287f81563efffb01563f05aaa2000a",
+      "modifiedDate": "2017-06-05 15:10:33",
+      "id": "8aad92b65c76a14d015c771747250caa",
+      "type": "libattery-shape",
+      "chineseName": "近长方体",
+      "englishName": "almost cuboid",
+      "sn": 0,
+      "disable": false
+    },
+    {
+      "createdBy": "40287f81563efffb01563f05aaa2000a",
+      "createdDate": "2017-07-26 16:51:10",
+      "modifiedBy": "40287f81563efffb01563f05aaa2000a",
+      "modifiedDate": "2017-07-26 16:51:10",
+      "id": "8aad92b65d7a7078015d7e17b9fc23cd",
+      "type": "libattery-shape",
+      "chineseName": "正方体",
+      "englishName": "cube",
+      "sn": 0,
+      "disable": false
+    },
+    {
+      "createdBy": "40287f81563efffb01563f05aaa2000a",
+      "createdDate": "2017-07-26 16:51:56",
+      "modifiedBy": "40287f81563efffb01563f05aaa2000a",
+      "modifiedDate": "2023-01-18 13:19:18",
+      "id": "8aad92b65d7a7078015d7e186bf923d6",
+      "type": "libattery-shape",
+      "chineseName": "不规则形状",
+      "englishName": "irregular",
+      "sn": 0,
+      "disable": false
+    },
+    {
+      "createdBy": "40287f81563efffb01563f05aaa2000a",
+      "createdDate": "2017-07-26 16:53:16",
+      "modifiedBy": "40287f81563efffb01563f05aaa2000a",
+      "modifiedDate": "2017-07-26 16:53:16",
+      "id": "8aad92b65d7a7078015d7e19a3b12448",
+      "type": "libattery-shape",
+      "chineseName": "长方体带有导线",
+      "englishName": "cuboid with wire",
+      "sn": 0,
+      "disable": false
+    },
+    {
+      "createdBy": "40287f81563efffb01563f05aaa2000a",
+      "createdDate": "2017-07-26 16:55:30",
+      "modifiedBy": "40287f81563efffb01563f05aaa2000a",
+      "modifiedDate": "2017-07-26 16:55:30",
+      "id": "8aad92b65d7a7078015d7e1bb1a2245d",
+      "type": "libattery-shape",
+      "chineseName": "近圆柱体",
+      "englishName": "approximate cylinder",
+      "sn": 0,
+      "disable": false
+    },
+    {
+      "createdBy": "40287f81563efffb01563f05aaa2000a",
+      "createdDate": "2017-08-21 10:01:42",
+      "modifiedBy": "40287f81563efffb01563f05aaa2000a",
+      "modifiedDate": "2017-08-21 10:01:42",
+      "id": "8aad92b65de116af015e02862e0c25de",
+      "type": "libattery-shape",
+      "chineseName": "块状",
+      "englishName": "bulk",
+      "sn": 0,
+      "disable": false
+    }
+  ];
+
+  // src/summary/checkShape.ts
+  function checkShape(formShape, summaryShape) {
+    const shapeText = summaryShape.trim().split("色")[1];
+    let formShapeChineseName = "";
+    let summaryShapeId = "";
+    shapeMap.forEach((item) => {
+      if (formShape === item.id) {
+        formShapeChineseName = item.chineseName;
+      }
+      if (item.chineseName === shapeText) {
+        summaryShapeId = item.id;
+      }
+    });
+    if (formShape !== summaryShapeId && summaryShapeId) {
+      return [{
+        ok: false,
+        result: `形状不一致, 系统上为${formShapeChineseName}, 概要上为${shapeText}`
+      }];
+    }
+    return [];
+  }
+
+  // src/summary/checkT7.ts
+  var batteryTypeMap2 = {
+    "500": "锂离子电池",
+    "501": "锂离子电芯",
+    "502": "锂金属电池",
+    "503": "锂金属电芯",
+    "504": "单芯锂离子电池",
+    "505": "单芯锂金属电池"
+  };
+  function checkT7(batteryType, summaryTest7, note) {
+    switch (batteryType) {
+      case "501":
+      case "502":
+      case "503":
+        if (!summaryTest7.includes("通过")) {
+          return [{
+            ok: false,
+            result: `电池类型为${batteryTypeMap2[batteryType]}, 概要T7测试结果为${summaryTest7}`
+          }];
+        }
+        break;
+      case "500":
+        if (summaryTest7.includes("不适用") && !note.includes("保护")) {
+          return [{
+            ok: false,
+            result: `电池类型为${batteryTypeMap2[batteryType]}，不含保护电路，概要T7测试结果为${summaryTest7}`
+          }];
+        }
+        break;
+      case "504":
+        if (summaryTest7.includes("不适用")) {
+          return [{
+            ok: false,
+            result: `电池类型为${batteryTypeMap2[batteryType]}，概要T7测试结果为${summaryTest7}`
+          }];
+        }
+        break;
+    }
+    return [];
+  }
+
+  // src/summary/checkTradeMark.ts
+  function checkTradeMark(formTradeMark, summaryTradeMark) {
+    let formTradeMarkText = formTradeMark.trim();
+    let summaryTradeMarkText = summaryTradeMark.trim();
+    if (!formTradeMarkText || summaryTradeMarkText === "/") return [];
+    if (formTradeMarkText !== summaryTradeMarkText) {
+      return [{
+        ok: false,
+        result: `商标不一致, 系统上为${formTradeMarkText}, 概要上为${summaryTradeMarkText}`
+      }];
+    }
+    return [];
+  }
+
+  // src/summary/checkVoltage.ts
+  function checkVoltage(formVoltage, summaryVoltage) {
+    let summaryVoltageNumber = matchVoltage(summaryVoltage.trim());
+    if (summaryVoltageNumber !== formVoltage) {
+      return [{
+        ok: false,
+        result: `电压不一致, 系统上为${formVoltage}, 概要上为${summaryVoltageNumber}`
+      }];
+    }
+    return [];
+  }
+
+  // src/summary/checkWattHour.ts
+  function checkWattHour(formWattHour, summaryWattHour) {
+    let summaryWattHourNumber = matchWattHour(summaryWattHour.trim());
+    if (summaryWattHourNumber !== formWattHour) {
+      return [{
+        ok: false,
+        result: `瓦时不一致, 系统上为${formWattHour}, 概要上为${summaryWattHourNumber}`
+      }];
+    }
+    return [];
+  }
+
+  // src/summary/index.ts
+  function checkSekSummary(currentData, summaryData) {
+    const checkMap = {
+      "500": ["≤100Wh", ">100Wh"],
+      "501": ["≤20Wh", ">20Wh"],
+      "504": ["≤20Wh", ">20Wh"],
+      "502": [">2g", "≤2g"],
+      "503": [">1g", "≤1g"],
+      "505": [">1g", "≤1g"]
+    };
+    const btyType = currentData["btyType"];
+    const {
+      // 中文品名
+      itemCName,
+      // 英文品名
+      itemEName,
+      // 电池尺寸
+      btySize,
+      // 电池形状
+      // 锂离子电池 锂离子电芯 锂金属电池 锂金属电芯 单芯锂离子电池 单芯锂金属电池
+      // '500'    | '501'    | '504'  |  '502'   | '503'       | '505'
+      btyShape,
+      // 电池型号
+      btyKind,
+      // 其他描述
+      otherDescribe,
+      // 备注
+      comment,
+      // 技术备注
+      market,
+      // 危险性
+      classOrDiv
+    } = currentData;
+    const btyCount = matchNumber(currentData["btyCount"]);
+    const voltage = matchVoltage(itemCName);
+    const capacity = matchCapacity(itemCName);
+    const wattHour = matchNumber(currentData["inspectionItem1Text1"]);
+    const wattHourFromName = matchWattHour(itemCName);
+    const liContent = matchNumber(currentData["inspectionItem1Text2"]);
+    const netWeight = matchNumber(currentData["btyNetWeight"]);
+    const netWeightDisplay = matchNumber(currentData["btyNetWeight"]) * 1e3;
+    const btyGrossWeight = Number(currentData["btyGrossWeight"]);
+    const otherDescribeCAddition = currentData["otherDescribeCAddition"];
+    const batteryWeight = matchBatteryWeight(currentData["otherDescribeCAddition"]);
+    const inspectionResult1 = currentData["inspectionResult1"];
+    const isSingleCell = getIsSingleCell(btyType);
+    const unno = currentData["unno"];
+    const isCell = getIsCell(btyType);
+    const packageType = otherDescribe === "540" ? "0" : otherDescribe === "541" ? "1" : "2";
+    const isIon = getIsIon(btyType);
+    const pkgInfo = getPkgInfo(unno, isIon, packageType);
+    const unTest = String(currentData["inspectionResult2"]) === "0";
+    const dropTest = String(currentData["inspectionResult5"]) === "0";
+    const packageGrade = currentData["pg"];
+    const conclusions = Number(currentData["conclusions"]);
+    const properShippingName = currentData["psn"];
+    const according = currentData["according"];
+    const otherDescribeChecked = currentData["otherDescribeChecked"] === "1";
+    const btyBrand = currentData["btyBrand"];
+    let results = [];
+    results.push(...checkName(packageType, itemEName, itemCName, btyKind, summaryData.cnName));
+    results.push(...checkBatteryType(btyType, summaryData.classification));
+    results.push(...checkModel(btyKind, summaryData.type));
+    results.push(...checkTradeMark(btyBrand, summaryData.trademark));
+    results.push(...checkVoltage(voltage, summaryData.voltage));
+    results.push(...checkCapacity(capacity, summaryData.capacity));
+    results.push(...checkWattHour(wattHour, summaryData.watt));
+    results.push(...checkShape(btyShape, summaryData.shape));
+    results.push(...checkMass(batteryWeight, summaryData.mass));
+    results.push(...checkLiContent(liContent, summaryData.licontent));
+    results.push(...checkT7(btyType, summaryData.test7, summaryData.note));
+    results.push(...checkIssueDate(summaryData.issue_date));
+    return results;
+  }
+  function checkPekSummary(currentData, summaryData) {
+    const btyType = getBtyTypeCode(currentData);
+    const {
+      // 品名
+      itemCName,
+      // 品名
+      itemEName,
+      // 操作信息
+      otherDescribe,
+      // 注意事项
+      remarks,
+      // 危险性类别
+      classOrDiv,
+      // 仅限货机
+      packCargo,
+      // 技术备注
+      market
+    } = currentData;
+    const btyKind = currentData["model"];
+    const voltage = matchNumber(currentData["inspectionItem2Text1"]);
+    const capacity = matchNumber(currentData["inspectionItem2Text2"]);
+    const wattHour = matchNumber(currentData["inspectionItem3Text1"]);
+    const wattHourFromName = matchWattHour(currentData["itemCName"]);
+    const liContent = matchNumber(currentData["inspectionItem4Text1"]);
+    const btyCount = matchNumber(currentData["btyCount"]);
+    const netWeight = parseNetWeight(currentData["netWeight"]);
+    const netWeightDisplay = matchNumber(currentData["netWeight"]) * 1e3;
+    const otherDescribeCAddition = currentData["otherDescribeCAddition"];
+    const batteryWeight = matchBatteryWeight(otherDescribeCAddition);
+    const isSingleCell = getIsSingleCell(btyType);
+    const btyShape = currentData["shape"];
+    const btySize = currentData["size"];
+    const inspectionItem3Text1 = currentData["inspectionItem3Text1"];
+    const inspectionItem4Text1 = currentData["inspectionItem4Text1"];
+    const unno = currentData["unno"];
+    const isCell = String(currentData["type2"]) === "1";
+    const properShippingName = currentData["psn"];
+    const packageGrade = currentData["pg"];
+    const packPassengerCargo = currentData["packPassengerCargo"];
+    const packageType = String(currentData["inspectionItem1"]);
+    const isIon = String(currentData["type1"]) === "1";
+    const pkgInfo = getPkgInfo(unno, isIon, packageType);
+    const pkgInfoReference = currentData["inspectionItem5Text1"];
+    const pkgInfoByPackCargo = getPkgInfoByPackCargo(pkgInfoReference, packCargo);
+    const pkgInfoSubType = getPkgInfoSubType(pkgInfoReference, packCargo);
+    const stackTest = String(currentData["inspectionItem6"]) === "1";
+    const stackTestEvaluation = otherDescribe.includes("2c9180849267773c0192dc73c77e5fb2");
+    const dropTest = String(currentData["inspectionItem2"]) === "1";
+    const liBtyLabel = String(currentData["inspectionItem4"]) === "1";
+    const unTest = String(currentData["inspectionItem3"]) === "1";
+    const randomFile = String(currentData["inspectionItem5"]) === "1";
+    const isChargeBoxOrRelated = otherDescribeCAddition.includes("总净重");
+    const isDangerous = pekIsDangerous(
+      wattHour,
+      pkgInfo,
+      liContent,
+      netWeight,
+      isSingleCell
+    );
+    const isIA = pkgInfoIsIA(wattHour, pkgInfo, liContent, netWeight, isSingleCell);
+    const btyBrand = currentData["brands"];
+    let results = [];
+    results.push(...checkName(packageType, itemEName, itemCName, btyKind, summaryData.cnName));
+    results.push(...checkBatteryType(btyType, summaryData.classification));
+    results.push(...checkModel(btyKind, summaryData.type));
+    results.push(...checkTradeMark(btyBrand, summaryData.trademark));
+    results.push(...checkVoltage(voltage, summaryData.voltage));
+    results.push(...checkCapacity(capacity, summaryData.capacity));
+    results.push(...checkWattHour(wattHour, summaryData.watt));
+    results.push(...checkShape(btyShape, summaryData.shape));
+    results.push(...checkMass(batteryWeight, summaryData.mass));
+    results.push(...checkLiContent(liContent, summaryData.licontent));
+    results.push(...checkT7(btyType, summaryData.test7, summaryData.note));
+    results.push(...checkIssueDate(summaryData.issue_date));
+    return results;
+  }
+
   // src/index.ts
   window.checkPekBtyType = checkPekBtyType;
   window.checkSekBtyType = checkSekBtyType;
+  window.checkSekSummary = checkSekSummary;
+  window.checkPekSummary = checkPekSummary;
 })();

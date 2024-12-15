@@ -86,3 +86,26 @@ async function sendMessageToActiveTab(message: string) {
 async function backgroundSleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
+
+// async function getSummaryInfo(projectNo: string) {
+//   const response = await fetch(
+//     `http://127.0.0.1:25455/get-summary-info/${projectNo}`,
+//     {
+//       method: 'GET',
+//       mode: 'cors',
+//     }
+//   )
+//   if (!response.ok) {
+//     return null
+//   }
+//   return await response.json()
+// }
+
+// chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+//   if (request.action === 'getSummaryInfo') {
+//     getSummaryInfo(request.projectNo)
+//       .then(result => sendResponse(result))
+//       .catch(error => sendResponse(null));
+//     return true; // 保持消息通道开放，等待异步响应
+//   }
+// });
