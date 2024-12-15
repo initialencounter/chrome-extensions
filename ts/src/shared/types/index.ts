@@ -1,3 +1,6 @@
+import { SummaryModelDocx } from "./summary"
+
+export type SummaryData = SummaryModelDocx
 export type SekBtyType = '500' | '501' | '504' | '502' | '503' | '505'
 export type PekUNNO = '' | 'UN3480' | 'UN3481' | 'UN3090' | 'UN3091' | 'UN3171' | 'UN3556' | 'UN3557' | 'UN3558'
 export type PekPkgInfo = '' | '965' | '966' | '967' | '968' | '969' | '970' | '952'
