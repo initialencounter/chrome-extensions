@@ -23,6 +23,7 @@ import { checkLiContent } from "./checkLiContent";
 import { checkMass } from "./checkMass";
 import { checkModel } from "./checkModel";
 import { checkName } from "./checkName";
+import { checkProjectNo } from "./checkProjectNo";
 import { checkShape } from "./checkShape";
 import { checkT7 } from "./checkT7";
 import { checkTradeMark } from "./checkTradeMark";
@@ -124,6 +125,7 @@ export function checkSekSummary(currentData: SekData, summaryData: SummaryData) 
   results.push(...checkLiContent(liContent, summaryData.licontent))
   results.push(...checkT7(btyType, summaryData.test7, summaryData.note))
   results.push(...checkIssueDate(summaryData.issueDate))
+  results.push(...checkProjectNo(currentData.projectNo, summaryData.projectNo))
   return results
 }
 export function checkPekSummary(currentData: PekData, summaryData: SummaryData) {
@@ -230,5 +232,6 @@ export function checkPekSummary(currentData: PekData, summaryData: SummaryData) 
   results.push(...checkLiContent(liContent, summaryData.licontent))
   results.push(...checkT7(btyType, summaryData.test7, summaryData.note))
   results.push(...checkIssueDate(summaryData.issueDate))
+  results.push(...checkProjectNo(currentData.projectNo, summaryData.projectNo))
   return results
 }
