@@ -1,24 +1,39 @@
 import { CheckResult } from "../shared/types/index"
 
 // 检查日期 2024-11-06
-export function checkIssueDate(issue_date: string): CheckResult[] {
+export function checkIssueDate(issue_date: string, projectNo: string): CheckResult[] {
   // 解析输入的日期
   const inputDate = new Date(issue_date)
   // 获取今天的日期，并设置时分秒为0
   const today = new Date()
   today.setHours(0, 0, 0, 0)
-
-  // 计算日期差值（毫秒）
   const diffTime = inputDate.getTime() - today.getTime()
-  // 转换为天数
   const diffDays = diffTime / (1000 * 60 * 60 * 24)
 
-  // 如果日期差大于等于1天或小于-1天，返回false
-  if (diffDays >= 1 || diffDays < -1) {
-    return [{
+  const projectDate = parseProjectData(projectNo)
+  const diffProjectTime = inputDate.getTime() - projectDate.getTime()
+  const diffProjectDays = diffProjectTime / (1000 * 60 * 60 * 24)
+  let result: CheckResult[] = []
+  if (diffProjectDays < 0) {
+    result.push({
       ok: false,
-      result: `概要签发日期可能错误, 概要签发日期为${issue_date}`
-    }]
+      result: '签发日期小于项目编号日期'
+    })
   }
-  return []
+  // 如果日期差大于等于1天或小于-1天，返回false
+  if (diffDays > 0) {
+    result.push({
+      ok: false,
+      result: '签发日期大于今天'
+    })
+  }
+  return result
+}
+
+function parseProjectData(projectNo: string) {
+  const year = projectNo.slice(5, 9)
+  const month = projectNo.slice(9, 11)
+  const day = projectNo.slice(11, 13)
+  let date = `${year}-${month}-${day}`
+  return new Date(date)
 }

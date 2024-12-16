@@ -2,12 +2,6 @@ import { CheckResult } from "../shared/types/index"
 
 // inspectionItem1 0 965 1 966 2 967
 export function checkName(packageType: '0' | '1' | '2', formEName: string, formCName: string, model: string, summaryCName: string): CheckResult[] {
-  console.log('inspectionItem1', packageType)
-  console.log('formEName', formEName)
-  console.log('formCName', formCName)
-  console.log('model', model)
-  console.log('summaryCName', summaryCName)
-  console.log('--------------------------------')
   formCName = formCName.trim()
   formEName = formEName.trim()
   summaryCName = summaryCName.trim()
@@ -59,10 +53,6 @@ export function checkName(packageType: '0' | '1' | '2', formEName: string, formC
   }
   formCNameText = formCNameText.trim()
   formENameText = formENameText.trim()
-  console.log('keyWord', keyWord)
-  console.log('formCNameText', formCNameText)
-  console.log('formENameText', formENameText)
-  console.log('--------------------------------')
   let result: CheckResult[] = []
   if (!summaryCName.includes(formCNameText)) {
     result.push({
