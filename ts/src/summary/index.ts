@@ -1,4 +1,4 @@
-import { CheckResult, PekData, PekPkgInfo, PekUNNO, PkgInfoSubType, SekBtyType, SekData, SummaryData } from "../shared/types/index";
+import { CheckResult, PekData, PekPkgInfo, PekUNNO, PkgInfoSubType, SekBtyType, SekData, SummaryData, EntrustData } from "../shared/types/index";
 import {
   getBtyTypeCode,
   getIsCell,
@@ -30,7 +30,7 @@ import { checkTradeMark } from "./checkTradeMark";
 import { checkVoltage } from "./checkVoltage";
 import { checkWattHour } from "./checkWattHour";
 
-export function checkSekSummary(currentData: SekData, summaryData: SummaryData) {
+export function checkSekSummary(currentData: SekData, summaryData: SummaryData, entrustData: EntrustData) {
   const checkMap = {
     '500': ['≤100Wh', '>100Wh'],
     '501': ['≤20Wh', '>20Wh'],
@@ -128,7 +128,7 @@ export function checkSekSummary(currentData: SekData, summaryData: SummaryData) 
   results.push(...checkProjectNo(currentData.projectNo, summaryData.projectNo))
   return results
 }
-export function checkPekSummary(currentData: PekData, summaryData: SummaryData) {
+export function checkPekSummary(currentData: PekData, summaryData: SummaryData, entrustData: EntrustData) {
   const btyType = getBtyTypeCode(currentData)
   // 品名
   const {
