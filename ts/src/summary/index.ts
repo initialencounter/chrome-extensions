@@ -23,12 +23,14 @@ import { checkLiContent } from "./checkLiContent";
 import { checkMass } from "./checkMass";
 import { checkModel } from "./checkModel";
 import { checkName } from "./checkName";
-import { checkProjectNo } from "./checkProjectNo";
 import { checkShape } from "./checkShape";
 import { checkT7 } from "./checkT7";
 import { checkTradeMark } from "./checkTradeMark";
 import { checkVoltage } from "./checkVoltage";
 import { checkWattHour } from "./checkWattHour";
+import { checkProjectNo } from "./checkProjectNo";
+import { checkConsignor } from "./checkConsignor";
+import { checkManufacturer } from "./checkManufacturer";
 
 export function checkSekSummary(currentData: SekData, summaryData: SummaryData, entrustData: EntrustData) {
   const checkMap = {
@@ -126,6 +128,8 @@ export function checkSekSummary(currentData: SekData, summaryData: SummaryData, 
   results.push(...checkT7(btyType, summaryData.test7, summaryData.note))
   results.push(...checkIssueDate(summaryData.issueDate))
   results.push(...checkProjectNo(currentData.projectNo, summaryData.projectNo))
+  results.push(...checkConsignor(entrustData.consignor, summaryData.consignor))
+  results.push(...checkManufacturer(entrustData.manufacturer, summaryData.manufacturer))
   return results
 }
 export function checkPekSummary(currentData: PekData, summaryData: SummaryData, entrustData: EntrustData) {
@@ -233,5 +237,7 @@ export function checkPekSummary(currentData: PekData, summaryData: SummaryData, 
   results.push(...checkT7(btyType, summaryData.test7, summaryData.note))
   results.push(...checkIssueDate(summaryData.issueDate))
   results.push(...checkProjectNo(currentData.projectNo, summaryData.projectNo))
+  results.push(...checkConsignor(entrustData.consignor, summaryData.consignor))
+  results.push(...checkManufacturer(entrustData.manufacturer, summaryData.manufacturer))
   return results
 }

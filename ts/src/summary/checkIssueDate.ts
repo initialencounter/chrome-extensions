@@ -17,7 +17,7 @@ export function checkIssueDate(issue_date: string): CheckResult[] {
   if (diffDays >= 1 || diffDays < -1) {
     return [{
       ok: false,
-      result: `概要签发日期可能错误, 概要上为${issue_date}`
+      result: `概要签发日期可能错误, 概要签发日期为${issue_date}`
     }]
   }
   return []
