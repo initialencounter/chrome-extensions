@@ -1,8 +1,8 @@
 declare global {
   function checkPekBtyType(data: PekData): Array<{ ok: boolean; result: string }>
   function checkSekBtyType(data: SekData): Array<{ ok: boolean; result: string }>
-  function checkPekSummary(data: PekData, summary: SummaryModelDocx): Array<{ ok: boolean; result: string }>
-  function checkSekSummary(data: SekData, summary: SummaryModelDocx): Array<{ ok: boolean; result: string }>
+  function checkPekSummary(data: PekData, summary: SummaryModelDocx, entrustData: EntrustModelDocx): Array<{ ok: boolean; result: string }>
+  function checkSekSummary(data: SekData, summary: SummaryModelDocx, entrustData: EntrustModelDocx): Array<{ ok: boolean; result: string }>
 }
 
 const isInspect = new URLSearchParams(window.location.search).get('from') === null;
@@ -32,7 +32,7 @@ const host = window.location.host
       window.checkSekBtyType = mod.check_sek_bty
     }
     await verifySleep(500)
-    // insertCheckSummaryButton()
+    insertCheckSummaryButton()
     if (category !== "battery") return
     if (localConfig.verify === false) {
       console.log('未启用验证，退出脚本')
@@ -663,6 +663,9 @@ function getFormData<T>(systemId: 'pek' | 'sek'): T {
   const formData = new FormData(form);
   const data: Partial<T> = {};
 
+  let projectNo = getCurrentProjectNo()
+  // @ts-ignore
+  data['projectNo'] = projectNo ?? ''
   // 遍历 FormData 并构建数据对象
   formData.forEach((value, name) => {
     if (data[name as keyof Partial<T>]) {
@@ -747,6 +750,45 @@ export interface SummaryModelDocx {
   watt: string;
 }
 
+/**
+ * EntrustModelDocx
+ */
+export interface EntrustModelDocx {
+  consignor: string;
+  manufacturer: string;
+}
+
+async function getEntrustData() {
+  const entrustId = new URLSearchParams(window.location.search).get('entrustId')
+  if (!entrustId) return null
+  const response = await fetch(
+    `${window.location.origin}/page/html/${entrustId}`,
+    {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Accept': 'text/html',
+        'Referer': window.location.href,
+      }
+    }
+  )
+  if (!response.ok) return null
+  return await response.text() as string
+}
+
+function parseEntrust(entrustData: string): EntrustModelDocx | null {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(entrustData, 'text/html');
+  if (!doc) return null
+  const consignor = doc.querySelector('#page1 > table > tbody > tr:nth-child(6) > td:nth-child(3) > span')
+  const manufacturer = doc.querySelector('#page1 > table > tbody > tr:nth-child(13) > td:nth-child(4) > span')
+  if (!consignor || !manufacturer) return null
+  return {
+    consignor: consignor.innerHTML.trim(),
+    manufacturer: manufacturer.innerHTML.trim(),
+  }
+}
+
 async function getProjectSummary(projectNo: string) {
   const response = await fetch(
     `http://127.0.0.1:25455/get-summary-info/${projectNo}`,
@@ -800,20 +842,24 @@ function insertCheckSummaryButton() {
     if (!projectNo) return
     const summaryInfo: SummaryModelDocx = await getProjectSummary(projectNo)
     if (!summaryInfo) return
-    checkSummary(summaryInfo)
+    const entrustDataText = await getEntrustData()
+    if (!entrustDataText) return
+    const entrustData = parseEntrust(entrustDataText)
+    if (!entrustData) return
+    checkSummary(summaryInfo, entrustData)
   }
   targetParent.appendChild(verifyButton)
 }
 
-function checkSummary(summaryData: SummaryModelDocx) {
+function checkSummary(summaryData: SummaryModelDocx, entrustData: EntrustModelDocx) {
   let result = []
   let dataFromForm: PekData | SekData
   if (systemIdLowercase === 'pek') {
     dataFromForm = getFormData<PekData>(systemIdLowercase)
-    result = window.checkPekSummary(dataFromForm, summaryData)
+    result = window.checkPekSummary(dataFromForm, summaryData, entrustData)
   } else {
     dataFromForm = getFormData<SekData>(systemIdLowercase)
-    result = window.checkSekSummary(dataFromForm, summaryData)
+    result = window.checkSekSummary(dataFromForm, summaryData, entrustData)
   }
   if (!result.length) {
     const verifyButton2 = document.getElementById('lims-verifyButton3')?.children[0]?.children[1] as SVGAElement
