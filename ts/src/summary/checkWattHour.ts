@@ -2,7 +2,7 @@ import { CheckResult } from "../shared/types/index"
 import { matchWattHour } from "../shared/utils/index"
 
 export function checkWattHour(formWattHour: number, summaryWattHour: string): CheckResult[] {
-  let summaryWattHourNumber = matchWattHour(summaryWattHour.trim())
+  let summaryWattHourNumber = matchWattHour(' ' + summaryWattHour.trim())
   if (summaryWattHourNumber !== formWattHour) {
     return [{
       ok: false,
