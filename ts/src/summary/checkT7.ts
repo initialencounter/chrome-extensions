@@ -14,7 +14,7 @@ export function checkT7(batteryType: SekBtyType, summaryTest7: string, note: str
     case '501':
     case '502':
     case '503':
-      if (!summaryTest7.includes('通过')) {
+      if (summaryTest7.includes('通过')) {
         return [{
           ok: false,
           result: `电池类型为${batteryTypeMap[batteryType]}, 概要T7测试结果为${summaryTest7}`
