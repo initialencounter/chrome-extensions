@@ -151,6 +151,9 @@ function checkSekBtyType(currentData: SekData): CheckResult[] {
     if (otherDescribe.includes('540') && String(conclusions) === "0") {
       result.push({ ok: false, result: '单独运输非限制性，未通过1.2米跌落' })
     }
+    if (otherDescribe.includes('541') && String(conclusions) === "0") {
+      result.push({ ok: false, result: '非限制性和设备包装在一起，未通过1.2米跌落' })
+    }
   }
   // 随附文件
   if (currentData['inspectionResult7'] !== '2')
