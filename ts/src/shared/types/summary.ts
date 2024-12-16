@@ -2,9 +2,9 @@ export interface SummaryModelDocx {
   // 标题
   title: string,
   // 项目编号
-  project_no: string,
+  projectNo: string,
   // 签发日期
-  issue_date: string,
+  issueDate: string,
   capacity: string;
   classification: string;
   cnName: string;

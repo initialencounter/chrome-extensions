@@ -123,7 +123,7 @@ export function checkSekSummary(currentData: SekData, summaryData: SummaryData) 
   results.push(...checkMass(batteryWeight, summaryData.mass))
   results.push(...checkLiContent(liContent, summaryData.licontent))
   results.push(...checkT7(btyType, summaryData.test7, summaryData.note))
-  results.push(...checkIssueDate(summaryData.issue_date))
+  results.push(...checkIssueDate(summaryData.issueDate))
   return results
 }
 export function checkPekSummary(currentData: PekData, summaryData: SummaryData) {
@@ -229,6 +229,6 @@ export function checkPekSummary(currentData: PekData, summaryData: SummaryData) 
   results.push(...checkMass(batteryWeight, summaryData.mass))
   results.push(...checkLiContent(liContent, summaryData.licontent))
   results.push(...checkT7(btyType, summaryData.test7, summaryData.note))
-  results.push(...checkIssueDate(summaryData.issue_date))
+  results.push(...checkIssueDate(summaryData.issueDate))
   return results
 }
