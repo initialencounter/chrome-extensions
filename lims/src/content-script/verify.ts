@@ -32,7 +32,7 @@ const host = window.location.host
       window.checkSekBtyType = mod.check_sek_bty
     }
     await verifySleep(500)
-    insertCheckSummaryButton()
+    // insertCheckSummaryButton()
     if (category !== "battery") return
     if (localConfig.verify === false) {
       console.log('未启用验证，退出脚本')
