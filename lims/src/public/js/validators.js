@@ -1005,6 +1005,9 @@
       if (otherDescribe.includes("540") && String(conclusions) === "0") {
         result.push({ ok: false, result: "单独运输非限制性，未通过1.2米跌落" });
       }
+      if (otherDescribe.includes("541") && String(conclusions) === "0") {
+        result.push({ ok: false, result: "非限制性和设备包装在一起，未通过1.2米跌落" });
+      }
     }
     if (currentData["inspectionResult7"] !== "2")
       result.push({ ok: false, result: "随附文件错误，未勾选不适用" });
@@ -1113,19 +1116,36 @@
   }
 
   // src/summary/checkIssueDate.ts
-  function checkIssueDate(issue_date) {
+  function checkIssueDate(issue_date, projectNo) {
     const inputDate = new Date(issue_date);
     const today = /* @__PURE__ */ new Date();
     today.setHours(0, 0, 0, 0);
     const diffTime = inputDate.getTime() - today.getTime();
     const diffDays = diffTime / (1e3 * 60 * 60 * 24);
-    if (diffDays >= 1 || diffDays < -1) {
-      return [{
+    const projectDate = parseProjectData(projectNo);
+    const diffProjectTime = inputDate.getTime() - projectDate.getTime();
+    const diffProjectDays = diffProjectTime / (1e3 * 60 * 60 * 24);
+    let result = [];
+    if (diffProjectDays < 0) {
+      result.push({
         ok: false,
-        result: `概要签发日期可能错误, 概要上为${issue_date}`
-      }];
+        result: "签发日期小于项目编号日期"
+      });
     }
-    return [];
+    if (diffDays > 0) {
+      result.push({
+        ok: false,
+        result: "签发日期大于今天"
+      });
+    }
+    return result;
+  }
+  function parseProjectData(projectNo) {
+    const year = projectNo.slice(5, 9);
+    const month = projectNo.slice(9, 11);
+    const day = projectNo.slice(11, 13);
+    let date = `${year}-${month}-${day}`;
+    return new Date(date);
   }
 
   // src/summary/checkLiContent.ts
@@ -1166,12 +1186,6 @@
 
   // src/summary/checkName.ts
   function checkName(packageType, formEName, formCName, model, summaryCName) {
-    console.log("inspectionItem1", packageType);
-    console.log("formEName", formEName);
-    console.log("formCName", formCName);
-    console.log("model", model);
-    console.log("summaryCName", summaryCName);
-    console.log("--------------------------------");
     formCName = formCName.trim();
     formEName = formEName.trim();
     summaryCName = summaryCName.trim();
@@ -1220,10 +1234,6 @@
     }
     formCNameText = formCNameText.trim();
     formENameText = formENameText.trim();
-    console.log("keyWord", keyWord);
-    console.log("formCNameText", formCNameText);
-    console.log("formENameText", formENameText);
-    console.log("--------------------------------");
     let result = [];
     if (!summaryCName.includes(formCNameText)) {
       result.push({
@@ -1412,7 +1422,7 @@
       case "501":
       case "502":
       case "503":
-        if (!summaryTest7.includes("通过")) {
+        if (summaryTest7.includes("通过")) {
           return [{
             ok: false,
             result: `电池类型为${batteryTypeMap2[batteryType]}, 概要T7测试结果为${summaryTest7}`
@@ -1467,7 +1477,7 @@
 
   // src/summary/checkWattHour.ts
   function checkWattHour(formWattHour, summaryWattHour) {
-    let summaryWattHourNumber = matchWattHour(summaryWattHour.trim());
+    let summaryWattHourNumber = matchWattHour(" " + summaryWattHour.trim());
     if (summaryWattHourNumber !== formWattHour) {
       return [{
         ok: false,
@@ -1477,8 +1487,38 @@
     return [];
   }
 
+  // src/summary/checkProjectNo.ts
+  function checkProjectNo(formProjectNo, summaryProjectNo) {
+    if (formProjectNo !== summaryProjectNo.trim()) {
+      return [{ ok: false, result: "项目编号不一致" }];
+    }
+    return [];
+  }
+
+  // src/summary/checkConsignor.ts
+  function checkConsignor(systemIdConsignor, summaryConsignor) {
+    if (!systemIdConsignor) {
+      return [{ ok: false, result: "获取系统委托方失败" }];
+    }
+    if (!summaryConsignor.includes(systemIdConsignor.trim())) {
+      return [{ ok: false, result: `委托方不一致, 系统上委托方为${systemIdConsignor.trim()}, 概要委托方为${summaryConsignor}` }];
+    }
+    return [];
+  }
+
+  // src/summary/checkManufacturer.ts
+  function checkManufacturer(systemIdManufacturer, summaryManufacturer) {
+    if (!systemIdManufacturer) {
+      return [{ ok: false, result: "获取系统制造商失败" }];
+    }
+    if (!summaryManufacturer.includes(systemIdManufacturer.trim())) {
+      return [{ ok: false, result: `制造商不一致, 系统上制造商为${systemIdManufacturer.trim()}, 概要制造商为${summaryManufacturer}` }];
+    }
+    return [];
+  }
+
   // src/summary/index.ts
-  function checkSekSummary(currentData, summaryData) {
+  function checkSekSummary(currentData, summaryData, entrustData) {
     const checkMap = {
       "500": ["≤100Wh", ">100Wh"],
       "501": ["≤20Wh", ">20Wh"],
@@ -1548,10 +1588,13 @@
     results.push(...checkMass(batteryWeight, summaryData.mass));
     results.push(...checkLiContent(liContent, summaryData.licontent));
     results.push(...checkT7(btyType, summaryData.test7, summaryData.note));
-    results.push(...checkIssueDate(summaryData.issue_date));
+    results.push(...checkIssueDate(summaryData.issueDate, currentData.projectNo));
+    results.push(...checkProjectNo(currentData.projectNo, summaryData.projectNo));
+    results.push(...checkConsignor(entrustData.consignor, summaryData.consignor));
+    results.push(...checkManufacturer(entrustData.manufacturer, summaryData.manufacturer));
     return results;
   }
-  function checkPekSummary(currentData, summaryData) {
+  function checkPekSummary(currentData, summaryData, entrustData) {
     const btyType = getBtyTypeCode(currentData);
     const {
       // 品名
@@ -1624,7 +1667,10 @@
     results.push(...checkMass(batteryWeight, summaryData.mass));
     results.push(...checkLiContent(liContent, summaryData.licontent));
     results.push(...checkT7(btyType, summaryData.test7, summaryData.note));
-    results.push(...checkIssueDate(summaryData.issue_date));
+    results.push(...checkIssueDate(summaryData.issueDate, currentData.projectNo));
+    results.push(...checkProjectNo(currentData.projectNo, summaryData.projectNo));
+    results.push(...checkConsignor(entrustData.consignor, summaryData.consignor));
+    results.push(...checkManufacturer(entrustData.manufacturer, summaryData.manufacturer));
     return results;
   }
 

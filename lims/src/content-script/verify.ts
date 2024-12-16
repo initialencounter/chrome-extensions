@@ -32,7 +32,7 @@ const host = window.location.host
       window.checkSekBtyType = mod.check_sek_bty
     }
     await verifySleep(500)
-    insertCheckSummaryButton()
+    // insertCheckSummaryButton()
     if (category !== "battery") return
     if (localConfig.verify === false) {
       console.log('未启用验证，退出脚本')
@@ -776,13 +776,18 @@ async function getEntrustData() {
   return await response.text() as string
 }
 
-function parseEntrust(entrustData: string): EntrustModelDocx | null {
+function parseEntrust(entrustData: string | null): EntrustModelDocx {
+  let res: EntrustModelDocx = {
+    consignor: '',
+    manufacturer: '',
+  }
+  if (!entrustData) return res
   const parser = new DOMParser();
   const doc = parser.parseFromString(entrustData, 'text/html');
-  if (!doc) return null
+  if (!doc) return res
   const consignor = doc.querySelector('#page1 > table > tbody > tr:nth-child(6) > td:nth-child(3) > span')
   const manufacturer = doc.querySelector('#page1 > table > tbody > tr:nth-child(13) > td:nth-child(4) > span')
-  if (!consignor || !manufacturer) return null
+  if (!consignor || !manufacturer) return res
   return {
     consignor: consignor.innerHTML.trim(),
     manufacturer: manufacturer.innerHTML.trim(),
@@ -843,9 +848,7 @@ function insertCheckSummaryButton() {
     const summaryInfo: SummaryModelDocx = await getProjectSummary(projectNo)
     if (!summaryInfo) return
     const entrustDataText = await getEntrustData()
-    if (!entrustDataText) return
     const entrustData = parseEntrust(entrustDataText)
-    if (!entrustData) return
     checkSummary(summaryInfo, entrustData)
   }
   targetParent.appendChild(verifyButton)
