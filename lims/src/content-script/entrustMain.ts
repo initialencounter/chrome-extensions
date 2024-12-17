@@ -129,6 +129,16 @@ function setAmountListener() {
     sekSystemButton.addEventListener('click', () => {
       setAmount()
     })
+  const aekSystemButton = document.getElementById('_easyui_combobox_i1_2')
+  if (aekSystemButton)
+    aekSystemButton.addEventListener('click', () => {
+      setAmount('800.00')
+    })
+  const rekSystemButton = document.getElementById('_easyui_combobox_i1_3')
+  if (rekSystemButton)
+    rekSystemButton.addEventListener('click', () => {
+      setAmount('800.00')
+    })
 }
 
 function setCategory() {
@@ -140,8 +150,14 @@ function setCategory() {
   }
 }
 
-async function setAmount() {
-  let money = localConfig.amount
+async function setAmount(moneyDefault: string = '') {
+  let money = (moneyDefault !== '' ? moneyDefault : localConfig.amount).slice()
+  let systemIdInput = document.querySelector("#entrustEditForm > table > tbody > tr:nth-child(1) > td:nth-child(2) > span > input.textbox-text.validatebox-text") as HTMLInputElement
+  if (systemIdInput) {
+    if (systemIdInput.value === '道路' || systemIdInput.value === '铁路') {
+      money = '800.00'
+    }
+  }
   await sleep(200)
   const target = document.querySelectorAll(
     'input[type="hidden"][class="textbox-value"][value="480.00"][name="amount"]'
@@ -255,6 +271,9 @@ function getEntrustFormData(): EntrustFormData | undefined {
       if (!confirm("报告确定是" + data.reportCopy + "份吗？")) return
     }
   }
+  if ((data.systemId === 'aek' || data.systemId === 'rek') && data.amount !== '800.00') {
+    if (!confirm(`陆运金额${data.amount}是正确的吗？`)) return
+  }
   return data as EntrustFormData
 }
 
@@ -299,6 +318,9 @@ async function saveAndAssign() {
       assignRunning = false
       hideMask()
       return
+    }
+    if (data.systemId === '道路' || data.systemId === '铁路') {
+      data.amount = '800.00'
     }
     const id = await saveFormData(data)
     if (!id) {
@@ -521,9 +543,9 @@ function updatePosition(target: HTMLElement, follower: HTMLElement) {
     follower.style.left = targetRect.left + 'px';
     animationFrameId = requestAnimationFrame(update);
   };
-  
+
   let animationFrameId = requestAnimationFrame(update);
-  
+
   return () => {
     cancelAnimationFrame(animationFrameId);
   };
@@ -532,10 +554,10 @@ function updatePosition(target: HTMLElement, follower: HTMLElement) {
 function startFollow() {
   const target = document.querySelector("#entrustEditForm > table > tbody") as HTMLElement;
   const follower = document.querySelector("#entrustBottomFollower") as HTMLElement;
-  
+
   if (target && follower) {
     const cleanup = updatePosition(target, follower);
-    
+
     window.addEventListener('unload', cleanup);
   }
 }

@@ -723,13 +723,12 @@
   }
 
   // src/sek/conclusionsCheck.ts
-  function conclusionsCheck2(conclusions, unno, otherDescribe, inspectionResult1, btyGrossWeight, comment, packageGrade, classOrDiv, isIon, properShippingName) {
+  function conclusionsCheck2(conclusions, unno, otherDescribe, inspectionResult1, btyGrossWeight, packageGrade, classOrDiv, isIon, properShippingName) {
     let result = [];
     unno = unno.trim();
     properShippingName = properShippingName.trim();
     packageGrade = packageGrade.trim();
     classOrDiv = classOrDiv.trim();
-    comment = comment.trim();
     if (conclusions === 1) {
       if (unno === "UN3171" || unno === "UN3556" || unno === "UN3557" || unno === "UN3558" || unno === "UN3480" || unno === "UN3481" || unno === "UN3090" || unno === "UN3091") {
         let unKey = unno;
@@ -772,12 +771,6 @@
           result.push({ ok: false, result: "危险品，设备内置或与设备包装在一起的电池，UN编号应为UN3481" });
         if (otherDescribe !== "540" && unno !== "UN3091" && !isIon)
           result.push({ ok: false, result: "危险品，设备内置或与设备包装在一起的电池，UN编号应为UN3091" });
-        if (["540", "541"].includes(otherDescribe) && comment !== "1200") {
-          result.push({
-            ok: false,
-            result: "结论错误，危险品物品，单独运输或与设备包装在一起，应达到II级包装性能"
-          });
-        }
       }
       if (classOrDiv !== "9") {
         result.push({
@@ -826,12 +819,6 @@
         result.push({
           ok: false,
           result: "非限制性物品，包装等级应为空"
-        });
-      }
-      if (comment !== "8aad92b6595aada201595aaf03370000") {
-        result.push({
-          ok: false,
-          result: "非限制性物品，备注应为：根据IMDG CODE特殊规定188不受限制。"
         });
       }
       if (otherDescribe === "540" && btyGrossWeight > 30)
@@ -901,6 +888,81 @@
     return result;
   }
 
+  // src/sek/checkReMark.ts
+  var remarkPreventingAccidentalActivationMap = {
+    "AEK": "3c91808276a9d82d017833f4de822e9f",
+    "REK": "4c91808276a9d82d017833f4de822e9f",
+    "SEK": "2c91808276a9d82d017833f4de822e9f"
+  };
+  var remarkPreventingShortCircuitMap = {
+    "AEK": "3aad92b659404f660159431a20630007",
+    "REK": "4aad92b659404f660159431a20630007",
+    "SEK": "8aad92b659404f660159431a20630007"
+  };
+  function checkReMark(remarks, projectNo, conclusions, otherDescribe) {
+    let result = [];
+    if (!projectNo) return result;
+    let systemId = projectNo.slice(0, 3);
+    if (otherDescribe === "542") {
+      if (remarks !== remarkPreventingAccidentalActivationMap[systemId]) {
+        result.push({
+          ok: false,
+          result: "注意事项错误，应为：必须防止设备意外启动。"
+        });
+      }
+    } else {
+      if (remarks !== remarkPreventingShortCircuitMap[systemId]) {
+        result.push({
+          ok: false,
+          result: "注意事项错误，应为：每一单电池必须做好防短路措施，并装入坚固外包装内。"
+        });
+      }
+    }
+    return result;
+  }
+
+  // src/sek/checkComment.ts
+  var comment188Map = {
+    "AEK": "3aad92b6595aada201595aaf03370000",
+    "REK": "4aad92b6595aada201595aaf03370000",
+    "SEK": "8aad92b6595aada201595aaf03370000"
+  };
+  var commentUNMap = {
+    "AEK": "3200",
+    "REK": "4200",
+    "SEK": "1200"
+  };
+  function checkComment(comment, projectNo, conclusions, otherDescribe) {
+    let result = [];
+    if (!projectNo) return result;
+    let systemId = projectNo.slice(0, 3);
+    if (conclusions === 1) {
+      if (["540", "541"].includes(otherDescribe)) {
+        if (comment !== commentUNMap[systemId]) {
+          result.push({
+            ok: false,
+            result: "单独运输或外配危险品，备注应为：包装必须达到 II 级包装的性能标准。。"
+          });
+        }
+      } else {
+        if (comment !== "") {
+          result.push({
+            ok: false,
+            result: "内置危险品，备注应为空"
+          });
+        }
+      }
+    } else {
+      if (comment !== comment188Map[systemId]) {
+        result.push({
+          ok: false,
+          result: "非限制性物品，备注应为：根据IMDG CODE特殊规定188不受限制。"
+        });
+      }
+    }
+    return result;
+  }
+
   // src/sek/index.ts
   function checkSekBtyType(currentData) {
     const result = [];
@@ -914,6 +976,8 @@
     };
     const btyType = currentData["btyType"];
     const {
+      // 项目编号
+      projectNo,
       // 中文品名
       itemCName,
       // 英文品名
@@ -928,6 +992,8 @@
       btyKind,
       // 其他描述
       otherDescribe,
+      // 注意事项
+      remarks,
       // 备注
       comment,
       // 技术备注
@@ -1015,13 +1081,14 @@
       result.push({ ok: false, result: "鉴别项目8，9 错误，未勾选不适用" });
     if (currentData["inspectionItem8Cn"] !== "" || currentData["inspectionItem8En"] !== "" || currentData["inspectionItem9Cn"] !== "" || currentData["inspectionItem9En"] !== "")
       result.push({ ok: false, result: "鉴别项目8，9 不为空" });
+    result.push(...checkReMark(remarks, projectNo, conclusions, otherDescribe));
+    result.push(...checkComment(comment, projectNo, conclusions, otherDescribe));
     result.push(...conclusionsCheck2(
       conclusions,
       unno,
       otherDescribe,
       inspectionResult1,
       btyGrossWeight,
-      comment,
       packageGrade,
       classOrDiv,
       isIon,

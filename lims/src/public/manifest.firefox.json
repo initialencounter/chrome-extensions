@@ -28,6 +28,8 @@
     "content_scripts": [
       {
         "matches": [
+          "https://*/rek/inspect*",
+          "https://*/aek/inspect*",
           "https://*/sek/inspect*",
           "https://*/pek/inspect*"
         ],
