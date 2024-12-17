@@ -4,9 +4,8 @@ import { CheckResult } from "../shared/types/index"
 export function checkIssueDate(issue_date: string, projectNo: string): CheckResult[] {
   // 解析输入的日期
   const inputDate = new Date(issue_date)
-  // 获取今天的日期，并设置时分秒为0
   const today = new Date()
-  today.setHours(0, 0, 0, 0)
+  today.setHours(23, 59, 59, 999)
   const diffTime = inputDate.getTime() - today.getTime()
 
   const projectDate = parseProjectData(projectNo)
@@ -18,7 +17,6 @@ export function checkIssueDate(issue_date: string, projectNo: string): CheckResu
       result: '签发日期早于项目编号日期'
     })
   }
-  // 如果日期差大于等于1天或小于-1天，返回false
   if (diffTime > 0) {
     result.push({
       ok: false,
