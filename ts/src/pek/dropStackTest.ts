@@ -40,11 +40,11 @@ export function dropStackTest(pkgInfoSubType: PkgInfoSubType, stackTest: boolean
 
   // 要跌落的包装
   if (['965, IB', '968, IB', '966, II', '969, II'].includes(pkgInfoSubType)) {
-    if (dropTest) {
+    if (!dropTest) {
       result.push({ ok: false, result: `${pkgInfoSubType}未勾选跌落` })
     }
   } else {
-    if (!dropTest) {
+    if (dropTest) {
       result.push({ ok: false, result: `${pkgInfoSubType}不应勾选跌落` })
     }
   }
