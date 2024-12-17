@@ -31,6 +31,7 @@ import { checkWattHour } from "./checkWattHour";
 import { checkProjectNo } from "./checkProjectNo";
 import { checkConsignor } from "./checkConsignor";
 import { checkManufacturer } from "./checkManufacturer";
+import { checkMarket } from "./checkMarket";
 
 export function checkSekSummary(currentData: SekData, summaryData: SummaryData, entrustData: EntrustData) {
   const checkMap = {
@@ -130,6 +131,7 @@ export function checkSekSummary(currentData: SekData, summaryData: SummaryData, 
   results.push(...checkProjectNo(currentData.projectNo, summaryData.projectNo))
   results.push(...checkConsignor(entrustData.consignor, summaryData.consignor))
   results.push(...checkManufacturer(entrustData.manufacturer, summaryData.manufacturer))
+  results.push(...checkMarket(market, summaryData.testReportNo))
   return results
 }
 export function checkPekSummary(currentData: PekData, summaryData: SummaryData, entrustData: EntrustData) {
@@ -239,5 +241,6 @@ export function checkPekSummary(currentData: PekData, summaryData: SummaryData, 
   results.push(...checkProjectNo(currentData.projectNo, summaryData.projectNo))
   results.push(...checkConsignor(entrustData.consignor, summaryData.consignor))
   results.push(...checkManufacturer(entrustData.manufacturer, summaryData.manufacturer))
+  results.push(...checkMarket(market, summaryData.testReportNo))
   return results
 }
