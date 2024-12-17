@@ -8,23 +8,21 @@ export function checkIssueDate(issue_date: string, projectNo: string): CheckResu
   const today = new Date()
   today.setHours(0, 0, 0, 0)
   const diffTime = inputDate.getTime() - today.getTime()
-  const diffDays = diffTime / (1000 * 60 * 60 * 24)
 
   const projectDate = parseProjectData(projectNo)
   const diffProjectTime = inputDate.getTime() - projectDate.getTime()
-  const diffProjectDays = diffProjectTime / (1000 * 60 * 60 * 24)
   let result: CheckResult[] = []
-  if (diffProjectDays < 0) {
+  if (diffProjectTime < 0) {
     result.push({
       ok: false,
-      result: '签发日期小于项目编号日期'
+      result: '签发日期早于项目编号日期'
     })
   }
   // 如果日期差大于等于1天或小于-1天，返回false
-  if (diffDays > 0) {
+  if (diffTime > 0) {
     result.push({
       ok: false,
-      result: '签发日期大于今天'
+      result: '签发日期晚于今天'
     })
   }
   return result
