@@ -1,4 +1,9 @@
 import { PekData, PekPkgInfo, PekUNNO, PkgInfoSubType, SekBtyType } from "../types"
+import { matchDeviceName, matchDeviceModel, matchDeviceTrademark } from "./matchDevice"
+
+export {
+  matchDeviceName, matchDeviceModel, matchDeviceTrademark
+}
 
 function matchWattHour(projectName: string) {
   const matches = [...projectName.matchAll(/\s(\d+\.?\d+)[Kk]?[Ww][Hh]/g)]

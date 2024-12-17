@@ -1,3 +1,4 @@
+import { checkDevice } from "../shared/checkDevice"
 import { baseCheck } from "../shared/index"
 import { CheckResult, PekData, PekPkgInfo, PekUNNO, PkgInfoSubType } from "../shared/types/index"
 import {
@@ -175,6 +176,9 @@ function checkPekBtyType(currentData: PekData): CheckResult[] {
     if (wattHour !== wattHourFromName)
       result.push({ ok: false, result: '瓦时数与项目名称不匹配' })
   }
+
+  // 设备名称、型号、商标验证
+  result.push(...checkDevice(itemCName, otherDescribeCAddition))
 
   // 注意事项
   result.push(...remarksCheck(remarks, pkgInfoSubType))
