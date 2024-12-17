@@ -1,105 +1,25 @@
 "use strict";
 (() => {
-  // src/shared/btySizeBtyShape.ts
-  function btySizeBtyShape(btySize, btyShape) {
-    if (btySize.includes("Φ") || btySize.includes("φ") || btySize.includes("Ø") || btySize.includes("ø")) {
-      if (![
-        "8aad92b65aae82c3015ab094788a0026",
-        "8aad92b65d7a7078015d7e1bb1a2245d",
-        "521",
-        "2c9180838b90642e018bf132f37f5a60"
-      ].includes(btyShape)) {
-        return [{ ok: false, result: "电池形状或尺寸错误，应为扣式 近圆柱体 圆柱体 球形" }];
-      }
-    }
-    return [];
-  }
-
-  // src/shared/btySizeUnit.ts
-  function btySizeUnit(btySize) {
-    if (btySize.replace(/ /g, "").length > 0) {
-      if (!btySize.includes("m") && !btySize.includes("M"))
-        return [{ ok: false, result: "电池尺寸缺失单位" }];
-    }
-    return [];
-  }
-
-  // src/shared/btyWeightCalculate.ts
-  function btyWeightCalculate(batteryWeight, btyCount, netWeightDisplay) {
-    if (batteryWeight && btyCount && netWeightDisplay) {
-      let expectedNetWeight = batteryWeight * btyCount;
-      let abs = Math.abs((expectedNetWeight - netWeightDisplay) / netWeightDisplay);
-      if (abs > 0.05 && btyCount > 1) {
-        return [{ ok: false, result: "电池净重误差大于5%" }];
-      }
-    }
-    return [];
-  }
-
-  // src/shared/cellOrBattery.ts
-  function cellOrBattery(isCell, otherDescribeCAddition, isChargeBoxOrRelated) {
-    let result = [];
-    if (isCell && !otherDescribeCAddition.includes("单块电芯") && !isChargeBoxOrRelated)
-      result.push({ ok: false, result: "物品为电芯时，描述中不应该出现单块电池" });
-    if (!isCell && !otherDescribeCAddition.includes("单块电池") && !isChargeBoxOrRelated)
-      result.push({ ok: false, result: "物品为电池时，描述中不应该出现单块电芯" });
+  // src/shared/utils/matchDevice.ts
+  function matchDeviceName(projectName) {
+    let matches = [...projectName.matchAll(/设备[:：](.*?)[。;；]/g)];
+    let results = matches.map((match) => match[1]);
+    let result = results[results.length - 1];
+    if (!results.length) return "";
     return result;
   }
-
-  // src/shared/itemCNameBtyType.ts
-  function itemCNameBtyType(itemCName, btyType) {
-    if (itemCName.includes("芯") && !["501", "503"].includes(btyType))
-      return [{ ok: false, result: "电池类型应为电芯" }];
-    return [];
-  }
-
-  // src/shared/itemNameModel.ts
-  function itemNameModel(itemCName, itemEName, btyKind) {
-    let result = [];
-    if (!itemCName.includes(btyKind))
-      result.push({
-        ok: false,
-        result: "型号或中文品名错误，电池型号不在项目中文名称中"
-      });
-    if (!itemEName.includes(btyKind))
-      result.push({
-        ok: false,
-        result: "型号或英文品名错误，电池型号不在项目英文名称中"
-      });
+  function matchDeviceModel(projectName) {
+    let matches = [...projectName.matchAll(/设备[:：].*?[;；]型号[:：](.*?)[。；;]/g)];
+    let results = matches.map((match) => match[1]);
+    let result = results[results.length - 1];
+    if (!results.length) return "";
     return result;
   }
-
-  // src/shared/voltageBtyType.ts
-  function voltageBtyType(voltage, btyType) {
-    if (voltage > 7 && (btyType === "503" || btyType === "501")) {
-      return [{ ok: false, result: "电压大于7V，可能为电池组" }];
-    }
-    return [];
-  }
-
-  // src/shared/wattHourCalculate.ts
-  function wattHourCalculate(capacity, voltage, wattHour, wattHourFromName) {
-    if (capacity && voltage && wattHour && wattHourFromName === wattHour) {
-      let expectedWattHour = capacity * voltage / 1e3;
-      let abs = Math.abs((expectedWattHour - wattHour) / wattHour);
-      if (abs > 0.05) {
-        return [{ ok: false, result: "容量*电压 与 瓦时数 误差大于5%" }];
-      }
-    }
-    return [];
-  }
-
-  // src/shared/index.ts
-  function baseCheck(btySize, btyShape, batteryWeight, btyCount, netWeightDisplay, btyType, otherDescribeCAddition, isChargeBoxOrRelated, isCell, itemCName, itemEName, btyKind, voltage, capacity, wattHour, wattHourFromName) {
-    let result = [];
-    result.push(...btySizeUnit(btySize));
-    result.push(...btySizeBtyShape(btySize, btyShape));
-    result.push(...btyWeightCalculate(batteryWeight, btyCount, netWeightDisplay));
-    result.push(...cellOrBattery(isCell, otherDescribeCAddition, isChargeBoxOrRelated));
-    result.push(...itemCNameBtyType(itemCName, btyType));
-    result.push(...itemNameModel(itemCName, itemEName, btyKind));
-    result.push(...voltageBtyType(voltage, btyType));
-    result.push(...wattHourCalculate(capacity, voltage, wattHour, wattHourFromName));
+  function matchDeviceTrademark(projectName) {
+    let matches = [...projectName.matchAll(/设备[:：].*?[;；]型号[:：].*?[；;]商标[:：](.*?)[。;；]/g)];
+    let results = matches.map((match) => match[1]);
+    let result = results[results.length - 1];
+    if (!results.length) return "";
     return result;
   }
 
@@ -305,6 +225,130 @@
     return result;
   }
 
+  // src/shared/checkDevice.ts
+  function checkDevice(cName, otherDescribeCAddition) {
+    let results = [];
+    const name = matchDeviceName(otherDescribeCAddition).trim();
+    const model = matchDeviceModel(otherDescribeCAddition).trim();
+    const trademark = matchDeviceTrademark(otherDescribeCAddition).trim();
+    if (name.length && !cName.includes(name)) {
+      results.push({
+        ok: false,
+        result: `设备名称不匹配: ${cName} 和 ${name}`
+      });
+    }
+    if (model.length && !cName.includes(model)) {
+      results.push({
+        ok: false,
+        result: `设备型号不匹配: ${cName} 和 ${model}`
+      });
+    }
+    return results;
+  }
+
+  // src/shared/btySizeBtyShape.ts
+  function btySizeBtyShape(btySize, btyShape) {
+    if (btySize.includes("Φ") || btySize.includes("φ") || btySize.includes("Ø") || btySize.includes("ø")) {
+      if (![
+        "8aad92b65aae82c3015ab094788a0026",
+        "8aad92b65d7a7078015d7e1bb1a2245d",
+        "521",
+        "2c9180838b90642e018bf132f37f5a60"
+      ].includes(btyShape)) {
+        return [{ ok: false, result: "电池形状或尺寸错误，应为扣式 近圆柱体 圆柱体 球形" }];
+      }
+    }
+    return [];
+  }
+
+  // src/shared/btySizeUnit.ts
+  function btySizeUnit(btySize) {
+    if (btySize.replace(/ /g, "").length > 0) {
+      if (!btySize.includes("m") && !btySize.includes("M"))
+        return [{ ok: false, result: "电池尺寸缺失单位" }];
+    }
+    return [];
+  }
+
+  // src/shared/btyWeightCalculate.ts
+  function btyWeightCalculate(batteryWeight, btyCount, netWeightDisplay) {
+    if (batteryWeight && btyCount && netWeightDisplay) {
+      let expectedNetWeight = batteryWeight * btyCount;
+      let abs = Math.abs((expectedNetWeight - netWeightDisplay) / netWeightDisplay);
+      if (abs > 0.05 && btyCount > 1) {
+        return [{ ok: false, result: "电池净重误差大于5%" }];
+      }
+    }
+    return [];
+  }
+
+  // src/shared/cellOrBattery.ts
+  function cellOrBattery(isCell, otherDescribeCAddition, isChargeBoxOrRelated) {
+    let result = [];
+    if (isCell && !otherDescribeCAddition.includes("单块电芯") && !isChargeBoxOrRelated)
+      result.push({ ok: false, result: "物品为电芯时，描述中不应该出现单块电池" });
+    if (!isCell && !otherDescribeCAddition.includes("单块电池") && !isChargeBoxOrRelated)
+      result.push({ ok: false, result: "物品为电池时，描述中不应该出现单块电芯" });
+    return result;
+  }
+
+  // src/shared/itemCNameBtyType.ts
+  function itemCNameBtyType(itemCName, btyType) {
+    if (itemCName.includes("芯") && !["501", "503"].includes(btyType))
+      return [{ ok: false, result: "电池类型应为电芯" }];
+    return [];
+  }
+
+  // src/shared/itemNameModel.ts
+  function itemNameModel(itemCName, itemEName, btyKind) {
+    let result = [];
+    if (!itemCName.includes(btyKind))
+      result.push({
+        ok: false,
+        result: "型号或中文品名错误，电池型号不在项目中文名称中"
+      });
+    if (!itemEName.includes(btyKind))
+      result.push({
+        ok: false,
+        result: "型号或英文品名错误，电池型号不在项目英文名称中"
+      });
+    return result;
+  }
+
+  // src/shared/voltageBtyType.ts
+  function voltageBtyType(voltage, btyType) {
+    if (voltage > 7 && (btyType === "503" || btyType === "501")) {
+      return [{ ok: false, result: "电压大于7V，可能为电池组" }];
+    }
+    return [];
+  }
+
+  // src/shared/wattHourCalculate.ts
+  function wattHourCalculate(capacity, voltage, wattHour, wattHourFromName) {
+    if (capacity && voltage && wattHour && wattHourFromName === wattHour) {
+      let expectedWattHour = capacity * voltage / 1e3;
+      let abs = Math.abs((expectedWattHour - wattHour) / wattHour);
+      if (abs > 0.05) {
+        return [{ ok: false, result: "容量*电压 与 瓦时数 误差大于5%" }];
+      }
+    }
+    return [];
+  }
+
+  // src/shared/index.ts
+  function baseCheck(btySize, btyShape, batteryWeight, btyCount, netWeightDisplay, btyType, otherDescribeCAddition, isChargeBoxOrRelated, isCell, itemCName, itemEName, btyKind, voltage, capacity, wattHour, wattHourFromName) {
+    let result = [];
+    result.push(...btySizeUnit(btySize));
+    result.push(...btySizeBtyShape(btySize, btyShape));
+    result.push(...btyWeightCalculate(batteryWeight, btyCount, netWeightDisplay));
+    result.push(...cellOrBattery(isCell, otherDescribeCAddition, isChargeBoxOrRelated));
+    result.push(...itemCNameBtyType(itemCName, btyType));
+    result.push(...itemNameModel(itemCName, itemEName, btyKind));
+    result.push(...voltageBtyType(voltage, btyType));
+    result.push(...wattHourCalculate(capacity, voltage, wattHour, wattHourFromName));
+    return result;
+  }
+
   // src/shared/consts/properShippingNameMap.ts
   var properShippingNameMap = {
     "UN3480": "Lithium ion batteries",
@@ -407,11 +451,11 @@
       }
     }
     if (["965, IB", "968, IB", "966, II", "969, II"].includes(pkgInfoSubType)) {
-      if (dropTest) {
+      if (!dropTest) {
         result.push({ ok: false, result: `${pkgInfoSubType}未勾选跌落` });
       }
     } else {
-      if (!dropTest) {
+      if (dropTest) {
         result.push({ ok: false, result: `${pkgInfoSubType}不应勾选跌落` });
       }
     }
@@ -696,6 +740,7 @@
       if (wattHour !== wattHourFromName)
         result.push({ ok: false, result: "瓦时数与项目名称不匹配" });
     }
+    result.push(...checkDevice(itemCName, otherDescribeCAddition));
     result.push(...remarksCheck(remarks, pkgInfoSubType));
     const conclusions = Number(currentData["conclusions"]);
     const result1 = currentData["result1"];
@@ -1055,6 +1100,7 @@
       wattHourFromName
     ));
     result.push(...packetOrContain2(otherDescribe, otherDescribeCAddition, isChargeBoxOrRelated));
+    result.push(...checkDevice(itemCName, otherDescribeCAddition));
     const inspectionResult3 = currentData["inspectionResult3"];
     if (inspectionResult3 !== "0")
       result.push({
@@ -1150,8 +1196,8 @@
     "505": "单芯锂金属电池"
   };
   function matchBatteryType(summaryBatteryType) {
-    if (summaryBatteryType.includes("单芯锂离子电池")) return "504";
-    if (summaryBatteryType.includes("单芯锂金属电池")) return "505";
+    if (summaryBatteryType.includes("单电芯锂离子电池")) return "504";
+    if (summaryBatteryType.includes("单电芯锂金属电池")) return "505";
     if (summaryBatteryType.includes("锂离子电芯")) return "501";
     if (summaryBatteryType.includes("锂金属电池")) return "502";
     if (summaryBatteryType.includes("锂金属电芯")) return "503";
@@ -1186,23 +1232,21 @@
   function checkIssueDate(issue_date, projectNo) {
     const inputDate = new Date(issue_date);
     const today = /* @__PURE__ */ new Date();
-    today.setHours(0, 0, 0, 0);
+    today.setHours(23, 59, 59, 999);
     const diffTime = inputDate.getTime() - today.getTime();
-    const diffDays = diffTime / (1e3 * 60 * 60 * 24);
     const projectDate = parseProjectData(projectNo);
     const diffProjectTime = inputDate.getTime() - projectDate.getTime();
-    const diffProjectDays = diffProjectTime / (1e3 * 60 * 60 * 24);
     let result = [];
-    if (diffProjectDays < 0) {
+    if (diffProjectTime < 0) {
       result.push({
         ok: false,
-        result: "签发日期小于项目编号日期"
+        result: "签发日期早于项目编号日期"
       });
     }
-    if (diffDays > 0) {
+    if (diffTime > 0) {
       result.push({
         ok: false,
-        result: "签发日期大于今天"
+        result: "签发日期晚于今天"
       });
     }
     return result;
@@ -1584,6 +1628,17 @@
     return [];
   }
 
+  // src/summary/checkMarket.ts
+  function checkMarket(market, summaryReportNo) {
+    if (market.trim() !== summaryReportNo.trim()) {
+      return [{
+        ok: false,
+        result: "技术备注与测试报告编号不一致"
+      }];
+    }
+    return [];
+  }
+
   // src/summary/index.ts
   function checkSekSummary(currentData, summaryData, entrustData) {
     const checkMap = {
@@ -1659,6 +1714,7 @@
     results.push(...checkProjectNo(currentData.projectNo, summaryData.projectNo));
     results.push(...checkConsignor(entrustData.consignor, summaryData.consignor));
     results.push(...checkManufacturer(entrustData.manufacturer, summaryData.manufacturer));
+    results.push(...checkMarket(market, summaryData.testReportNo));
     return results;
   }
   function checkPekSummary(currentData, summaryData, entrustData) {
@@ -1738,6 +1794,7 @@
     results.push(...checkProjectNo(currentData.projectNo, summaryData.projectNo));
     results.push(...checkConsignor(entrustData.consignor, summaryData.consignor));
     results.push(...checkManufacturer(entrustData.manufacturer, summaryData.manufacturer));
+    results.push(...checkMarket(market, summaryData.testReportNo));
     return results;
   }
 
