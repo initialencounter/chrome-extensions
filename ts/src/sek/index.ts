@@ -15,6 +15,8 @@ import { conclusionsCheck } from "./conclusionsCheck"
 import { liContentScope } from "./liContentScope"
 import { wattHourScope } from "./wattHourScope"
 import { packetOrContain } from "./packetOrContain"
+import { checkReMark } from "./checkReMark"
+import { checkComment } from "./checkComment"
 
 function checkSekBtyType(currentData: SekData): CheckResult[] {
   const result = []
@@ -28,6 +30,8 @@ function checkSekBtyType(currentData: SekData): CheckResult[] {
   }
   const btyType = currentData['btyType'] as SekBtyType
   const {
+    // 项目编号
+    projectNo,
     // 中文品名
     itemCName,
     // 英文品名
@@ -42,6 +46,8 @@ function checkSekBtyType(currentData: SekData): CheckResult[] {
     btyKind,
     // 其他描述
     otherDescribe,
+    // 注意事项
+    remarks,
     // 备注
     comment,
     // 技术备注
@@ -171,6 +177,10 @@ function checkSekBtyType(currentData: SekData): CheckResult[] {
     currentData['inspectionItem9En'] !== ''
   )
     result.push({ ok: false, result: '鉴别项目8，9 不为空' })
+  // 注意事项
+  result.push(...checkReMark(remarks, projectNo, conclusions, otherDescribe))
+  // 备注
+  result.push(...checkComment(comment, projectNo, conclusions, otherDescribe))
   // 结论
   result.push(...conclusionsCheck(
     conclusions,
@@ -178,7 +188,6 @@ function checkSekBtyType(currentData: SekData): CheckResult[] {
     otherDescribe,
     inspectionResult1,
     btyGrossWeight,
-    comment,
     packageGrade,
     classOrDiv,
     isIon,

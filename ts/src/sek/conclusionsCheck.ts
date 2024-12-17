@@ -20,7 +20,6 @@ export function conclusionsCheck(
   otherDescribe: string,
   inspectionResult1: string,
   btyGrossWeight: number,
-  comment: string,
   packageGrade: string,
   classOrDiv: string,
   isIon: boolean,
@@ -31,7 +30,6 @@ export function conclusionsCheck(
   properShippingName = properShippingName.trim()
   packageGrade = packageGrade.trim()
   classOrDiv = classOrDiv.trim()
-  comment = comment.trim()
   if (conclusions === 1) { // 危险品
     if (
       unno === 'UN3171'
@@ -87,17 +85,6 @@ export function conclusionsCheck(
         result.push({ ok: false, result: '危险品，设备内置或与设备包装在一起的电池，UN编号应为UN3481' })
       if (otherDescribe !== '540' && unno !== 'UN3091' && !isIon)
         result.push({ ok: false, result: '危险品，设备内置或与设备包装在一起的电池，UN编号应为UN3091' })
-      if (
-        ['540', '541'].includes(otherDescribe) &&
-        comment !== '1200'
-      ) {
-        // II级包装性能
-        result.push({
-          ok: false,
-          result:
-            '结论错误，危险品物品，单独运输或与设备包装在一起，应达到II级包装性能'
-        })
-      }
     }
     if (classOrDiv !== '9') {
       result.push({
@@ -146,12 +133,6 @@ export function conclusionsCheck(
       result.push({
         ok: false,
         result: '非限制性物品，包装等级应为空'
-      })
-    }
-    if (comment !== '8aad92b6595aada201595aaf03370000') {
-      result.push({
-        ok: false,
-        result: '非限制性物品，备注应为：根据IMDG CODE特殊规定188不受限制。'
       })
     }
     // 非限制性 单独运输 毛重大于30kg
