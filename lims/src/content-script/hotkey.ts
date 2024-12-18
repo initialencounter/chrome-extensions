@@ -254,7 +254,12 @@ async function classification() {
   if (!localConfig.autoProjectNoPreset) {
     if (systemId.startsWith('PEK'))
       qProjectNo.value = localConfig.pekProjectNoPreset
-    else qProjectNo.value = localConfig.sekProjectNoPreset
+    else if (systemId.startsWith('SEK'))
+      qProjectNo.value = localConfig.sekProjectNoPreset
+    else if (systemId.startsWith('AEK'))
+      qProjectNo.value = localConfig.aekProjectNoPreset
+    else if (systemId.startsWith('REK'))
+      qProjectNo.value = localConfig.rekProjectNoPreset
   } else qProjectNo.value = getMonthsAgoProjectNo()
   setQItemCName1Text(projectNameSpan.value)
   setUnNo(projectNameSpan.value)

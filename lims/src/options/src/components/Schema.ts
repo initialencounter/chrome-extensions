@@ -10,6 +10,8 @@ export interface Config {
   autoProjectNoPreset?: boolean
   pekProjectNoPreset?: string
   sekProjectNoPreset?: string
+  aekProjectNoPreset?: string
+  rekProjectNoPreset?: string
   enableSetQueryProjectNo?: boolean
   enableSetImportClassification?: boolean
   enableDisplayEntrustEName?: boolean
@@ -112,6 +114,8 @@ export const Config: Schema<Config> = Schema.intersect([
       autoProjectNoPreset: Schema.const(false),
       pekProjectNoPreset: Schema.string().description(`手动设置空运检验单编号前缀`).default('PEKGZ2024'),
       sekProjectNoPreset: Schema.string().description(`手动设置海运检验单编号前缀`).default('SEKGZ2024'),
+      aekProjectNoPreset: Schema.string().description(`手动设置空运检验单编号前缀`).default('AEKGZ2024'),
+      rekProjectNoPreset: Schema.string().description(`手动设置空运检验单编号前缀`).default('REKGZ2024'),
     }),
     Schema.object({
       autoProjectNoPreset: Schema.const(true),

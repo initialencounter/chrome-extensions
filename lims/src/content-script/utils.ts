@@ -1,4 +1,4 @@
-const systemId = window.location.pathname.startsWith('/pek') ? 'PEKGZ' : 'SEKGZ'
+const systemId = window.location.pathname.startsWith('/pek') ? 'PEKGZ' : window.location.pathname.startsWith('/aek') ? 'AEKGZ' : window.location.pathname.startsWith('/rek') ? 'REKGZ' : 'SEKGZ'
 const category = new URLSearchParams(window.location.search).get('category')
 const localConfig = {
   customIcon: false,
@@ -12,6 +12,8 @@ const localConfig = {
   autoProjectNoPreset: false,
   pekProjectNoPreset: 'PEKGZ2024',
   sekProjectNoPreset: 'SEKGZ2024',
+  aekProjectNoPreset: 'AEKGZ2024',
+  rekProjectNoPreset: 'REKGZ2024',
   enableSetQueryProjectNo: false,
   enableSetImportClassification: true,
   verify: true,
@@ -34,6 +36,8 @@ const configKeys: Array<keyof typeof localConfig> = [
   'autoProjectNoPreset',
   'pekProjectNoPreset',
   'sekProjectNoPreset',
+  'aekProjectNoPreset',
+  'rekProjectNoPreset',
   'enableSetQueryProjectNo',
   'enableSetImportClassification',
   'verify',
