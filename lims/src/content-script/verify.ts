@@ -762,7 +762,7 @@ async function getEntrustData() {
   const entrustId = new URLSearchParams(window.location.search).get('entrustId')
   if (!entrustId) return null
   const response = await fetch(
-    `${window.location.origin}/page/html/${entrustId}`,
+    `${window.location.origin}//document/basicinfo/${entrustId}`,
     {
       method: 'GET',
       credentials: 'include',
@@ -785,8 +785,8 @@ function parseEntrust(entrustData: string | null): EntrustModelDocx {
   const parser = new DOMParser();
   const doc = parser.parseFromString(entrustData, 'text/html');
   if (!doc) return res
-  const consignor = doc.querySelector('#page1 > table > tbody > tr:nth-child(6) > td:nth-child(3) > span')
-  const manufacturer = doc.querySelector('#page1 > table > tbody > tr:nth-child(13) > td:nth-child(4) > span')
+  const consignor = doc.querySelector("body > div.main-content > div:nth-child(3) > div:nth-child(2) > div > div > div")
+  const manufacturer = doc.querySelector("body > div.main-content > div:nth-child(7) > div:nth-child(1) > div > div > div")
   if (!consignor || !manufacturer) return res
   return {
     consignor: consignor.innerHTML.trim(),
