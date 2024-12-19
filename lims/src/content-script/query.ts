@@ -43,6 +43,12 @@ async function handleQueryBtnClick() {
   if (projectNo.indexOf('PEKGZ') !== -1) {
     systemId = 'pek'
   }
+  if (projectNo.indexOf('AEKGZ') !== -1) {
+    systemId = 'aek'
+  }
+  if (projectNo.indexOf('REKGZ') !== -1) {
+    systemId = 'rek'
+  }
   ;(
     document.getElementsByClassName('textbox-value')[0] as HTMLInputElement
   ).value = systemId
