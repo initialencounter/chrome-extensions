@@ -24,7 +24,7 @@ export function checkReMark(remarks: string, projectNo: string, conclusions: num
       })
     }
   }
-  else {
+  else if (otherDescribe === '540') {
     if (remarks !== remarkPreventingShortCircuitMap[systemId]) {
       result.push({
         ok: false,
