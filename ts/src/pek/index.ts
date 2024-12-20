@@ -174,7 +174,7 @@ function checkPekBtyType(currentData: PekData): CheckResult[] {
   // 验证瓦数数
   if (wattHourFromName > 0 && !isNaN(wattHour) && isIon) {
     if (wattHour !== wattHourFromName)
-      result.push({ ok: false, result: '瓦时数与项目名称不匹配' })
+      result.push({ ok: false, result: `瓦时数与项目名称不匹配: ${wattHour} !== ${wattHourFromName}` })
   }
 
   // 设备名称、型号、商标验证
