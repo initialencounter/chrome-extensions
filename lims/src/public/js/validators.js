@@ -532,21 +532,21 @@
   function netWeighLimit(netWeight, pkgInfoSubType) {
     let result = [];
     if (!isNaN(netWeight)) {
-      if (netWeight > 2.5) {
-        if (pkgInfoSubType === "968, IB") {
-          result.push({ ok: false, result: "968，IB 电池净重超过2.5kg" });
-        }
-      } else if (netWeight > 5) {
-        if (pkgInfoSubType === "966, II" || pkgInfoSubType === "967, II" || pkgInfoSubType === "969, II" || pkgInfoSubType === "970, II") {
-          result.push({ ok: false, result: `${pkgInfoSubType} 电池净重超过5kg` });
+      if (netWeight > 35) {
+        if (pkgInfoSubType === "965, IA" || pkgInfoSubType === "966, I" || pkgInfoSubType === "967, I" || pkgInfoSubType === "968, IA" || pkgInfoSubType === "969, I" || pkgInfoSubType === "970, I") {
+          result.push({ ok: false, result: `${pkgInfoSubType} 电池净重超过35kg` });
         }
       } else if (netWeight > 10) {
         if (pkgInfoSubType === "965, IB") {
           result.push({ ok: false, result: `${pkgInfoSubType} 电池净重超过10kg` });
         }
-      } else if (netWeight > 35) {
-        if (pkgInfoSubType === "965, IA" || pkgInfoSubType === "966, I" || pkgInfoSubType === "967, I" || pkgInfoSubType === "968, IA" || pkgInfoSubType === "969, I" || pkgInfoSubType === "970, I") {
-          result.push({ ok: false, result: `${pkgInfoSubType} 电池净重超过35kg` });
+      } else if (netWeight > 5) {
+        if (pkgInfoSubType === "966, II" || pkgInfoSubType === "967, II" || pkgInfoSubType === "969, II" || pkgInfoSubType === "970, II") {
+          result.push({ ok: false, result: `${pkgInfoSubType} 电池净重超过5kg` });
+        }
+      } else if (netWeight > 2.5) {
+        if (pkgInfoSubType === "968, IB") {
+          result.push({ ok: false, result: "968，IB 电池净重超过2.5kg" });
         }
       }
     }
@@ -738,7 +738,7 @@
     result.push(...ionOrMetal(isIon, inspectionItem3Text1, inspectionItem4Text1));
     if (wattHourFromName > 0 && !isNaN(wattHour) && isIon) {
       if (wattHour !== wattHourFromName)
-        result.push({ ok: false, result: "瓦时数与项目名称不匹配" });
+        result.push({ ok: false, result: `瓦时数与项目名称不匹配: ${wattHour} !== ${wattHourFromName}` });
     }
     result.push(...checkDevice(itemCName, otherDescribeCAddition));
     result.push(...remarksCheck(remarks, pkgInfoSubType));
@@ -955,7 +955,7 @@
           result: "注意事项错误，应为：必须防止设备意外启动。"
         });
       }
-    } else {
+    } else if (otherDescribe === "540") {
       if (remarks !== remarkPreventingShortCircuitMap[systemId]) {
         result.push({
           ok: false,
@@ -1156,12 +1156,13 @@
     if (currentData["inspectionItem1Text2"] !== "")
       result.push({ ok: false, result: "鉴别项目1错误，锂含量不为空" });
     const wattHourFromName = matchWattHour(currentData["itemCName"]);
+    const wattHour = matchNumber(currentData["inspectionItem1Text1"]);
     const inspectionResult1 = currentData["inspectionResult1"];
     if (!checkMap[btyType].includes(inspectionResult1))
       result.push({ ok: false, result: "检验结果1错误，瓦时数取值范围错误" });
-    if (wattHourFromName > 0 && !isNaN(Number(currentData["inspectionItem1Text1"]))) {
-      if (Number(currentData["inspectionItem1Text1"]) !== wattHourFromName)
-        result.push({ ok: false, result: "瓦时数与项目名称不匹配" });
+    if (wattHourFromName > 0 && !isNaN(wattHour)) {
+      if (wattHour !== wattHourFromName)
+        result.push({ ok: false, result: `瓦时数与项目名称不匹配${wattHour} !== ${wattHourFromName}` });
     }
     result.push(...wattHourScope(btyType, inspectionResult1, wattHourFromName));
     if (currentData["inspectionItem7"] !== "1125")
