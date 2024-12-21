@@ -379,7 +379,7 @@
         }
       }
       if (properShippingNameMap[unKey] !== properShippingName) {
-        result.push({ ok: false, result: `结论错误，运输专有名称错误，应为${properShippingNameMap[unKey]}` });
+        result.push({ ok: false, result: `运输专有名称错误，应为${properShippingNameMap[unKey]}` });
       }
       if (!isDangerous) {
         result.push({ ok: false, result: "结论错误，经包装、电池瓦时、锂含量、净重、电芯类型判断，物品为非限制性货物" });
@@ -390,11 +390,7 @@
         result.push({ ok: false, result: "结论错误，客货机禁止运输" });
       }
       if (unno !== UNNO) {
-        if (UNNO === "UN3556") {
-          result.push({ ok: false, result: "结论错误，UN编号应为UN3556, 如果是25年报告请忽略" });
-        } else {
-          result.push({ ok: false, result: "结论错误，UN编号应为" + UNNO });
-        }
+        result.push({ ok: false, result: "结论错误，UN编号应为" + UNNO });
       }
       if (String(classOrDiv) !== "9") {
         result.push({ ok: false, result: "结论错误，危险性类别应为9" });
@@ -406,6 +402,9 @@
         result.push({ ok: false, result: "结论错误，危险品，包装等级应为斜杠" });
       }
     } else if (conclusions === 0) {
+      if (isDangerous) {
+        result.push({ ok: false, result: "结论错误，经包装、电池瓦时、锂含量、净重、电芯类型判断，物品为危险品" });
+      }
       if (packCargo !== "") {
         result.push({ ok: false, result: "结论错误，仅限货机应为空" });
       }
