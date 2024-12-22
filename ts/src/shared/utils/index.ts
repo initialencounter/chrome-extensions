@@ -8,10 +8,11 @@ export {
 function matchWattHour(projectName: string) {
   const matches = [...projectName.matchAll(/\s(\d+\.?\d+)[Kk]?[Ww][Hh]/g)]
   const results = matches.map((match) => match[1])
+  const rowText = matches.map((match) => match[0])[0]
   let wattHour = Number(results[results.length - 1])
   if (!results.length) return 0
   if (isNaN(wattHour)) return 0
-  if (projectName.toLowerCase().includes('kwh')) wattHour *= 1000
+  if (rowText.toLowerCase().includes('kwh')) wattHour *= 1000
   return wattHour
 }
 
@@ -27,20 +28,22 @@ function matchVoltage(projectName: string) {
 function matchCapacity(projectName: string) {
   let matches = [...projectName.matchAll(/(\d+\.?\d*)[Mm]?[Aa][Hh]/g)]
   let results = matches.map((match) => match[1])
+  const rowText = matches.map((match) => match[0])[0]
   let result = Number(results[results.length - 1])
   if (!results.length) return 0
   if (isNaN(result)) return 0
-  if (!projectName.toLowerCase().includes('mah')) result *= 1000
+  if (!rowText.toLowerCase().includes('mah')) result *= 1000
   return result
 }
 
 function matchBatteryWeight(describe: string) {
-  const matches = [...describe.matchAll(/(\d+\.?\d*)[Kk]?[g]/g)]
+  const matches = [...describe.matchAll(/为(\d+\.?\d*)[Kk]?[g]?/g)]
   const results = matches.map((match) => match[1])
+  const rowText = matches.map((match) => match[0])[0]
   let weight = Number(results[0])
   if (!results.length) return 0
   if (isNaN(weight)) return 0
-  if (describe.toLowerCase().includes("kg")) weight = weight * 1000
+  if (rowText.toLowerCase().includes("kg")) weight = weight * 1000
   return weight
 }
 
