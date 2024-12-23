@@ -32,6 +32,7 @@ import { checkProjectNo } from "./checkProjectNo";
 import { checkConsignor } from "./checkConsignor";
 import { checkManufacturer } from "./checkManufacturer";
 import { checkMarket } from "./checkMarket";
+import { checkUN38fg } from "./checkUN38fg";
 
 export function checkSekSummary(currentData: SekData, summaryData: SummaryData, entrustData: EntrustData) {
   const checkMap = {
@@ -132,6 +133,7 @@ export function checkSekSummary(currentData: SekData, summaryData: SummaryData, 
   results.push(...checkConsignor(entrustData.consignor, summaryData.consignor))
   results.push(...checkManufacturer(entrustData.manufacturer, summaryData.manufacturer))
   results.push(...checkMarket(market, summaryData.testReportNo))
+  results.push(...checkUN38fg(summaryData.un38f, summaryData.un38g))
   return results
 }
 export function checkPekSummary(currentData: PekData, summaryData: SummaryData, entrustData: EntrustData) {
@@ -242,5 +244,6 @@ export function checkPekSummary(currentData: PekData, summaryData: SummaryData, 
   results.push(...checkConsignor(entrustData.consignor, summaryData.consignor))
   results.push(...checkManufacturer(entrustData.manufacturer, summaryData.manufacturer))
   results.push(...checkMarket(market, summaryData.testReportNo))
+  results.push(...checkUN38fg(summaryData.un38f, summaryData.un38g))
   return results
 }
