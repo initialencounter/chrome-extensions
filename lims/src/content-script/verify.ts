@@ -1,8 +1,8 @@
 declare global {
   function checkPekBtyType(data: PekData): Array<{ ok: boolean; result: string }>
   function checkSekBtyType(data: SekData): Array<{ ok: boolean; result: string }>
-  function checkPekSummary(data: PekData, summary: SummaryModelDocx, entrustData: EntrustModelDocx): Array<{ ok: boolean; result: string }>
-  function checkSekSummary(data: SekData, summary: SummaryModelDocx, entrustData: EntrustModelDocx): Array<{ ok: boolean; result: string }>
+  function checkPekAttachment(data: PekData, attachmentInfo: AttachmentInfo, entrustData: EntrustModelDocx): Array<{ ok: boolean; result: string }>
+  function checkSekAttachment(data: SekData, attachmentInfo: AttachmentInfo, entrustData: EntrustModelDocx): Array<{ ok: boolean; result: string }>
 }
 
 const isInspect = new URLSearchParams(window.location.search).get('from') === null;
@@ -32,7 +32,7 @@ const host = window.location.host
       window.checkSekBtyType = mod.check_sek_bty
     }
     await verifySleep(500)
-    // insertCheckSummaryButton()
+    insertCheckSummaryButton()
     if (category !== "battery") return
     if (localConfig.verify === false) {
       console.log('未启用验证，退出脚本')
@@ -707,13 +707,13 @@ function getFormData<T>(systemId: 'pek' | 'sek'): T {
   return data as T;
 }
 
-export interface SummaryModelDocx {
+export interface SummaryInfo {
   // 标题
   title: string,
   // 项目编号
-  project_no: string,
+  projectNo: string,
   // 签发日期
-  issue_date: string,
+  issueDate: string,
   capacity: string;
   classification: string;
   cnName: string;
@@ -750,6 +750,16 @@ export interface SummaryModelDocx {
   watt: string;
 }
 
+export interface GoodsInfo {
+  projectNo: string;
+  name: string;
+  labels: string[];
+}
+
+export interface AttachmentInfo {
+  summary: SummaryInfo;
+  goods: GoodsInfo;
+}
 /**
  * EntrustModelDocx
  */
@@ -794,9 +804,9 @@ function parseEntrust(entrustData: string | null): EntrustModelDocx {
   }
 }
 
-async function getProjectSummary(projectNo: string) {
+async function getProjectAttachmentInfo(projectNo: string) {
   const response = await fetch(
-    `http://127.0.0.1:25455/get-summary-info/${projectNo}`,
+    `http://127.0.0.1:25455/get-attachment-info/${projectNo}`,
     {
       method: 'GET',
       mode: 'cors',
@@ -838,31 +848,32 @@ function insertCheckSummaryButton() {
   }
   verifyButton.innerHTML = `
     <span class="l-btn-left l-btn-icon-left">
-      <span class="l-btn-text">Summary</span>
+      <span class="l-btn-text">附件</span>
       <svg class="l-btn-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffbbab"><path d="m344-60-76-128-144-32 14-148-98-112 98-112-14-148 144-32 76-128 136 58 136-58 76 128 144 32-14 148 98 112-98 112 14 148-144 32-76 128-136-58-136 58Zm34-102 102-44 104 44 56-96 110-26-10-112 74-84-74-86 10-112-110-24-58-96-102 44-104-44-56 96-110 24 10 112-74 86 74 84-10 114 110 24 58 96Zm102-318Zm-42 142 226-226-56-58-170 170-86-84-56 56 142 142Z"/></svg>
     </span>
     `
   verifyButton.onclick = async () => {
     const projectNo = getCurrentProjectNo()
     if (!projectNo) return
-    const summaryInfo: SummaryModelDocx = await getProjectSummary(projectNo)
-    if (!summaryInfo) return
+    const attachmentInfo: AttachmentInfo = await getProjectAttachmentInfo(projectNo)
+    console.log(attachmentInfo, 'attachmentInfo')
+    if (!attachmentInfo) return
     const entrustDataText = await getEntrustData()
     const entrustData = parseEntrust(entrustDataText)
-    checkSummary(summaryInfo, entrustData)
+    checkSummary(attachmentInfo, entrustData)
   }
   targetParent.appendChild(verifyButton)
 }
 
-function checkSummary(summaryData: SummaryModelDocx, entrustData: EntrustModelDocx) {
+function checkSummary(attachmentInfo: AttachmentInfo, entrustData: EntrustModelDocx) {
   let result = []
   let dataFromForm: PekData | SekData
   if (systemIdLowercase === 'pek') {
     dataFromForm = getFormData<PekData>(systemIdLowercase)
-    result = window.checkPekSummary(dataFromForm, summaryData, entrustData)
+    result = window.checkPekAttachment(dataFromForm, attachmentInfo, entrustData)
   } else {
     dataFromForm = getFormData<SekData>(systemIdLowercase)
-    result = window.checkSekSummary(dataFromForm, summaryData, entrustData)
+    result = window.checkSekAttachment(dataFromForm, attachmentInfo, entrustData)
   }
   if (!result.length) {
     const verifyButton2 = document.getElementById('lims-verifyButton3')?.children[0]?.children[1] as SVGAElement
