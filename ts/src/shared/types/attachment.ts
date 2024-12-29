@@ -1,4 +1,4 @@
-export interface SummaryModelDocx {
+export interface SummaryInfo {
   // 标题
   title: string,
   // 项目编号
@@ -39,4 +39,15 @@ export interface SummaryModelDocx {
   un38g: string;
   voltage: string;
   watt: string;
+}
+
+export interface GoodsInfo {
+  projectNo: string;
+  name: string;
+  labels: string[];
+}
+
+export interface AttachmentInfo {
+  summary: SummaryInfo;
+  goods: GoodsInfo;
 }

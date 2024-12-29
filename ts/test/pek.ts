@@ -8,19 +8,19 @@ import { matchDeviceModel, matchDeviceName, matchDeviceTrademark} from '../src/s
 // @ts-ignore
 const cwd = path.resolve(__dirname)
 
-// for (let i = 1; i < 165; i++) {
-//     const data: PekData = JSON.parse(readFileSync(path.resolve(cwd, `../../tests/data/pek/data${i}.json`), 'utf-8'))
-//     let result = checkPekBtyType(data)
-//     if (result.length) {
-//         if (result.length === 1 && result[0].result.includes("如果是24年报告请忽略")) {
+for (let i = 1; i < 165; i++) {
+    const data: PekData = JSON.parse(readFileSync(path.resolve(cwd, `../../tests/data/pek/data${i}.json`), 'utf-8'))
+    let result = checkPekBtyType(data)
+    if (result.length) {
+        if (result.length === 1 && result[0].result.includes("如果是24年报告请忽略")) {
 
-//         } else {
-//             console.log(i)
-//             console.log(result)
-//         }
-//     }
+        } else {
+            console.log(i)
+            console.log(result)
+        }
+    }
 
-// }
+}
 
 // @ts-ignore
 // const data: PekData = JSON.parse(readFileSync(path.resolve(cwd, `../../tests/data/pek/1.json`), 'utf-8'))
@@ -69,15 +69,15 @@ const cwd = path.resolve(__dirname)
 //     }
 // }
 
-for (let i = 1; i < 165; i++) {
-    const data: PekData = JSON.parse(readFileSync(path.resolve(cwd, `../../tests/data/pek/data${i}.json`), 'utf-8'))
-    let otherDescribeCAddition = data['otherDescribeCAddition']
-    const name = matchDeviceName(otherDescribeCAddition)
-    const type = matchDeviceModel(otherDescribeCAddition)
-    const trademark = matchDeviceTrademark(otherDescribeCAddition)
-    console.log(i)
-    console.log("name:", name)
-    console.log("type:", type)
-    console.log("trademark:", trademark)
-    console.log("otherDescribeCAddition:", otherDescribeCAddition)
-}
+// for (let i = 1; i < 165; i++) {
+//     const data: PekData = JSON.parse(readFileSync(path.resolve(cwd, `../../tests/data/pek/data${i}.json`), 'utf-8'))
+//     let otherDescribeCAddition = data['otherDescribeCAddition']
+//     const name = matchDeviceName(otherDescribeCAddition)
+//     const type = matchDeviceModel(otherDescribeCAddition)
+//     const trademark = matchDeviceTrademark(otherDescribeCAddition)
+//     console.log(i)
+//     console.log("name:", name)
+//     console.log("type:", type)
+//     console.log("trademark:", trademark)
+//     console.log("otherDescribeCAddition:", otherDescribeCAddition)
+// }

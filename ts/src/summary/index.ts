@@ -33,8 +33,12 @@ import { checkConsignor } from "./checkConsignor";
 import { checkManufacturer } from "./checkManufacturer";
 import { checkMarket } from "./checkMarket";
 import { checkUN38fg } from "./checkUN38fg";
+import { checkPekGoods, checkSekGoods } from "./goods/index";
+import { AttachmentInfo } from "../shared/types/attachment";
 
-export function checkSekSummary(currentData: SekData, summaryData: SummaryData, entrustData: EntrustData) {
+export function checkSekAttachment(currentData: SekData, attachmentInfo: AttachmentInfo, entrustData: EntrustData) {
+  const summaryData = attachmentInfo.summary
+  const goodsInfo = attachmentInfo.goods
   const checkMap = {
     '500': ['≤100Wh', '>100Wh'],
     '501': ['≤20Wh', '>20Wh'],
@@ -134,9 +138,12 @@ export function checkSekSummary(currentData: SekData, summaryData: SummaryData, 
   results.push(...checkManufacturer(entrustData.manufacturer, summaryData.manufacturer))
   results.push(...checkMarket(market, summaryData.testReportNo))
   results.push(...checkUN38fg(summaryData.un38f, summaryData.un38g))
+  results.push(...checkSekGoods(conclusions, unno, itemCName, currentData.projectNo, goodsInfo))
   return results
 }
-export function checkPekSummary(currentData: PekData, summaryData: SummaryData, entrustData: EntrustData) {
+export function checkPekAttachment(currentData: PekData, attachmentInfo: AttachmentInfo, entrustData: EntrustData) {
+  const summaryData = attachmentInfo.summary
+  const goodsInfo = attachmentInfo.goods
   const btyType = getBtyTypeCode(currentData)
   // 品名
   const {
@@ -245,5 +252,6 @@ export function checkPekSummary(currentData: PekData, summaryData: SummaryData, 
   results.push(...checkManufacturer(entrustData.manufacturer, summaryData.manufacturer))
   results.push(...checkMarket(market, summaryData.testReportNo))
   results.push(...checkUN38fg(summaryData.un38f, summaryData.un38g))
+  results.push(...checkPekGoods(pkgInfoSubType, netWeight, itemCName, currentData.projectNo, goodsInfo))
   return results
 }

@@ -16,7 +16,6 @@ export function packetOrContain(
 ): CheckResult[] {
   let result: CheckResult[] = []
   if (pkgInfo !== pkgInfoByPackCargo) {
-    console.log(pkgInfo, pkgInfoByPackCargo)
     result.push({ ok: false, result: `${pkgInfo}包装，但结论是${pkgInfoByPackCargo}` })
   }
   if (
