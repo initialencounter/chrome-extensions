@@ -27,10 +27,11 @@
   function matchWattHour(projectName) {
     const matches = [...projectName.matchAll(/\s(\d+\.?\d+)[Kk]?[Ww][Hh]/g)];
     const results = matches.map((match) => match[1]);
+    const rowText = matches.map((match) => match[0])[0];
     let wattHour = Number(results[results.length - 1]);
     if (!results.length) return 0;
     if (isNaN(wattHour)) return 0;
-    if (projectName.toLowerCase().includes("kwh")) wattHour *= 1e3;
+    if (rowText.toLowerCase().includes("kwh")) wattHour *= 1e3;
     return wattHour;
   }
   function matchVoltage(projectName) {
@@ -44,19 +45,21 @@
   function matchCapacity(projectName) {
     let matches = [...projectName.matchAll(/(\d+\.?\d*)[Mm]?[Aa][Hh]/g)];
     let results = matches.map((match) => match[1]);
+    const rowText = matches.map((match) => match[0])[0];
     let result = Number(results[results.length - 1]);
     if (!results.length) return 0;
     if (isNaN(result)) return 0;
-    if (!projectName.toLowerCase().includes("mah")) result *= 1e3;
+    if (!rowText.toLowerCase().includes("mah")) result *= 1e3;
     return result;
   }
   function matchBatteryWeight(describe) {
-    const matches = [...describe.matchAll(/(\d+\.?\d*)[Kk]?[g]/g)];
+    const matches = [...describe.matchAll(/为(\d+\.?\d*)[Kk]?[g]?/g)];
     const results = matches.map((match) => match[1]);
+    const rowText = matches.map((match) => match[0])[0];
     let weight = Number(results[0]);
     if (!results.length) return 0;
     if (isNaN(weight)) return 0;
-    if (describe.toLowerCase().includes("kg")) weight = weight * 1e3;
+    if (rowText.toLowerCase().includes("kg")) weight = weight * 1e3;
     return weight;
   }
   function getBtyTypeCode(currentData) {
@@ -571,7 +574,6 @@
   function packetOrContain(pkgInfo, pkgInfoByPackCargo, otherDescribeCAddition, isChargeBoxOrRelated) {
     let result = [];
     if (pkgInfo !== pkgInfoByPackCargo) {
-      console.log(pkgInfo, pkgInfoByPackCargo);
       result.push({ ok: false, result: `${pkgInfo}包装，但结论是${pkgInfoByPackCargo}` });
     }
     if ((pkgInfo === "966" || pkgInfo === "969") && !otherDescribeCAddition.includes("包装在一起") && !isChargeBoxOrRelated)
@@ -1639,8 +1641,130 @@
     return [];
   }
 
+  // src/summary/checkUN38fg.ts
+  function checkUN38fg(un38f, un38g) {
+    const result = [];
+    if (!un38f.includes("不适用")) {
+      result.push({ ok: false, result: "un38f应为不适用" });
+    }
+    if (!un38g.includes("不适用")) {
+      result.push({ ok: false, result: "un38g应为不适用" });
+    }
+    return result;
+  }
+
+  // src/summary/goods/checkItemCName.ts
+  function replaceSpace(str) {
+    return str.replace(/\s+/g, "");
+  }
+  function checkItemCName(currentDataItemCName, goodsInfoItemCName) {
+    currentDataItemCName = replaceSpace(currentDataItemCName);
+    goodsInfoItemCName = replaceSpace(goodsInfoItemCName);
+    if (currentDataItemCName !== goodsInfoItemCName) {
+      return [{
+        ok: false,
+        result: `图片品名不一致: ${currentDataItemCName} !== ${goodsInfoItemCName}`
+      }];
+    }
+    return [];
+  }
+
+  // src/summary/goods/checkLabel.ts
+  function getPekExpectedLabel(pkgInfoSubType, netWeight) {
+    let label = [];
+    switch (pkgInfoSubType) {
+      case "952":
+        label.push("9");
+        break;
+      case "965, IA":
+      case "968, IA":
+        label.push("9A", "CAO");
+        break;
+      case "965, IB":
+      case "968, IB":
+        label.push("9A", "CAO", "bty");
+        break;
+      case "966, I":
+      case "969, I":
+      case "967, I":
+      case "970, I":
+        label.push("9A");
+        if (netWeight > 5) {
+          label.push("CAO");
+        }
+        break;
+      case "966, II":
+      case "969, II":
+      case "967, II":
+      case "970, II":
+        label.push("bty");
+        break;
+    }
+    return label;
+  }
+  function getSekExpectedLabel(conclusions, UNNO) {
+    if (["UN3556", "UN3557", "UN3558"].includes(UNNO)) {
+      return ["9A"];
+    }
+    if (["UN3171"].includes(UNNO)) {
+      return ["9"];
+    }
+    if (conclusions === 1) {
+      return ["9A"];
+    } else {
+      return ["bty"];
+    }
+  }
+  function sortLabel(arr) {
+    return arr.sort((a, b) => a.charCodeAt(0) - b.charCodeAt(0));
+  }
+  function checkLabel(expectedLabel, goodsLabels) {
+    expectedLabel = sortLabel(expectedLabel);
+    goodsLabels = sortLabel(goodsLabels);
+    if (expectedLabel.length !== goodsLabels.length) {
+      return [{ ok: false, result: `标签不一致，期望标签：${expectedLabel.join(",")}, 实际标签：${goodsLabels.join(",")}` }];
+    }
+    for (let i = 0; i < expectedLabel.length; i++) {
+      if (expectedLabel[i] !== goodsLabels[i]) {
+        return [{ ok: false, result: `标签不一致，期望标签：${expectedLabel.join(",")}, 实际标签：${goodsLabels.join(",")}` }];
+      }
+    }
+    return [];
+  }
+
+  // src/summary/goods/checkProjectNo.ts
+  function checkProjectNo2(currentDataProjectNo, goodsInfoProjectNo) {
+    if (currentDataProjectNo !== goodsInfoProjectNo) {
+      return [{
+        ok: false,
+        result: "图片项目号不一致"
+      }];
+    }
+    return [];
+  }
+
+  // src/summary/goods/index.ts
+  function checkSekGoods(conclusions, UNNO, itemCName, projectNo, goodsInfo) {
+    let results = [];
+    const expectedLabel = getSekExpectedLabel(conclusions, UNNO);
+    results.push(...checkLabel(expectedLabel, goodsInfo.labels));
+    results.push(...checkItemCName(itemCName, goodsInfo.name));
+    results.push(...checkProjectNo2(projectNo, goodsInfo.projectNo));
+    return results;
+  }
+  function checkPekGoods(pkgInfoSubType, netWeight, itemCName, projectNo, goodsInfo) {
+    let results = [];
+    const expectedLabel = getPekExpectedLabel(pkgInfoSubType, netWeight);
+    results.push(...checkLabel(expectedLabel, goodsInfo.labels));
+    results.push(...checkItemCName(itemCName, goodsInfo.name));
+    results.push(...checkProjectNo2(projectNo, goodsInfo.projectNo));
+    return results;
+  }
+
   // src/summary/index.ts
-  function checkSekSummary(currentData, summaryData, entrustData) {
+  function checkSekAttachment(currentData, attachmentInfo, entrustData) {
+    const summaryData = attachmentInfo.summary;
+    const goodsInfo = attachmentInfo.goods;
     const checkMap = {
       "500": ["≤100Wh", ">100Wh"],
       "501": ["≤20Wh", ">20Wh"],
@@ -1715,9 +1839,13 @@
     results.push(...checkConsignor(entrustData.consignor, summaryData.consignor));
     results.push(...checkManufacturer(entrustData.manufacturer, summaryData.manufacturer));
     results.push(...checkMarket(market, summaryData.testReportNo));
+    results.push(...checkUN38fg(summaryData.un38f, summaryData.un38g));
+    results.push(...checkSekGoods(conclusions, unno, itemCName, currentData.projectNo, goodsInfo));
     return results;
   }
-  function checkPekSummary(currentData, summaryData, entrustData) {
+  function checkPekAttachment(currentData, attachmentInfo, entrustData) {
+    const summaryData = attachmentInfo.summary;
+    const goodsInfo = attachmentInfo.goods;
     const btyType = getBtyTypeCode(currentData);
     const {
       // 品名
@@ -1795,12 +1923,14 @@
     results.push(...checkConsignor(entrustData.consignor, summaryData.consignor));
     results.push(...checkManufacturer(entrustData.manufacturer, summaryData.manufacturer));
     results.push(...checkMarket(market, summaryData.testReportNo));
+    results.push(...checkUN38fg(summaryData.un38f, summaryData.un38g));
+    results.push(...checkPekGoods(pkgInfoSubType, netWeight, itemCName, currentData.projectNo, goodsInfo));
     return results;
   }
 
   // src/index.ts
   window.checkPekBtyType = checkPekBtyType;
   window.checkSekBtyType = checkSekBtyType;
-  window.checkSekSummary = checkSekSummary;
-  window.checkPekSummary = checkPekSummary;
+  window.checkPekAttachment = checkPekAttachment;
+  window.checkSekAttachment = checkSekAttachment;
 })();
