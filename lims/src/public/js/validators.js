@@ -1263,7 +1263,7 @@
 
   // src/summary/checkLiContent.ts
   function checkLiContent(formLiContent, summaryLiContent) {
-    let summaryLiContentNumber = matchBatteryWeight(summaryLiContent.trim());
+    let summaryLiContentNumber = matchBatteryWeight("为" + summaryLiContent.trim());
     if (isNaN(summaryLiContentNumber) || isNaN(formLiContent)) return [];
     if (summaryLiContentNumber !== formLiContent) {
       return [{
@@ -1276,7 +1276,7 @@
 
   // src/summary/checkMass.ts
   function checkMass(formMass, summaryMass) {
-    let summaryMassNumber = matchBatteryWeight(summaryMass.trim());
+    let summaryMassNumber = matchBatteryWeight("为" + summaryMass.trim());
     if (summaryMassNumber !== formMass) {
       return [{
         ok: false,
