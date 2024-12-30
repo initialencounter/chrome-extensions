@@ -2,7 +2,7 @@ import { CheckResult } from "../shared/types/index"
 import { matchBatteryWeight } from "../shared/utils/index"
 
 export function checkMass(formMass: number, summaryMass: string): CheckResult[] {
-  let summaryMassNumber = matchBatteryWeight(summaryMass.trim())
+  let summaryMassNumber = matchBatteryWeight("为" + summaryMass.trim())
   if (summaryMassNumber !== formMass) {
     return [{
       ok: false,
