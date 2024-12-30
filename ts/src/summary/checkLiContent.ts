@@ -2,7 +2,7 @@ import { CheckResult } from "../shared/types/index"
 import { matchBatteryWeight } from "../shared/utils/index"
 
 export function checkLiContent(formLiContent: number, summaryLiContent: string): CheckResult[] {
-  let summaryLiContentNumber = matchBatteryWeight(summaryLiContent.trim())
+  let summaryLiContentNumber = matchBatteryWeight("为" + summaryLiContent.trim())
   if (isNaN(summaryLiContentNumber) || isNaN(formLiContent)) return []
   if (summaryLiContentNumber !== formLiContent) {
     return [{
