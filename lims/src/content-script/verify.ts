@@ -32,7 +32,6 @@ const host = window.location.host
       window.checkSekBtyType = mod.check_sek_bty
     }
     await verifySleep(500)
-    insertCheckSummaryButton()
     if (category !== "battery") return
     if (localConfig.verify === false) {
       console.log('未启用验证，退出脚本')
@@ -396,6 +395,9 @@ async function lims_verify_inspect() {
   result.push(
     ...(await checkAttchmentFiles(projectNo, currentProjectId))
   )
+
+  result.push(...(await checkAttachment()))
+  
   if (!result.length) {
     const verifyButton = document.getElementById('lims-verifyButton')?.children[0]?.children[1] as SVGAElement
     const verifyButton2 = document.getElementById('lims-verifyButton2')?.children[0]?.children[1] as SVGAElement
@@ -411,6 +413,25 @@ async function lims_verify_inspect() {
   })
 }
 
+async function checkAttachment() {
+  if (localConfig.enableCheckAttachment === false) return []
+  try {
+    const projectNo = getCurrentProjectNo()
+    if (!projectNo) return []
+    const attachmentInfo: AttachmentInfo = await getProjectAttachmentInfo(projectNo)
+    if (!localConfig.enableLabelCheck) {
+      attachmentInfo.goods.labels = ['pass']
+    }
+    console.log(attachmentInfo, 'attachmentInfo')
+    if (!attachmentInfo) return []
+    const entrustDataText = await getEntrustData()
+    const entrustData = parseEntrust(entrustDataText)
+    return checkSummary(attachmentInfo, entrustData)
+  } catch (e) {
+    console.log(e)
+    return [{ ok: false, result: "附件解析失败" }]
+  }
+}
 
 async function verifySleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -806,7 +827,7 @@ function parseEntrust(entrustData: string | null): EntrustModelDocx {
 
 async function getProjectAttachmentInfo(projectNo: string) {
   const response = await fetch(
-    `http://127.0.0.1:25455/get-attachment-info/${projectNo}`,
+    `${localConfig.aircraftServer}/get-attachment-info/${projectNo}?label=${localConfig.enableLabelCheck ? '1' : '0'}`,
     {
       method: 'GET',
       mode: 'cors',
@@ -828,42 +849,6 @@ async function getProjectAttachmentInfo(projectNo: string) {
   // }
 }
 
-function insertCheckSummaryButton() {
-  const targetChild = document.getElementById('openDocumentsBtn0')
-  if (!targetChild) return
-  const targetParent = targetChild.parentElement
-  if (!targetParent) return
-  const verifyButton = document.createElement('a')
-  verifyButton.id = 'lims-verifyButton3'
-  verifyButton.href = 'javascript:void(0);'
-  verifyButton.className = 'easyui-linkbutton l-btn l-btn-small'
-  verifyButton.style.background = '#ffffff'
-  // verifyButton.style.margin = '0 3px 0 3px'
-  // hover
-  verifyButton.onmouseover = function () {
-    verifyButton.style.background = '#54a124'
-  }
-  verifyButton.onmouseout = function () {
-    verifyButton.style.background = '#ffffff'
-  }
-  verifyButton.innerHTML = `
-    <span class="l-btn-left l-btn-icon-left">
-      <span class="l-btn-text">附件</span>
-      <svg class="l-btn-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffbbab"><path d="m344-60-76-128-144-32 14-148-98-112 98-112-14-148 144-32 76-128 136 58 136-58 76 128 144 32-14 148 98 112-98 112 14 148-144 32-76 128-136-58-136 58Zm34-102 102-44 104 44 56-96 110-26-10-112 74-84-74-86 10-112-110-24-58-96-102 44-104-44-56 96-110 24 10 112-74 86 74 84-10 114 110 24 58 96Zm102-318Zm-42 142 226-226-56-58-170 170-86-84-56 56 142 142Z"/></svg>
-    </span>
-    `
-  verifyButton.onclick = async () => {
-    const projectNo = getCurrentProjectNo()
-    if (!projectNo) return
-    const attachmentInfo: AttachmentInfo = await getProjectAttachmentInfo(projectNo)
-    console.log(attachmentInfo, 'attachmentInfo')
-    if (!attachmentInfo) return
-    const entrustDataText = await getEntrustData()
-    const entrustData = parseEntrust(entrustDataText)
-    checkSummary(attachmentInfo, entrustData)
-  }
-  targetParent.appendChild(verifyButton)
-}
 
 function checkSummary(attachmentInfo: AttachmentInfo, entrustData: EntrustModelDocx) {
   let result = []
@@ -875,15 +860,5 @@ function checkSummary(attachmentInfo: AttachmentInfo, entrustData: EntrustModelD
     dataFromForm = getFormData<SekData>(systemIdLowercase)
     result = window.checkSekAttachment(dataFromForm, attachmentInfo, entrustData)
   }
-  if (!result.length) {
-    const verifyButton2 = document.getElementById('lims-verifyButton3')?.children[0]?.children[1] as SVGAElement
-    if (verifyButton2) verifyButton2.setAttribute('fill', '#54a124')
-    // @ts-expect-error: use Qmsg from assets
-    Qmsg['success']('初步验证通过')
-    return
-  }
-  // @ts-expect-error: use Qmsg from assets
-  Qmsg['warning']('初步验证未通过' + JSON.stringify(result, null, 2), {
-    timeout: 4000
-  })
+  return result
 }

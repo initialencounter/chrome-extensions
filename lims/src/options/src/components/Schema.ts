@@ -76,6 +76,9 @@ export const Config: Schema<Config> = Schema.intersect([
   // 样品检验-主界面 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   Schema.object({
     verify: Schema.boolean().description('表单验证（仅限锂电池），验证规则详见[rule](https://lims.initenc.cn/rule.html)，欢迎补充').default(true),
+    aircraftServer: Schema.string().description('附件解析服务器地址').default('http://127.0.0.1:25455'),
+    enableCheckAttachment: Schema.boolean().description('启用附件解析').default(true),
+    enableLabelCheck: Schema.boolean().description('启用标签检查（识别不准确，不建议开启）').default(false),
     verifyButtonOnMiddle: Schema.boolean().description('验证按钮放在提交按钮旁边').default(false),
     enableCopyProjectNo: Schema.boolean()
       .description(

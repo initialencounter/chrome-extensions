@@ -1719,6 +1719,9 @@
     return arr.sort((a, b) => a.charCodeAt(0) - b.charCodeAt(0));
   }
   function checkLabel(expectedLabel, goodsLabels) {
+    if (goodsLabels[0] === "pass") {
+      return [];
+    }
     expectedLabel = sortLabel(expectedLabel);
     goodsLabels = sortLabel(goodsLabels);
     if (expectedLabel.length !== goodsLabels.length) {
