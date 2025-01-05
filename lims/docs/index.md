@@ -22,7 +22,9 @@ hero:
     - theme: alt
       text: 验证规则
       link: /rule
-
+    - theme: alt
+      text: 验证概要 & 一键上传
+      link: /attachment
 features:
   - title: 一键分配、退回
     details: 勾选检验单之后点击一键分配，会直接将检验单分配给主检员。

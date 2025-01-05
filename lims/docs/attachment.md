@@ -1,0 +1,104 @@
+# 验证概要 & 一键上传
+
+## 功能介绍
+
+- 通过 `Everything` 工具，搜索图片概要。
+- 再调用解析器读取图片概要，与系统检验单进行匹配。
+
+## 前置条件
+
+- 安装解析器。
+  - 方法一：安装图形化界面。
+  - 方法二：直接运行可执行文件。
+- 设置 `Everything` 服务。
+- `v1.8.9` 以上版本的 `lims` 插件 。
+
+## 安装
+
+### 方法一：安装图形化界面。
+
+1. 退出所有杀毒软件
+2. 双击安装包，进行安装。
+3. 选择安装路径，不要安装在C盘。
+4. 安装完成后，双击桌面快捷方式 `aircraft` ，运行程序。
+
+### 方法二：可执行文件。
+
+如果方法一程序点击后，没有反应。则使用方法二。
+
+1. 退出所有杀毒软件
+2. 解压到C盘以外的地方。
+3. 双击 `headless.exe` 运行程序。
+
+### 设置 Everything 服务
+
+1. 打开 `Everything` 选项。
+2. 启用 `HTTP服务器` 。
+3. 将 `HTTP服务端口` 设置为 `25456` 。
+4. 点击 `应用` 按钮。
+
+### 更新 lims 插件
+
+点击验证按钮，会验证图片概要。
+
+# 一键上传
+
+## 配置
+
+### 如果使用的是 `aircraft`：
+
+1. 直接输入账号密码。
+2. 关闭调试模式
+3. 重置配置
+
+### 如果使用的是 `headless.exe`：
+
+1. 在 `headless.exe` 相同文件夹下创建 `local.env` 文本文件，
+2. `local.env` 内容如下，根据实际情况修改：
+
+```ini
+BASE_URL=系统的域名
+USER_NAME=主检员的账号
+PASSWORD=主检员的密码
+PORT=25455
+DEBUG=false
+LOG_ENABLED=true
+DOC_ENABLE=false
+DOC_KEY=ctrl+shift+d
+UPLOAD_ENABLE=true
+UPLOAD_KEY=ctrl+shift+u
+COPY_ENABLE=false
+COPY_KEY=ctrl+shift+z
+DOCX_ENABLE=false
+DOCX_KEY=ctrl+shift+x
+INSPECTOR=空
+SIGNATURE_WIDTH=5.58
+SIGNATURE_HEIGHT=1.73
+```
+
+### 操作
+
+#### 使用快捷键上传
+
+1. 选中要上传的资料。
+2. 按快捷键 `Ctrl + Shift + U` ，进行上传。
+
+:::warning
+
+- 上传前，相应的检验单必须保存，否则无法上传成功。
+
+:::
+
+### 使用 `client.exe` 上传
+
+1. 下载 `client.exe` 。
+2. 双击 `client.exe` ，运行程序。
+3. 在需要上传的资料的文件夹空白处右键，点击菜单栏 `Upload file here`。
+
+:::warning
+
+- 上传前，相应的检验单必须保存，否则无法上传成功。
+- 此方法需要将 word 源文件和 pdf 文件放同个文件夹。
+- client.exe 文件位置移到后，需要重新运行，否则无法上传。
+
+:::
