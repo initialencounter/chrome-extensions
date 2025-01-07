@@ -35,6 +35,7 @@ import { checkMarket } from "./checkMarket";
 import { checkUN38fg } from "./checkUN38fg";
 import { checkPekGoods, checkSekGoods } from "./goods/index";
 import { AttachmentInfo } from "../shared/types/attachment";
+import { checkTitle } from "./checkTitle";
 
 export function checkSekAttachment(currentData: SekData, attachmentInfo: AttachmentInfo, entrustData: EntrustData) {
   const summaryData = attachmentInfo.summary
@@ -121,6 +122,7 @@ export function checkSekAttachment(currentData: SekData, attachmentInfo: Attachm
   const otherDescribeChecked = currentData['otherDescribeChecked'] === '1'
   const btyBrand = currentData['btyBrand']
   let results: CheckResult[] = []
+  results.push(...checkTitle(summaryData.title))
   results.push(...checkName(packageType, itemEName, itemCName, btyKind, summaryData.cnName))
   results.push(...checkBatteryType(btyType, summaryData.classification))
   results.push(...checkModel(btyKind, summaryData.type))
@@ -239,6 +241,7 @@ export function checkPekAttachment(currentData: PekData, attachmentInfo: Attachm
   const isIA = pkgInfoIsIA(wattHour, pkgInfo, liContent, netWeight, isSingleCell)
   const btyBrand = currentData['brands']
   let results: CheckResult[] = []
+  results.push(...checkTitle(summaryData.title))
   results.push(...checkName(packageType, itemEName, itemCName, btyKind, summaryData.cnName))
   results.push(...checkBatteryType(btyType, summaryData.classification))
   results.push(...checkModel(btyKind, summaryData.type))
