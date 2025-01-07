@@ -1305,45 +1305,27 @@
     model = model.trim();
     let formCNameText = "";
     let formENameText = "";
-    let keyWord = "";
     switch (packageType) {
       case "0":
+      case "1":
         formCNameText = formCName.split(model)[0];
         formENameText = formEName.split(model)[0];
         break;
-      case "1":
-        keyWord = "包装";
-        break;
       case "2":
-        keyWord = "内置";
+        let indexKeyWord = formCName.indexOf("内置");
+        let indexKeyEWord = formEName.indexOf("Containing");
+        let indexModel = formCName.indexOf(model);
+        let indexEModel = formEName.indexOf(model);
+        console.log("indexKeyWord", indexKeyWord);
+        console.log("indexModel", indexModel);
+        if (indexKeyWord < indexModel) {
+          formCNameText = formCName.substring(indexKeyWord + 2, indexModel);
+          formENameText = formEName.substring(indexKeyEWord + 10, indexEModel);
+        } else {
+          formCNameText = formCName.substring(0, indexModel);
+          formENameText = formEName.substring(0, indexModel);
+        }
         break;
-    }
-    if (keyWord === "内置") {
-      let indexKeyWord = formCName.indexOf("内置");
-      let indexKeyEWord = formEName.indexOf("Containing");
-      let indexModel = formCName.indexOf(model);
-      let indexEModel = formEName.indexOf(model);
-      console.log("indexKeyWord", indexKeyWord);
-      console.log("indexModel", indexModel);
-      if (indexKeyWord < indexModel) {
-        formCNameText = formCName.substring(indexKeyWord + 2, indexModel);
-        formENameText = formEName.substring(indexKeyEWord + 10, indexEModel);
-      } else {
-        formCNameText = formCName.substring(0, indexModel);
-        formENameText = formEName.substring(0, indexModel);
-      }
-    } else if (keyWord === "包装") {
-      let indexKeyWord = formCName.indexOf("与");
-      let indexKeyEWord = formEName.indexOf("Packed With");
-      let indexModel = formCName.indexOf(model);
-      let indexEModel = formEName.indexOf(model);
-      if (indexKeyWord < indexModel) {
-        formCNameText = formCName.substring(0, indexModel);
-        formENameText = formEName.substring(0, indexEModel);
-      } else {
-        formCNameText = formCName.substring(indexKeyWord + 1, indexModel);
-        formENameText = formEName.substring(indexKeyEWord + 1, indexEModel);
-      }
     }
     formCNameText = formCNameText.trim();
     formENameText = formENameText.trim();
@@ -1660,6 +1642,9 @@
   function checkItemCName(currentDataItemCName, goodsInfoItemCName) {
     currentDataItemCName = replaceSpace(currentDataItemCName);
     goodsInfoItemCName = replaceSpace(goodsInfoItemCName);
+    if (goodsInfoItemCName === "未找到物品名称") {
+      return [];
+    }
     if (currentDataItemCName !== goodsInfoItemCName) {
       return [{
         ok: false,
@@ -1764,6 +1749,17 @@
     return results;
   }
 
+  // src/summary/checkTitle.ts
+  function checkTitle(summaryTitle) {
+    if (summaryTitle !== "锂电池/钠离子电池UN38.3试验概要Test Summary") {
+      return [{
+        ok: false,
+        result: `概要标题${summaryTitle}不正确`
+      }];
+    }
+    return [];
+  }
+
   // src/summary/index.ts
   function checkSekAttachment(currentData, attachmentInfo, entrustData) {
     const summaryData = attachmentInfo.summary;
@@ -1826,12 +1822,17 @@
     const otherDescribeChecked = currentData["otherDescribeChecked"] === "1";
     const btyBrand = currentData["btyBrand"];
     let results = [];
+    results.push(...checkTitle(summaryData.title));
     results.push(...checkName(packageType, itemEName, itemCName, btyKind, summaryData.cnName));
     results.push(...checkBatteryType(btyType, summaryData.classification));
     results.push(...checkModel(btyKind, summaryData.type));
     results.push(...checkTradeMark(btyBrand, summaryData.trademark));
-    results.push(...checkVoltage(voltage, summaryData.voltage));
-    results.push(...checkCapacity(capacity, summaryData.capacity));
+    if (voltage) {
+      results.push(...checkVoltage(voltage, summaryData.voltage));
+    }
+    if (capacity) {
+      results.push(...checkCapacity(capacity, summaryData.capacity));
+    }
     results.push(...checkWattHour(wattHour, summaryData.watt));
     results.push(...checkShape(btyShape, summaryData.shape));
     results.push(...checkMass(batteryWeight, summaryData.mass));
@@ -1910,6 +1911,7 @@
     const isIA = pkgInfoIsIA(wattHour, pkgInfo, liContent, netWeight, isSingleCell);
     const btyBrand = currentData["brands"];
     let results = [];
+    results.push(...checkTitle(summaryData.title));
     results.push(...checkName(packageType, itemEName, itemCName, btyKind, summaryData.cnName));
     results.push(...checkBatteryType(btyType, summaryData.classification));
     results.push(...checkModel(btyKind, summaryData.type));
