@@ -125,8 +125,12 @@ export function checkSekAttachment(currentData: SekData, attachmentInfo: Attachm
   results.push(...checkBatteryType(btyType, summaryData.classification))
   results.push(...checkModel(btyKind, summaryData.type))
   results.push(...checkTradeMark(btyBrand, summaryData.trademark))
-  results.push(...checkVoltage(voltage, summaryData.voltage))
-  results.push(...checkCapacity(capacity, summaryData.capacity))
+  if (voltage) {
+    results.push(...checkVoltage(voltage, summaryData.voltage))
+  }
+  if (capacity) {
+    results.push(...checkCapacity(capacity, summaryData.capacity))
+  }
   results.push(...checkWattHour(wattHour, summaryData.watt))
   results.push(...checkShape(btyShape, summaryData.shape))
   results.push(...checkMass(batteryWeight, summaryData.mass))
