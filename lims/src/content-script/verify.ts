@@ -404,11 +404,12 @@ async function lims_verify_inspect() {
     if (verifyButton) verifyButton.setAttribute('fill', '#54a124')
     if (verifyButton2) verifyButton2.setAttribute('fill', '#54a124')
     // @ts-expect-error: use Qmsg from assets
-    Qmsg['success']('初步验证通过')
+    Qmsg['success']('初步验证通过', {timeout: 500})
     return
   }
   // @ts-expect-error: use Qmsg from assets
   Qmsg['warning']('初步验证未通过' + JSON.stringify(result, null, 2), {
+    showClose: true,
     timeout: 4000
   })
 }

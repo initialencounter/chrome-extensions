@@ -1,6 +1,6 @@
 .qmsg.qmsg-wrapper {
     position: fixed;
-    top: 20px;
+    top: 0px;
     left: 0;
     z-index: 1010;
     width: 100%;
@@ -182,4 +182,8 @@
         transform: translateX(4px);
         opacity: .25
     }
+}
+
+.qmsg {
+    pointer-events: none; /* 使消息气泡不影响其他元素的点击 */
 }
