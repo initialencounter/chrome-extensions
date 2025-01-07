@@ -32,6 +32,17 @@ jobs:
           npm install -g web-ext
       - name: Build
         run: npm run build
+      
+      - name: Build docs
+        run: |
+          npm run docs:build
+
+      - name: Deploy Docs 🚀
+        uses: JamesIves/github-pages-deploy-action@4.1.4
+        with:
+          branch: gh-pages # The branch the action should deploy to.
+          folder: lims/docs/.vitepress/dist
+
       - name: Query version number
         id: get_version
         shell: bash
