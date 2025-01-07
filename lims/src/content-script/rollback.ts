@@ -13,7 +13,7 @@ let hiddenTimeInspectList: number | null = null;
       console.log('未启用一键退回，退出脚本')
       return
     }
-    getTbodyChild()
+    observeInspectList()
   })
 })()
 async function rollback(taskId: string): Promise<boolean> {
@@ -119,10 +119,7 @@ async function getTaskIdByProjectId(projectId: string) {
   return taskIds[0]
 }
 
-function getTbodyChild() {
-  console.log('一键退回脚本运行中...')
-  // 删除无用表头
-  // document.querySelectorAll('tr[class="datagrid-header-row"]')[1].children[1].remove()
+function insertRollbackButton() {
   const targets = document.getElementById('datagrid-row-r1-2-0')?.parentElement
     ?.children
   if (!targets) return false
@@ -136,6 +133,9 @@ function getTbodyChild() {
     if (!matches) continue
     if (matches.length < 2) continue
     const taskId = matches[1]
+    if (target.innerHTML.includes('退退退')) {
+      continue
+    }
     target.innerHTML = tmpInnerHTML
       .replace('rollback', 'void')
       .replace('>回退', '>退退退')
@@ -197,4 +197,36 @@ function listenVisibilityChangeInspectList(autoRefreshDuration: number) {
       hiddenTimeInspectList = null;
     }
   });
+}
+
+interface Task {
+  assignee: string
+  attchmentFiles: string[]
+  backId: null
+  category: string
+  comment: null
+  companyName: string
+  completeTime: null
+  completeUser: null
+  createTime: number
+  entrustId: string
+  freezed: boolean
+  id: string
+  itemCName: string
+  itemSendSample: number
+  nextYear: boolean
+  parallel: boolean
+  projectDate: number
+  projectId: string
+  projectNo: string
+  serviceType: number
+  submitDate: string
+  submitUser: string
+  submitUserName: string
+  systemId: string
+  taskName: string
+}
+
+function observeInspectList() {
+  setInterval(insertRollbackButton, 100)
 }
