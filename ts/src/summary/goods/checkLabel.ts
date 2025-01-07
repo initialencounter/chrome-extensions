@@ -52,6 +52,9 @@ function sortLabel(arr: string[]): string[] {
 }
 
 function checkLabel(expectedLabel: string[], goodsLabels: string[]): CheckResult[] {
+  if (goodsLabels[0] === 'pass') {
+    return []
+  }
   expectedLabel = sortLabel(expectedLabel)
   goodsLabels = sortLabel(goodsLabels)
   if (expectedLabel.length !== goodsLabels.length) {
