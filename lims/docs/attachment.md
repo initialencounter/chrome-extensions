@@ -64,30 +64,9 @@ PORT=25455
 DEBUG=false
 LOG_ENABLED=true
 DOC_ENABLE=false
-DOC_KEY=ctrl+shift+d
-UPLOAD_ENABLE=true
-UPLOAD_KEY=ctrl+shift+u
-COPY_ENABLE=false
-COPY_KEY=ctrl+shift+z
-DOCX_ENABLE=false
-DOCX_KEY=ctrl+shift+x
-INSPECTOR=空
-SIGNATURE_WIDTH=5.58
-SIGNATURE_HEIGHT=1.73
 ```
 
 ### 操作
-
-#### 使用快捷键上传
-
-1. 选中要上传的资料。
-2. 按快捷键 `Ctrl + Shift + U` ，进行上传。
-
-:::warning
-
-- 上传前，相应的检验单必须保存，否则无法上传成功。
-
-:::
 
 ### 使用 `client.exe` 上传
 
