@@ -23,7 +23,7 @@ hero:
       text: 验证规则
       link: /rule
     - theme: alt
-      text: 验证概要 & 一键上传
+      text: 验证概要
       link: /attachment
 features:
   - title: 一键分配、退回
