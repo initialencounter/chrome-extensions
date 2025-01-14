@@ -1,4 +1,4 @@
-# 验证概要 & 一键上传
+# 验证图片和概要
 
 ## 功能介绍
 
@@ -39,45 +39,4 @@
 
 ### 更新 lims 插件
 
-点击验证按钮，会验证图片概要。
-
-# 一键上传
-
-## 配置
-
-### 如果使用的是 `aircraft`：
-
-1. 直接输入账号密码。
-2. 关闭调试模式
-3. 重置配置
-
-### 如果使用的是 `headless.exe`：
-
-1. 在 `headless.exe` 相同文件夹下创建 `local.env` 文本文件，
-2. `local.env` 内容如下，根据实际情况修改：
-
-```ini
-BASE_URL=系统的域名
-USER_NAME=主检员的账号
-PASSWORD=主检员的密码
-PORT=25455
-DEBUG=false
-LOG_ENABLED=true
-DOC_ENABLE=false
-```
-
-### 操作
-
-### 使用 `client.exe` 上传
-
-1. 下载 `client.exe` 。
-2. 双击 `client.exe` ，运行程序。
-3. 在需要上传的资料的文件夹空白处右键，点击菜单栏 `Upload file here`。
-
-:::warning
-
-- 上传前，相应的检验单必须保存，否则无法上传成功。
-- 此方法需要将 word 源文件和 pdf 文件放同个文件夹。
-- client.exe 文件位置移到后，需要重新运行，否则无法上传。
-
-:::
+点击验证按钮，验证图片概要。
