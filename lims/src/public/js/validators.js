@@ -27,7 +27,7 @@
   function matchWattHour(projectName) {
     const matches = [...projectName.matchAll(/\s(\d+\.?\d+)[Kk]?[Ww][Hh]/g)];
     const results = matches.map((match) => match[1]);
-    const rowText = matches.map((match) => match[0])[0];
+    const rowText = matches.map((match) => match[0])[results.length - 1];
     let wattHour = Number(results[results.length - 1]);
     if (!results.length) return 0;
     if (isNaN(wattHour)) return 0;
@@ -45,7 +45,7 @@
   function matchCapacity(projectName) {
     let matches = [...projectName.matchAll(/(\d+\.?\d*)[Mm]?[Aa][Hh]/g)];
     let results = matches.map((match) => match[1]);
-    const rowText = matches.map((match) => match[0])[0];
+    const rowText = matches.map((match) => match[0])[results.length - 1];
     let result = Number(results[results.length - 1]);
     if (!results.length) return 0;
     if (isNaN(result)) return 0;
@@ -55,7 +55,7 @@
   function matchBatteryWeight(describe) {
     const matches = [...describe.matchAll(/为(\d+\.?\d*)[Kk]?[g]?/g)];
     const results = matches.map((match) => match[1]);
-    const rowText = matches.map((match) => match[0])[0];
+    const rowText = matches.map((match) => match[0])[results.length - 1];
     let weight = Number(results[0]);
     if (!results.length) return 0;
     if (isNaN(weight)) return 0;
