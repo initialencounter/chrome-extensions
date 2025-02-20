@@ -827,27 +827,30 @@ function parseEntrust(entrustData: string | null): EntrustModelDocx {
 }
 
 async function getProjectAttachmentInfo(projectNo: string) {
-  const response = await fetch(
-    `${localConfig.aircraftServer}/get-attachment-info/${projectNo}?label=${localConfig.enableLabelCheck ? '1' : '0'}`,
-    {
-      method: 'GET',
-      mode: 'cors',
-    }
-  )
-  if (!response.ok) {
-    return null
-  }
-  return await response.json()
-  // try {
-  //   const response = await chrome.runtime.sendMessage({
-  //     action: 'getSummaryInfo',
-  //     projectNo: projectNo
-  //   });
-  //   return response;
-  // } catch (error) {
-  //   console.error('获取项目信息失败:', error);
-  //   return null;
+  // const response = await fetch(
+  //   `${localConfig.aircraftServer}/get-attachment-info/${projectNo}?label=${localConfig.enableLabelCheck ? '1' : '0'}`,
+  //   {
+  //     method: 'GET',
+  //     mode: 'cors',
+  //   }
+  // )
+  // if (!response.ok) {
+  //   console.error('获取项目信息失败:', response)
+  //   return null
   // }
+  // return await response.json()
+  try {
+    const response = await chrome.runtime.sendMessage({
+      action: 'getAttachmentInfo',
+      aircraftServer: localConfig.aircraftServer,
+      projectNo: projectNo,
+      label: localConfig.enableLabelCheck ? '1' : '0'
+    });
+    return response;
+  } catch (error) {
+    console.error('获取项目信息失败:', error);
+    return null;
+  }
 }
 
 
