@@ -1,8 +1,15 @@
 import { shapeMap } from "../shared/appearence/index"
 import { CheckResult } from "../shared/types/index"
 
+function removeNonChineseCharacters(str: string): string {
+  // 使用正则表达式匹配所有非中文字符并替换为空字符串
+  return str.replace(/[^\u4e00-\u9fa5]/g, '');
+}
+
 export function checkShape(formShape: string, summaryShape: string): CheckResult[] {
-  const shapeText = summaryShape.trim().split('色')[1]
+  summaryShape = removeNonChineseCharacters(summaryShape.trim())
+  const splitTexts = summaryShape.split('色')
+  const shapeText = splitTexts[splitTexts.length - 1]
   let formShapeChineseName = ''
   let summaryShapeId = ''
   shapeMap.forEach(item => {
