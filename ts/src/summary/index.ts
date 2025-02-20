@@ -36,6 +36,7 @@ import { checkUN38fg } from "./checkUN38fg";
 import { checkPekGoods, checkSekGoods } from "./goods/index";
 import { AttachmentInfo } from "../shared/types/attachment";
 import { checkTitle } from "./checkTitle";
+import { checkColor } from "./checkColor";
 
 export function checkSekAttachment(currentData: SekData, attachmentInfo: AttachmentInfo, entrustData: EntrustData) {
   const summaryData = attachmentInfo.summary
@@ -56,6 +57,7 @@ export function checkSekAttachment(currentData: SekData, attachmentInfo: Attachm
     itemEName,
     // 电池尺寸
     btySize,
+    btyColor,
     // 电池形状
     // 锂离子电池 锂离子电芯 锂金属电池 锂金属电芯 单芯锂离子电池 单芯锂金属电池
     // '500'    | '501'    | '504'  |  '502'   | '503'       | '505'
@@ -135,6 +137,7 @@ export function checkSekAttachment(currentData: SekData, attachmentInfo: Attachm
   }
   results.push(...checkWattHour(wattHour, summaryData.watt))
   results.push(...checkShape(btyShape, summaryData.shape))
+  results.push(...checkColor(btyColor, summaryData.shape))
   results.push(...checkMass(batteryWeight, summaryData.mass))
   results.push(...checkLiContent(liContent, summaryData.licontent))
   results.push(...checkT7(btyType, summaryData.test7, summaryData.note))
@@ -191,6 +194,8 @@ export function checkPekAttachment(currentData: PekData, attachmentInfo: Attachm
   const batteryWeight = matchBatteryWeight(otherDescribeCAddition)
   // 单芯电池或电芯
   const isSingleCell = getIsSingleCell(btyType)
+  // 电池颜色
+  const btyColor = currentData['color']
   // 电池形状
   const btyShape = currentData['shape']
   // 电池尺寸
@@ -250,6 +255,7 @@ export function checkPekAttachment(currentData: PekData, attachmentInfo: Attachm
   results.push(...checkCapacity(capacity, summaryData.capacity))
   results.push(...checkWattHour(wattHour, summaryData.watt))
   results.push(...checkShape(btyShape, summaryData.shape))
+  results.push(...checkColor(btyColor, summaryData.shape))
   results.push(...checkMass(batteryWeight, summaryData.mass))
   results.push(...checkLiContent(liContent, summaryData.licontent))
   results.push(...checkT7(btyType, summaryData.test7, summaryData.note))

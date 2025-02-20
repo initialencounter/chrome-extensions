@@ -23,7 +23,7 @@ export function checkShape(formShape: string, summaryShape: string): CheckResult
   if (formShape !== summaryShapeId && summaryShapeId) {
     return [{
       ok: false,
-      result: `形状不一致, 系统上为${formShapeChineseName}, 概要上为${shapeText}`
+      result: `形状不一致, 系统上为${formShapeChineseName ?? '空'}, 概要上为${shapeText}`
     }]
   }
   return []
