@@ -19,8 +19,6 @@ export function checkName(packageType: '0' | '1' | '2', formEName: string, formC
       let indexKeyEWord = formEName.indexOf("Containing")
       let indexModel = formCName.indexOf(model)
       let indexEModel = formEName.indexOf(model)
-      console.log('indexKeyWord', indexKeyWord)
-      console.log('indexModel', indexModel)
       if (indexKeyWord < indexModel) {
         formCNameText = formCName.substring(indexKeyWord + 2, indexModel)
         formENameText = formEName.substring(indexKeyEWord + 10, indexEModel)
