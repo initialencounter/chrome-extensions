@@ -1,10 +1,16 @@
 import { CheckResult } from "../shared/types/index";
 
+function replaceSpace(str: string) {
+  return str.replace(/\s+/g, '')
+}
+
 export function checkMarket(market: string, summaryReportNo: string): CheckResult[] {
-  if (market.trim() !== summaryReportNo.trim()) {
+  market = replaceSpace(market)
+  summaryReportNo = replaceSpace(summaryReportNo)
+  if (market !== summaryReportNo) {
     return [{
       ok: false,
-      result: '技术备注与测试报告编号不一致'
+      result: `技术备注: ${market} 与测试报告编号: ${summaryReportNo} 不一致`
     }]
   }
   return []
