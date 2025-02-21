@@ -39,7 +39,7 @@ function matchCapacity(projectName: string) {
 function matchBatteryWeight(describe: string) {
   const matches = [...describe.matchAll(/为(\d+\.?\d*)[Kk]?[g]?/g)]
   const results = matches.map((match) => match[1])
-  const rowText = matches.map((match) => match[0])[results.length - 1]
+  const rowText = matches.map((match) => match[0])[0]
   let weight = Number(results[0])
   if (!results.length) return 0
   if (isNaN(weight)) return 0
