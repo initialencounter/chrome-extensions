@@ -17,7 +17,6 @@ import { wattHourScope } from "./wattHourScope"
 import { packetOrContain } from "./packetOrContain"
 import { checkReMark } from "./checkReMark"
 import { checkComment } from "./checkComment"
-import { checkDevice } from "../shared/checkDevice"
 
 function checkSekBtyType(currentData: SekData): CheckResult[] {
   const result = []
@@ -135,8 +134,6 @@ function checkSekBtyType(currentData: SekData): CheckResult[] {
   ))
   // 包装与其他描述验证
   result.push(...packetOrContain(otherDescribe, otherDescribeCAddition, isChargeBoxOrRelated))
-  // 设备名称、型号、商标验证
-  result.push(...checkDevice(itemCName, otherDescribeCAddition))
   // 检验结果3
   const inspectionResult3 = currentData['inspectionResult3']
   if (inspectionResult3 !== '0')

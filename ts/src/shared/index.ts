@@ -7,6 +7,7 @@ import { itemCNameBtyType } from './itemCNameBtyType'
 import { itemNameModel } from './itemNameModel'
 import { voltageBtyType } from './voltageBtyType'
 import { wattHourCalculate } from './wattHourCalculate'
+import { checkDevice } from './checkDevice'
 
 /**
  * 基础检测
@@ -61,5 +62,7 @@ export function baseCheck(btySize: string,
   result.push(...voltageBtyType(voltage, btyType))
   // 容量*电压 与 瓦时数 误差大于5%
   result.push(...wattHourCalculate(capacity, voltage, wattHour, wattHourFromName))
+  // 设备名称、型号、商标验证
+  result.push(...checkDevice(itemCName, itemEName, otherDescribeCAddition))
   return result
 }

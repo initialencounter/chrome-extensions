@@ -1,7 +1,7 @@
 import { CheckResult } from "./types/index"
 import { matchDeviceName, matchDeviceModel, matchDeviceTrademark } from "./utils/index"
 
-export function checkDevice(cName: string, otherDescribeCAddition: string): CheckResult[] {
+export function checkDevice(cName: string, eName: string, otherDescribeCAddition: string): CheckResult[] {
   let results: CheckResult[] = []
   const name = matchDeviceName(otherDescribeCAddition).trim()
   const model = matchDeviceModel(otherDescribeCAddition).trim()
@@ -10,15 +10,23 @@ export function checkDevice(cName: string, otherDescribeCAddition: string): Chec
   if (name.length && !cName.includes(name)) {
     results.push({
       ok: false,
-      result: `设备名称不匹配: ${cName} 和 ${name}`
+      result: `中文品名中不存在设备名称: ${name}`
     })
   }
 
-  if (model.length && !cName.includes(model)) {
-    results.push({
-      ok: false,
-      result: `设备型号不匹配: ${cName} 和 ${model}`
-    })
+  if (model.length) {
+    if (!cName.includes(model)) {
+      results.push({
+        ok: false,
+        result: `中文品名中不存在设备型号：${model}`
+      })
+    }
+    if (!eName.includes(model)) {
+      results.push({
+        ok: false,
+        result: `英文品名中不存在设备型号: ${model}`
+      })
+    }
   }
 
   // if (trademark.length && !cName.includes(trademark)) {
