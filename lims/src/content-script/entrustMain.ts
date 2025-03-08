@@ -160,7 +160,7 @@ async function setAmount(moneyDefault: string = '') {
   }
   await sleep(200)
   const target = document.querySelectorAll(
-    'input[type="hidden"][class="textbox-value"][value="480.00"][name="amount"]'
+    'input[type="hidden"][class="textbox-value"][name="amount"]'
   )[0] as HTMLInputElement
   if (target) {
     target.value = money
