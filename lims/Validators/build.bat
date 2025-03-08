@@ -1,7 +1,7 @@
 @echo off
 
 :: 设置输出路径变量
-set WASM_OUT_DIR=C:\Users\29115\dev\chrome\chrome-extensions\lims\src\public\js\wasm
+set WASM_OUT_DIR=..\src\public\js\wasm
 
 echo Building wasm module...
 wasm-pack build --release --no-typescript --out-dir "%WASM_OUT_DIR%" --out-name "validators" --target web

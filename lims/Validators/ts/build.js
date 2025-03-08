@@ -1,8 +1,9 @@
 // build.js
+const path = require('path')
 require('esbuild').build({
-    entryPoints: ['src/index.ts'],
+    entryPoints: [path.resolve(__dirname, 'src/index.ts')], // 入口文件
     bundle: true,
-    outfile: 'C:\\Users\\29115\\dev\\chrome\\chrome-extensions\\lims\\src\\public\\js\\validators.js',
+    outfile: path.resolve(__dirname, '../../src/public/js/validators.js'),
     // outfile: 'lib/index.js',
     platform: 'browser', // 设置为浏览器平台
     target: 'esnext', // 根据需要选择目标

@@ -4,6 +4,7 @@
   "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
   "private": true,
   "workspaces": [
+    "Validators/ts",
     "src/popup",
     "src/options"
   ],
@@ -13,6 +14,7 @@
     "build": "vite build --emptyOutDir",
     "build:op": "vite build -c vite.options.config.ts",
     "build:cs": "vite build -c vite.content-script.config.ts",
+    "build:v": "node Validators/ts/build.js",
     "zip": "7z a -tzip lims-v$npm_package_version.zip -r dist/*",
     "lint": "eslint src/*/*.ts",
     "format": "prettier --write src/*/*.ts",
