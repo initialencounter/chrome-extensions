@@ -54,8 +54,6 @@ jobs:
       - name: zip chrome extension
         if: startsWith(github.ref, 'refs/tags/')
         run: |
-          mv dist/js/wasm docs/wasm
-          mv dist/manifest.wasm.json docs/manifest.wasm.json
           mv dist/manifest.firefox.json docs/manifest.firefox.json
           zip -q -r lims-${{ steps.get_version.outputs.VERSION }}.chrome.zip dist
       - name: zip firefox extension
@@ -65,13 +63,6 @@ jobs:
           mv docs/manifest.firefox.json dist/manifest.json
           web-ext sign --api-key ${{ secrets.FIREFOX_JWT_ISSUER }} --api-secret ${{ secrets.FIREFOX_JWT_SECRET }} --channel unlisted -s dist
           mv web-ext-artifacts/*.xpi lims-${{ steps.get_version.outputs.VERSION }}.firefox.xpi
-      - name: zip wasm extension
-        if: startsWith(github.ref, 'refs/tags/')
-        run: |
-          mv docs/manifest.wasm.json dist/manifest.json
-          mv docs/wasm dist/js/wasm
-          zip -q -r lims-${{ steps.get_version.outputs.VERSION }}.wasm.zip dist
-          ls -lh
       - name: Release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
@@ -79,5 +70,4 @@ jobs:
           files: |
             lims/lims-${{ steps.get_version.outputs.VERSION }}.chrome.zip
             lims/lims-${{ steps.get_version.outputs.VERSION }}.firefox.xpi
-            lims/lims-${{ steps.get_version.outputs.VERSION }}.wasm.zip
           name: 'Lims ${{ steps.get_version.outputs.VERSION }}'
