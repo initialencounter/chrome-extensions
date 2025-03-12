@@ -132,12 +132,12 @@ function setAmountListener() {
   const aekSystemButton = document.getElementById('_easyui_combobox_i1_2')
   if (aekSystemButton)
     aekSystemButton.addEventListener('click', () => {
-      setAmount('800.00')
+      setAmount()
     })
   const rekSystemButton = document.getElementById('_easyui_combobox_i1_3')
   if (rekSystemButton)
     rekSystemButton.addEventListener('click', () => {
-      setAmount('800.00')
+      setAmount()
     })
 }
 
@@ -152,12 +152,6 @@ function setCategory() {
 
 async function setAmount(moneyDefault: string = '') {
   let money = (moneyDefault !== '' ? moneyDefault : localConfig.amount).slice()
-  let systemIdInput = document.querySelector("#entrustEditForm > table > tbody > tr:nth-child(1) > td:nth-child(2) > span > input.textbox-text.validatebox-text") as HTMLInputElement
-  if (systemIdInput) {
-    if (systemIdInput.value === '道路' || systemIdInput.value === '铁路') {
-      money = '800.00'
-    }
-  }
   await sleep(200)
   const target = document.querySelectorAll(
     'input[type="hidden"][class="textbox-value"][name="amount"]'
@@ -271,9 +265,6 @@ function getEntrustFormData(): EntrustFormData | undefined {
       if (!confirm("报告确定是" + data.reportCopy + "份吗？")) return
     }
   }
-  if ((data.systemId === 'aek' || data.systemId === 'rek') && data.amount !== '800.00') {
-    if (!confirm(`陆运金额${data.amount}是正确的吗？`)) return
-  }
   return data as EntrustFormData
 }
 
@@ -318,9 +309,6 @@ async function saveAndAssign() {
       assignRunning = false
       hideMask()
       return
-    }
-    if (data.systemId === '道路' || data.systemId === '铁路') {
-      data.amount = '800.00'
     }
     const id = await saveFormData(data)
     if (!id) {
