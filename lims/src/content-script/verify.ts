@@ -397,14 +397,14 @@ async function lims_verify_inspect() {
   )
 
   result.push(...(await checkAttachment()))
-  
+
   if (!result.length) {
     const verifyButton = document.getElementById('lims-verifyButton')?.children[0]?.children[1] as SVGAElement
     const verifyButton2 = document.getElementById('lims-verifyButton2')?.children[0]?.children[1] as SVGAElement
     if (verifyButton) verifyButton.setAttribute('fill', '#54a124')
     if (verifyButton2) verifyButton2.setAttribute('fill', '#54a124')
     // @ts-expect-error: use Qmsg from assets
-    Qmsg['success']('初步验证通过', {timeout: 500})
+    Qmsg['success']('初步验证通过', { timeout: 500 })
     return
   }
   // @ts-expect-error: use Qmsg from assets
@@ -866,3 +866,67 @@ function checkSummary(attachmentInfo: AttachmentInfo, entrustData: EntrustModelD
   }
   return result
 }
+
+function preventDefault(event: DragEvent) {
+  event.stopPropagation();
+  event.preventDefault();
+}
+
+interface FileData {
+  name: string,
+  type: string,
+  data: number[],
+}
+
+async function dropEvent(event: DragEvent) {
+  event.stopPropagation();
+  event.preventDefault();
+  const fileList = event.dataTransfer!.files;
+  // let formData = new FormData();
+  // for (let i = 0; i < fileList.length; i++) {
+  //   formData.append('file', fileList[i]);
+  // }
+  // let res = await fetch(`${localConfig.aircraftServer}/upload-llm-files`, {
+  //   method: "POST",
+  //   body: formData,
+  // });
+  // if (res.ok) {
+  //   console.log("上传文件成功")
+  // }
+
+  const filesData: FileData[] = [];
+
+  // 遍历 FileList 并将每个文件转换为 ArrayBuffer
+  for (let i = 0; i < fileList.length; i++) {
+    const file = fileList[i];
+    const reader = new FileReader();
+    await new Promise<void>((resolve) => {
+      reader.onload = () => {
+        const arrayBuffer = reader.result;
+        const uint8Array = new Uint8Array(arrayBuffer as ArrayBuffer);
+        filesData.push({
+          name: file.name,
+          type: file.type,
+          data: Array.from(uint8Array)
+        });
+        resolve();
+      };
+      reader.readAsArrayBuffer(file);
+    });
+  }
+  try {
+    const response = await chrome.runtime.sendMessage({
+      action: 'uploadLLMFiles',
+      aircraftServer: localConfig.aircraftServer,
+      files: filesData,
+    });
+    console.log("上传文件成功", response)
+  } catch (error) {
+    console.error('上传文件失败:', error);
+  }
+}
+
+document.ondragover = preventDefault
+document.ondragenter = preventDefault
+document.ondragleave = preventDefault
+document.ondrop = dropEvent

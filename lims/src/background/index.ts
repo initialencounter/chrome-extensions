@@ -101,11 +101,43 @@ async function getAttachmentInfo(aircraftServer: string, projectNo: string, labe
   return await response.json()
 }
 
+interface FileData {
+  name: string,
+  type: string,
+  data: number[],
+}
+
+async function uploadLLMFiles(aircraftServer: string, files: FileData[]) {
+  const formData = new FormData();
+  for (let file of files) {
+    let uint8Array = new Uint8Array(file.data)
+    formData.append("file", new Blob([uint8Array], { type: file.type }), file.name);
+  }
+  const response = await fetch(`${aircraftServer}/upload-llm-files`, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error(`上传失败！${await response.text()}`);
+  }
+  const result = await response.text();
+  return result
+}
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'getAttachmentInfo') {
     getAttachmentInfo(request.aircraftServer, request.projectNo, request.label)
       .then(result => sendResponse(result))
       .catch(error => sendResponse(null));
+    return true; // 保持消息通道开放，等待异步响应
+  }
+
+  if (request.action === 'uploadLLMFiles') {
+    console.log("uploadLLMFiles background")
+    uploadLLMFiles(request.aircraftServer, request.files)
+      .then(result => sendResponse(result))
+      .catch(error => sendResponse(error));
     return true; // 保持消息通道开放，等待异步响应
   }
 });
