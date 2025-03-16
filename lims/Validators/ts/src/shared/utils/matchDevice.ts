@@ -21,3 +21,11 @@ export function matchDeviceTrademark(projectName: string) {
   if (!results.length) return ''
   return result
 }
+
+export function matchTestManual(testManual: string) {
+  let matches = [...testManual.matchAll(/[\(（]?(第.*?)[\)）]?\s?[第]?38.3节/g)]
+  let results = matches.map((match) => match[1])
+  let result = results[results.length - 1]
+  if (!results.length) return ''
+  return result
+}

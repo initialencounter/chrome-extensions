@@ -1,8 +1,13 @@
+import type { PekData, SekData } from '../../Validators/ts/src/shared/types/index'
+import type { AttachmentInfo, SummaryFromLLM, SummaryInfo } from '../../Validators/ts/src/shared/types/attachment'
+import type { EntrustModelDocx } from '../../Validators/ts/src/shared/types/entrust'
+
 declare global {
   function checkPekBtyType(data: PekData): Array<{ ok: boolean; result: string }>
   function checkSekBtyType(data: SekData): Array<{ ok: boolean; result: string }>
   function checkPekAttachment(data: PekData, attachmentInfo: AttachmentInfo, entrustData: EntrustModelDocx): Array<{ ok: boolean; result: string }>
   function checkSekAttachment(data: SekData, attachmentInfo: AttachmentInfo, entrustData: EntrustModelDocx): Array<{ ok: boolean; result: string }>
+  function checkSummaryFromLLM(summaryFromLLM: SummaryFromLLM, summaryInfo: SummaryInfo): Array<{ ok: boolean; result: string }>
 }
 
 const isInspect = new URLSearchParams(window.location.search).get('from') === null;
@@ -94,223 +99,9 @@ const host = window.location.host
       targetParent.appendChild(verifyButton)
       targetParent2.appendChild(verifyButton2)
     }
+    createMask()
     console.log('验证按钮插入成功')
   })()
-
-export type PekUNNO = '' | 'UN3480' | 'UN3481' | 'UN3090' | 'UN3091' | 'UN3171' | 'UN3556' | 'UN3557' | 'UN3558'
-export type PekPkgInfo = '' | '965' | '966' | '967' | '968' | '969' | '970' | '952'
-export type PkgInfoSubType = '' | '968, IB' | '966, II' | '967, II' | '969, II' | '970, II' | '965, IB' | '965, IA' | '966, I' | '967, I' | '968, IA' | '969, I' | '970, I' | '952'
-/**
- * PekData
- */
-export interface PekData {
-  according: string
-  appraiseDate: string
-  appraiser: string
-  appraiserName: string
-  checkDate: number | null
-  checked: boolean
-  checker: string | null
-  checkerName: string | null
-  checkLocation: string
-  checkLocationName: string
-  classOrDiv: string
-  conclusions: number
-  createdBy: string
-  createdDate: string
-  editStatus: number
-  grossWeight: string
-  id: string
-  inspectionItem1: number
-  inspectionItem1Text1: string
-  inspectionItem1Text2: string
-  inspectionItem1Text3: string
-  inspectionItem1Text4: string
-  inspectionItem2: number
-  inspectionItem3: number
-  inspectionItem4: number
-  inspectionItem4Text1: string
-  inspectionItem5: number
-  inspectionItem5Text1: '' | '965' | '966' | '967' | '968' | '969' | '970'
-  inspectionItem6: number
-  itemCName: string
-  itemEName: string
-  modifiedBy: string
-  modifiedDate: string
-  otherDescribe: string
-  otherDescribeChecked: string
-  otherDescribeEAddition: string
-  packCargo: string
-  packPassengerCargo: string
-  packSpecial: string
-  packSubDanger: string
-  pg: string
-  principalName: null | string
-  projectId: string
-  projectNo: string
-  psn: string
-  remarks: string
-  result1: string
-  type1: number
-  type2: number
-  unno: string
-  /**
-   * 颜色
-   */
-  color: string
-  /**
-   * 形状
-   */
-  shape: string
-  /**
-   * 尺寸
-   */
-  size: string
-  /**
-   * 型号
-   */
-  model: string
-  /**
-   * 商标
-   */
-  brands: string
-  /**
-   * 电池数量
-   */
-  btyCount: string
-  /**
-   * 电池净重
-   */
-  netWeight: string
-  /**
-   * 操作信息
-   */
-  otherDescribeCAddition: string
-  /**
-   * 电压
-   */
-  inspectionItem2Text1: string
-  /**
-   * 容量
-   */
-  inspectionItem2Text2: string
-  /**
-   * 瓦时
-   */
-  inspectionItem3Text1: string
-  /**
-   * 技术备注
-   */
-  market: string
-}
-
-/**
- * SekData
- */
-export interface SekData {
-  according: string
-  appraiseDate: string
-  appraiser: string
-  appraiserName: string
-  btyCountChecked: string
-  btyGrossWeightChecked: string
-  btyNetWeightChecked: string
-  btyType: string
-  checkDate: null
-  checked: boolean
-  checker: null
-  checkerName: null
-  checkLocation: string
-  checkLocationName: string
-  classOrDiv: string
-  comment: string
-  commentExtra: null
-  conclusions: number
-  createdBy: string
-  createdDate: string
-  editStatus: number
-  id: string
-  inspectionItem1: string
-  inspectionItem1Text2: string
-  inspectionItem2: string
-  inspectionItem3: string
-  inspectionItem4: string
-  inspectionItem5: string
-  inspectionItem6: string
-  inspectionItem7: string
-  inspectionItem8Cn: string
-  inspectionItem8En: string
-  inspectionItem9Cn: string
-  inspectionItem9En: string
-  inspectionResult1: string
-  inspectionResult2: string
-  inspectionResult3: string
-  inspectionResult4: string
-  inspectionResult5: string
-  inspectionResult6: string
-  inspectionResult7: string
-  inspectionResult8: string
-  inspectionResult9: string
-  itemCName: string
-  itemEName: string
-  modifiedBy: string
-  modifiedDate: string
-  otherDescribe: string
-  otherDescribeChecked: string
-  otherDescribeEAddition: string
-  pg: string
-  principalName: string | null
-  projectId: string
-  projectNo: string
-  psn: string
-  remarks: string
-  unno: string
-  /**
-   * 颜色
-   */
-  btyColor: string
-  /**
-   * 形状
-   */
-  btyShape: string
-  /**
-   * 尺寸
-   */
-  btySize: string
-  /**
-   * 型号
-   */
-  btyKind: string
-  /**
-   * 商标
-   */
-  btyBrand: string
-  /**
-   * 电池数量
-   */
-  btyCount: string
-  /**
-   * 电池净重
-   */
-  btyNetWeight: string
-  /**
-   * 毛重
-   */
-  btyGrossWeight: string
-  /**
-   * 操作信息
-   */
-  otherDescribeCAddition: string
-  /**
-   * 瓦时
-   */
-  inspectionItem1Text1: string
-  /**
-   * 技术备注
-   */
-  market: string
-}
-
 
 async function getData(projectId: string): Promise<SekData | PekData | null> {
   const response = await fetch(
@@ -729,66 +520,6 @@ function getFormData<T>(systemId: 'pek' | 'sek'): T {
   return data as T;
 }
 
-export interface SummaryInfo {
-  // 标题
-  title: string,
-  // 项目编号
-  projectNo: string,
-  // 签发日期
-  issueDate: string,
-  capacity: string;
-  classification: string;
-  cnName: string;
-  color: string;
-  consignor: string;
-  consignorInfo: string;
-  enName: string;
-  id: string;
-  licontent: string;
-  manufacturer: string;
-  manufacturerInfo: string;
-  mass: string;
-  note: string;
-  projectId: string;
-  shape: string;
-  test1: string;
-  test2: string;
-  test3: string;
-  test4: string;
-  test5: string;
-  test6: string;
-  test7: string;
-  test8: string;
-  testDate: string;
-  testlab: string;
-  testlabInfo: string;
-  testManual: string;
-  testReportNo: string;
-  trademark: string;
-  type: string;
-  un38f: string;
-  un38g: string;
-  voltage: string;
-  watt: string;
-}
-
-export interface GoodsInfo {
-  projectNo: string;
-  name: string;
-  labels: string[];
-}
-
-export interface AttachmentInfo {
-  summary: SummaryInfo;
-  goods: GoodsInfo;
-}
-/**
- * EntrustModelDocx
- */
-export interface EntrustModelDocx {
-  consignor: string;
-  manufacturer: string;
-}
 
 async function getEntrustData() {
   const entrustId = new URLSearchParams(window.location.search).get('entrustId')
@@ -867,6 +598,35 @@ function checkSummary(attachmentInfo: AttachmentInfo, entrustData: EntrustModelD
   return result
 }
 
+function createMask() {
+  const mask = document.createElement('div');
+  mask.id = 'upload-mask';
+  mask.style.position = 'fixed';
+  mask.style.top = '0';
+  mask.style.left = '0';
+  mask.style.width = '100%';
+  mask.style.height = '100%';
+  mask.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+  mask.style.zIndex = '9999';
+  mask.style.display = 'none';
+  document.body.appendChild(mask);
+}
+
+function showMask() {
+  const mask = document.getElementById('upload-mask');
+  if (mask) {
+    mask.style.display = 'block';
+  }
+}
+
+function hideMask() {
+  const mask = document.getElementById('upload-mask');
+  if (mask) {
+    mask.style.display = 'none';
+  }
+}
+
+
 function preventDefault(event: DragEvent) {
   event.stopPropagation();
   event.preventDefault();
@@ -881,18 +641,8 @@ interface FileData {
 async function dropEvent(event: DragEvent) {
   event.stopPropagation();
   event.preventDefault();
+  showMask();
   const fileList = event.dataTransfer!.files;
-  // let formData = new FormData();
-  // for (let i = 0; i < fileList.length; i++) {
-  //   formData.append('file', fileList[i]);
-  // }
-  // let res = await fetch(`${localConfig.aircraftServer}/upload-llm-files`, {
-  //   method: "POST",
-  //   body: formData,
-  // });
-  // if (res.ok) {
-  //   console.log("上传文件成功")
-  // }
 
   const filesData: FileData[] = [];
 
@@ -920,10 +670,35 @@ async function dropEvent(event: DragEvent) {
       aircraftServer: localConfig.aircraftServer,
       files: filesData,
     });
-    console.log("上传文件成功", response)
+    let summaryFromLLM = JSON.parse(JSON.parse(response));
+    console.log('summaryFromLLM', summaryFromLLM)
+    await llmChecker(summaryFromLLM);
   } catch (error) {
-    console.error('上传文件失败:', error);
+    // @ts-expect-error: use Qmsg from assets
+    Qmsg['warning']('LLM验证未通过' + JSON.stringify(error, null, 2), {
+      showClose: true,
+      timeout: 4000
+    });
   }
+  hideMask();
+}
+
+async function llmChecker(summaryFromLLM: SummaryFromLLM) {
+  const projectNo = getCurrentProjectNo()
+  if (!projectNo) return []
+  const attachmentInfo: AttachmentInfo = await getProjectAttachmentInfo(projectNo)
+  let summaryInfo = attachmentInfo.summary;
+  let result = window.checkSummaryFromLLM(summaryFromLLM, summaryInfo);
+  if (!result.length) {
+    // @ts-expect-error: use Qmsg from assets
+    Qmsg['success']('LLM验证通过', { timeout: 500 })
+    return
+  }
+  // @ts-expect-error: use Qmsg from assets
+  Qmsg['warning']('LLM验证未通过' + JSON.stringify(result, null, 2), {
+    showClose: true,
+    timeout: 4000
+  })
 }
 
 document.ondragover = preventDefault
