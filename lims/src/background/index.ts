@@ -119,6 +119,7 @@ async function uploadLLMFiles(aircraftServer: string, files: FileData[]) {
   });
 
   if (!response.ok) {
+    console.error(`上传失败！${await response.text()}`);
     throw new Error(`上传失败！${await response.text()}`);
   }
   const result = await response.text();
@@ -134,7 +135,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 
   if (request.action === 'uploadLLMFiles') {
-    console.log("uploadLLMFiles background")
     uploadLLMFiles(request.aircraftServer, request.files)
       .then(result => sendResponse(result))
       .catch(error => sendResponse(error));

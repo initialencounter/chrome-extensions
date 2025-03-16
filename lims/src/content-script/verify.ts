@@ -664,22 +664,17 @@ async function dropEvent(event: DragEvent) {
       reader.readAsArrayBuffer(file);
     });
   }
-  try {
-    const response = await chrome.runtime.sendMessage({
-      action: 'uploadLLMFiles',
-      aircraftServer: localConfig.aircraftServer,
-      files: filesData,
-    });
-    let summaryFromLLM = JSON.parse(JSON.parse(response));
-    console.log('summaryFromLLM', summaryFromLLM)
-    await llmChecker(summaryFromLLM);
-  } catch (error) {
-    // @ts-expect-error: use Qmsg from assets
-    Qmsg['warning']('LLM验证未通过' + JSON.stringify(error, null, 2), {
-      showClose: true,
-      timeout: 4000
-    });
+  const response = await chrome.runtime.sendMessage({
+    action: 'uploadLLMFiles',
+    aircraftServer: localConfig.aircraftServer,
+    files: filesData,
+  });
+  let summaryFromLLM = JSON.parse(response);
+  if (typeof summaryFromLLM !== 'object') {
+    summaryFromLLM = JSON.parse(summaryFromLLM)
   }
+  console.log('summaryFromLLM', summaryFromLLM)
+  await llmChecker(summaryFromLLM);
   hideMask();
 }
 
