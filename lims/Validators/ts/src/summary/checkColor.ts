@@ -1,7 +1,7 @@
 import { CheckResult } from "../shared/types/index"
 import { colorMap } from "../shared/appearence/color"
 
-function removeNonChineseCharacters(str: string): string {
+export function removeNonChineseCharacters(str: string): string {
   // 使用正则表达式匹配所有非中文字符并替换为空字符串
   return str.replace(/[^\u4e00-\u9fa5]/g, '');
 }
