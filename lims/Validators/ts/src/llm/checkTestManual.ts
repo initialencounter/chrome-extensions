@@ -12,7 +12,7 @@ type TestManual ="联合国《试验和标准手册》第八修订版第38.3节"
 "联合国《关于危险货物运输的建议书-试验和标准手册》（第4版）38.3节"
 
 export function checkTestManual(rawTestManualLLM: string, rawTestManual: string): CheckResult[] {
-  let testManualLLM = (rawTestManualLLM).trim()
+  let testManualLLM = String(rawTestManualLLM).trim()
   testManualLLM = matchTestManual(testManualLLM)
   let testManual = rawTestManual.trim()
   testManual = matchTestManual(testManual)
@@ -23,6 +23,7 @@ export function checkTestManual(rawTestManualLLM: string, rawTestManual: string)
     }]
   }
   if (testManualLLM !== testManual) {
+    console.log(testManualLLM, testManual)
     return [{
       ok: false,
       result: `UN报告上的测试标准为:${rawTestManualLLM}，概要上的为:${rawTestManual}`

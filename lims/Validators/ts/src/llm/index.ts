@@ -24,6 +24,7 @@ export function checkSummaryFromLLM(summaryFromLLM: SummaryFromLLM, summaryInfo:
   results.push(...checkTestManual(String(summaryFromLLM.testManual), summaryInfo.testManual))
   // T1-8验证
   results.push(...checkT1_8(summaryFromLLM, summaryInfo))
+  console.log(results)
   for (let result of results) {
     result.result = "LLM验证：" + result.result
   }

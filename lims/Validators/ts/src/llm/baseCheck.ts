@@ -6,8 +6,8 @@ const baseCheckItem: Array<keyof SummaryFromLLM> = ["type", "testReportNo", "tes
 export function baseCheck(summaryFromLLM: SummaryFromLLM, summaryInfo: SummaryInfo): CheckResult[] {
   let results: CheckResult[] = []
   for (let item of baseCheckItem) {
-    let valueFromLLM = (summaryFromLLM[item] as string).trim()
-    let valueFromInfo = (summaryInfo[item as keyof SummaryInfo] as string).trim()
+    let valueFromLLM = String(summaryFromLLM[item] as string).trim()
+    let valueFromInfo = (summaryInfo[item as keyof SummaryInfo] as string)
     if (valueFromInfo !== valueFromLLM) {
       results.push({
         ok: false,

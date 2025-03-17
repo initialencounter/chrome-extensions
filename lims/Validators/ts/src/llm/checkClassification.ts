@@ -2,7 +2,7 @@ import { CheckResult } from '../shared/types/index'
 import { removeNonChineseCharacters } from '../summary/checkColor'
 
 export function checkClassification(classificationLLM: string, classification: string): CheckResult[] {
-  classification = removeNonChineseCharacters(classification.trim()).trim()
+  classification = removeNonChineseCharacters(String(classification).trim()).trim()
   if (classificationLLM !== classification) {
     return [{
       ok: false,

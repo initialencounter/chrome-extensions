@@ -10,8 +10,8 @@ export function checkContainUnit(summaryFromLLM: SummaryFromLLM, summaryInfo: Su
   let results: CheckResult[] = []
   for (let i = 0; i < containUnitItem.length; i++) {
     let item = containUnitItem[i]
-    let valueFromLLM = (summaryFromLLM[item as keyof SummaryFromLLM] as number)
-    let valueFromInfo = (summaryInfo[item as keyof SummaryInfo] as string).trim()
+    let valueFromLLM = Number(summaryFromLLM[item as keyof SummaryFromLLM])
+    let valueFromInfo = String(summaryInfo[item as keyof SummaryInfo]).trim()
     let unit = units[i]
     if (valueFromInfo.includes("不适用")) {
       continue

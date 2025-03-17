@@ -5,7 +5,7 @@ import { CheckResult } from '../shared/types/index'
 export function checkT1_8(summaryFromLLM: SummaryFromLLM, summaryInfo: SummaryInfo): CheckResult[] {
   let results: CheckResult[] = []
   for (let i = 1; i < 9; i++) {
-    let llmState = summaryFromLLM[`test${i}` as keyof SummaryFromLLM] as boolean
+    let llmState = Boolean(summaryFromLLM[`test${i}` as keyof SummaryFromLLM])
     let summaryText = summaryInfo[`test${i}` as keyof SummaryInfo] as string
     if (llmState) {
       if (summaryText.includes("不适用")) {
