@@ -87,9 +87,9 @@ async function backgroundSleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-async function getAttachmentInfo(aircraftServer: string, projectNo: string, label: string) {
+async function getAttachmentInfo(aircraftServer: string, projectNo: string, label: string, is_965: boolean) {
   const response = await fetch(
-    `${aircraftServer}/get-attachment-info/${projectNo}?label=${label}`,
+    `${aircraftServer}/get-attachment-info/${projectNo}?label=${label}?is_965=${is_965 ? 1 : 0}`,
     {
       method: 'GET',
       mode: 'cors',
@@ -128,7 +128,7 @@ async function uploadLLMFiles(aircraftServer: string, files: FileData[]) {
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'getAttachmentInfo') {
-    getAttachmentInfo(request.aircraftServer, request.projectNo, request.label)
+    getAttachmentInfo(request.aircraftServer, request.projectNo, request.label, request.is_965)
       .then(result => sendResponse(result))
       .catch(error => sendResponse(null));
     return true; // 保持消息通道开放，等待异步响应

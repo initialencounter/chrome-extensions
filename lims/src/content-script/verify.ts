@@ -210,7 +210,16 @@ async function checkAttachment() {
   try {
     const projectNo = getCurrentProjectNo()
     if (!projectNo) return []
-    const attachmentInfo: AttachmentInfo = await getProjectAttachmentInfo(projectNo)
+    let dataFromForm = null
+    let is_965 = false
+    if (systemIdLowercase === 'pek') {
+      dataFromForm = getFormData<PekData>(systemIdLowercase)
+      is_965 = dataFromForm.inspectionItem1 == 1
+    } else {
+      dataFromForm = getFormData<SekData>(systemIdLowercase)
+      is_965 = dataFromForm.otherDescribe === "540"
+    }
+    const attachmentInfo: AttachmentInfo = await getProjectAttachmentInfo(projectNo, is_965)
     if (!localConfig.enableLabelCheck) {
       attachmentInfo.goods.labels = ['pass']
     }
@@ -218,7 +227,7 @@ async function checkAttachment() {
     if (!attachmentInfo) return []
     const entrustDataText = await getEntrustData()
     const entrustData = parseEntrust(entrustDataText)
-    return checkSummary(attachmentInfo, entrustData)
+    return checkSummary(dataFromForm, attachmentInfo, entrustData)
   } catch (e) {
     console.log(e)
     return [{ ok: false, result: "附件解析失败" }]
@@ -557,7 +566,7 @@ function parseEntrust(entrustData: string | null): EntrustModelDocx {
   }
 }
 
-async function getProjectAttachmentInfo(projectNo: string) {
+async function getProjectAttachmentInfo(projectNo: string, is_965: boolean) {
   // const response = await fetch(
   //   `${localConfig.aircraftServer}/get-attachment-info/${projectNo}?label=${localConfig.enableLabelCheck ? '1' : '0'}`,
   //   {
@@ -575,7 +584,8 @@ async function getProjectAttachmentInfo(projectNo: string) {
       action: 'getAttachmentInfo',
       aircraftServer: localConfig.aircraftServer,
       projectNo: projectNo,
-      label: localConfig.enableLabelCheck ? '1' : '0'
+      label: localConfig.enableLabelCheck ? '1' : '0',
+      is_965,
     });
     return response;
   } catch (error) {
@@ -585,15 +595,12 @@ async function getProjectAttachmentInfo(projectNo: string) {
 }
 
 
-function checkSummary(attachmentInfo: AttachmentInfo, entrustData: EntrustModelDocx) {
+function checkSummary(dataFromForm: PekData | SekData, attachmentInfo: AttachmentInfo, entrustData: EntrustModelDocx) {
   let result = []
-  let dataFromForm: PekData | SekData
   if (systemIdLowercase === 'pek') {
-    dataFromForm = getFormData<PekData>(systemIdLowercase)
-    result = window.checkPekAttachment(dataFromForm, attachmentInfo, entrustData)
+    result = window.checkPekAttachment(dataFromForm as PekData, attachmentInfo, entrustData)
   } else {
-    dataFromForm = getFormData<SekData>(systemIdLowercase)
-    result = window.checkSekAttachment(dataFromForm, attachmentInfo, entrustData)
+    result = window.checkSekAttachment(dataFromForm as SekData, attachmentInfo, entrustData)
   }
   return result
 }
@@ -681,7 +688,16 @@ async function dropEvent(event: DragEvent) {
 async function llmChecker(summaryFromLLM: SummaryFromLLM) {
   const projectNo = getCurrentProjectNo()
   if (!projectNo) return []
-  const attachmentInfo: AttachmentInfo = await getProjectAttachmentInfo(projectNo)
+  let dataFromForm = null
+  let is_965 = false
+  if (systemIdLowercase === 'pek') {
+    dataFromForm = getFormData<PekData>(systemIdLowercase)
+    is_965 = dataFromForm.inspectionItem1 == 1
+  } else {
+    dataFromForm = getFormData<SekData>(systemIdLowercase)
+    is_965 = dataFromForm.otherDescribe === "540"
+  }
+  const attachmentInfo: AttachmentInfo = await getProjectAttachmentInfo(projectNo, is_965)
   let summaryInfo = attachmentInfo.summary;
   let result = window.checkSummaryFromLLM(summaryFromLLM, summaryInfo);
   if (!result.length) {
