@@ -89,7 +89,7 @@ async function backgroundSleep(ms: number) {
 
 async function getAttachmentInfo(aircraftServer: string, projectNo: string, label: string, is_965: boolean) {
   const response = await fetch(
-    `${aircraftServer}/get-attachment-info/${projectNo}?label=${label}?is_965=${is_965 ? 1 : 0}`,
+    `${aircraftServer}/get-attachment-info/${projectNo}?label=${label}&is_965=${is_965 ? 1 : 0}`,
     {
       method: 'GET',
       mode: 'cors',
