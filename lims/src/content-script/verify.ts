@@ -736,20 +736,20 @@ function carteLabelCheck() {
   if (!imagePosition) return
   const container = document.createElement('div');
   Object.assign(container.style, {
-    width: '200px',
-    height: '50px',
+    id: 'lims-verify-label-container',
+    width: 'auto',
+    height: 'auto',
     display: 'flex',
     'flex-direction': 'row',
     position: 'absolute',
   });
+  let y = imagePosition.getBoundingClientRect().y
+  container.style.top = y + 'px'
   setInterval(() => {
-    let y = imagePosition.getBoundingClientRect().y
     let width = imagePosition.getBoundingClientRect().width
-    let x = imagePosition.getBoundingClientRect().x + width - 250
-    container.style.top = y + 'px'
+    let x = imagePosition.getBoundingClientRect().x + width - container.getBoundingClientRect().width
     container.style.left = x + 'px'
-    console.log(x, y)
-  }, 100)
+  }, 200)
 
 
   // 创建图片函数
@@ -762,8 +762,9 @@ function carteLabelCheck() {
       objectFit: 'cover',
       cursor: 'pointer',
       opacity: '0.5',
-      transition: 'filter 0.3s',
+      transition: 'all 0.3s',
       margin: '5px',
+      border: '5px solid transparent' // 初始时设置透明边框
     });
     img.src = LABEL_IMG[num];
     img.dataset.selected = 'false';
@@ -773,6 +774,8 @@ function carteLabelCheck() {
       const isSelected = this.dataset.selected === 'true';
       this.dataset.selected = String(!isSelected);
       this.style.opacity = isSelected ? '0.5' : '1';
+      // 选中时添加蓝色边框，未选中时恢复透明边框
+      this.style.border = isSelected ? '5px solid transparent' : '5px solid green';
     });
 
     return img;
