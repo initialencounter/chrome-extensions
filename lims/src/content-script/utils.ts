@@ -25,6 +25,7 @@ const localConfig = {
   aircraftServer: 'http://127.0.0.1:25455',
   enableCheckAttachment: true,
   enableLabelCheck: false,
+  enableLabelCheckManual: false,
 }
 
 const configKeys: Array<keyof typeof localConfig> = [
@@ -52,6 +53,7 @@ const configKeys: Array<keyof typeof localConfig> = [
   'aircraftServer',
   'enableCheckAttachment',
   'enableLabelCheck',
+  'enableLabelCheckManual',
 ]
 chrome.storage.sync.get(configKeys, function (data) {
   for (const key of Object.keys(data) as Array<keyof typeof localConfig>) {

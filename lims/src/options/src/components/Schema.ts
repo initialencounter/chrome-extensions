@@ -31,6 +31,10 @@ export interface Config {
   showInspectFormLink?: boolean
   freshHotkey?: boolean
   autoRefreshDuration?: number
+  aircraftServer: string
+  enableCheckAttachment: boolean
+  enableLabelCheck: boolean
+  enableLabelCheckManual: boolean
 }
 
 export const Config: Schema<Config> = Schema.intersect([
@@ -79,6 +83,7 @@ export const Config: Schema<Config> = Schema.intersect([
     aircraftServer: Schema.string().description('附件解析服务器地址').default('http://127.0.0.1:25455'),
     enableCheckAttachment: Schema.boolean().description('启用附件解析').default(true),
     enableLabelCheck: Schema.boolean().description('启用标签检查（识别不准确，不建议开启）').default(false),
+    enableLabelCheckManual: Schema.boolean().description('启用手动标签检查').default(false),
     verifyButtonOnMiddle: Schema.boolean().description('验证按钮放在提交按钮旁边').default(false),
     enableCopyProjectNo: Schema.boolean()
       .description(
