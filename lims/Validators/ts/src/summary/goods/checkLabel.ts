@@ -4,7 +4,7 @@ function getPekExpectedLabel(pkgInfoSubType: PkgInfoSubType, netWeight: number):
   let label = []
   switch (pkgInfoSubType) {
     case '952':
-      label.push('9')
+      label.push('9A')
       break
     case '965, IA':
     case '968, IA':
