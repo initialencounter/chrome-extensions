@@ -193,7 +193,7 @@ async function checkAttachment() {
     let is_965 = false
     if (systemIdLowercase === 'pek') {
       dataFromForm = getFormData<PekData>(systemIdLowercase)
-      is_965 = dataFromForm.inspectionItem1 == 1
+      is_965 = dataFromForm.inspectionItem1 == 0
     } else {
       dataFromForm = getFormData<SekData>(systemIdLowercase)
       is_965 = dataFromForm.otherDescribe === '540'
@@ -521,7 +521,7 @@ async function llmChecker(summaryFromLLM: SummaryFromLLM) {
   let is_965 = false
   if (systemIdLowercase === 'pek') {
     dataFromForm = getFormData<PekData>(systemIdLowercase)
-    is_965 = dataFromForm.inspectionItem1 == 1
+    is_965 = dataFromForm.inspectionItem1 == 0
   } else {
     dataFromForm = getFormData<SekData>(systemIdLowercase)
     is_965 = dataFromForm.otherDescribe === '540'
