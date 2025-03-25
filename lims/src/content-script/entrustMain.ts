@@ -1,3 +1,5 @@
+import { localConfig, sleep } from './utils'
+
 interface Task {
   assignee: string
   attchmentFiles: string[]
@@ -178,12 +180,12 @@ function setMoonPay() {
 
 function setTagNextYear() {
   if (localConfig.tagNextYear === false) return
-  const nextYear = document.getElementById("nextYear") as HTMLInputElement
+  const nextYear = document.getElementById('nextYear') as HTMLInputElement
   if (nextYear) nextYear.click()
 }
 
 async function insertSaveAndAssignButton(uid: string) {
-  const parentElement = document.querySelector("#entrustBottomFollower")
+  const parentElement = document.querySelector('#entrustBottomFollower')
   if (!parentElement) return
 
   // select
@@ -213,8 +215,8 @@ async function insertSaveAndAssignButton(uid: string) {
   assignButton.dataset.options = 'width:120'
   assignButton.style.width = '118.4px'
   assignButton.innerHTML = `
-  <span class="l-btn-left" style="margin-top: 0px;">
-    <span class="l-btn-text">保存并分配</span>
+  <span class='l-btn-left' style='margin-top: 0px;'>
+    <span class='l-btn-text'>保存并分配</span>
   </span>
   `
   assignButton.onclick = saveAndAssign
@@ -240,19 +242,19 @@ function getEntrustFormData(): EntrustFormData | undefined {
     }
   })
   var errorContents = [];
-  if (isEmpty(data.itemCName)) errorContents.push("物品中文名称不能为空");
-  if (isEmpty(data.itemEName)) errorContents.push("物品英文名称不能为空");
+  if (isEmpty(data.itemCName)) errorContents.push('物品中文名称不能为空');
+  if (isEmpty(data.itemEName)) errorContents.push('物品英文名称不能为空');
 
 
   if (isEmpty(data.principalContact) || isEmpty(data.principal)) {
-    errorContents.push("委托方不能为空");
+    errorContents.push('委托方不能为空');
   }
 
   var category = data.category;
 
-  if (category === "battery" || category === "sodium") {
-    if (isEmpty(data.manufacturersCName)) errorContents.push("物品种类为电池类时：生产厂家中文不能为空");
-    if (isEmpty(data.manufacturersEName)) errorContents.push("物品种类为电池时类：生产厂家英文不能为空");
+  if (category === 'battery' || category === 'sodium') {
+    if (isEmpty(data.manufacturersCName)) errorContents.push('物品种类为电池类时：生产厂家中文不能为空');
+    if (isEmpty(data.manufacturersEName)) errorContents.push('物品种类为电池时类：生产厂家英文不能为空');
   }
 
   if (errorContents.length > 0) {
@@ -262,7 +264,7 @@ function getEntrustFormData(): EntrustFormData | undefined {
 
   if (data.reportCopy) {
     if (+data.reportCopy > 20) {
-      if (!confirm("报告确定是" + data.reportCopy + "份吗？")) return
+      if (!confirm('报告确定是' + data.reportCopy + '份吗？')) return
     }
   }
   return data as EntrustFormData
@@ -457,7 +459,7 @@ async function assignTask(taskIds: string[], uid: string) {
 }
 
 function insertReloadButton() {
-  const parentElement = document.querySelector("body > div.panel.easyui-fluid > div.easyui-panel.panel-body")
+  const parentElement = document.querySelector('body > div.panel.easyui-fluid > div.easyui-panel.panel-body')
   if (!parentElement) return
   const bottomElement = document.createElement('div')
   bottomElement.id = 'entrustBottomFollower'
@@ -470,8 +472,8 @@ function insertReloadButton() {
   reloadButton.dataset.options = 'width:120'
   reloadButton.style.width = '118.4px'
   reloadButton.innerHTML = `
-  <span class="l-btn-left" style="margin-top: 0px;">
-    <span class="l-btn-text">刷新页面</span>
+  <span class='l-btn-left' style='margin-top: 0px;'>
+    <span class='l-btn-text'>刷新页面</span>
   </span>
   `
   reloadButton.onclick = () => {
@@ -540,8 +542,8 @@ function updatePosition(target: HTMLElement, follower: HTMLElement) {
 }
 
 function startFollow() {
-  const target = document.querySelector("#entrustEditForm > table > tbody") as HTMLElement;
-  const follower = document.querySelector("#entrustBottomFollower") as HTMLElement;
+  const target = document.querySelector('#entrustEditForm > table > tbody') as HTMLElement;
+  const follower = document.querySelector('#entrustBottomFollower') as HTMLElement;
 
   if (target && follower) {
     const cleanup = updatePosition(target, follower);

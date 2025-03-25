@@ -5,6 +5,7 @@ import { getSekExpectedLabel, getPekExpectedLabel, checkLabel } from '../../Vali
 import { getPkgInfoSubType } from '../../Validators/ts/src/shared/utils'
 import { LABEL_IMG } from './resource/label'
 import { PekFullData, SekFullData, PekTypeTransMap, SekTypeTransMap, } from './resource/const'
+import { category, localConfig } from './utils'
 
 declare global {
   function checkPekBtyType(data: PekData): Array<{ ok: boolean; result: string }>
@@ -14,7 +15,7 @@ declare global {
   function checkSummaryFromLLM(summaryFromLLM: SummaryFromLLM, summaryInfo: SummaryInfo): Array<{ ok: boolean; result: string }>
 }
 
-const LABELS = ["lims-verify-label-9", "lims-verify-label-9A", "lims-verify-label-CAO", "lims-verify-label-bty"]
+const LABELS = ['lims-verify-label-9', 'lims-verify-label-9A', 'lims-verify-label-CAO', 'lims-verify-label-bty']
 
 const isInspect = new URLSearchParams(window.location.search).get('from') === null;
 const manifest = chrome.runtime.getManifest();
@@ -43,7 +44,7 @@ const host = window.location.host
       window.checkSekBtyType = mod.check_sek_bty
     }
     await verifySleep(500)
-    if (category !== "battery") return
+    if (category !== 'battery') return
     if (localConfig.verify === false) {
       console.log('未启用验证，退出脚本')
       return
@@ -66,9 +67,9 @@ const host = window.location.host
       verifyButton.style.background = '#ffffff'
     }
     verifyButton.innerHTML = `
-    <span class="l-btn-left l-btn-icon-left">
-      <span class="l-btn-text">验证</span>
-      <svg class="l-btn-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#bbbbbb"><path d="m344-60-76-128-144-32 14-148-98-112 98-112-14-148 144-32 76-128 136 58 136-58 76 128 144 32-14 148 98 112-98 112 14 148-144 32-76 128-136-58-136 58Zm34-102 102-44 104 44 56-96 110-26-10-112 74-84-74-86 10-112-110-24-58-96-102 44-104-44-56 96-110 24 10 112-74 86 74 84-10 114 110 24 58 96Zm102-318Zm-42 142 226-226-56-58-170 170-86-84-56 56 142 142Z"/></svg>
+    <span class='l-btn-left l-btn-icon-left'>
+      <span class='l-btn-text'>验证</span>
+      <svg class='l-btn-icon' xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 -960 960 960' width='24px' fill='#bbbbbb'><path d='m344-60-76-128-144-32 14-148-98-112 98-112-14-148 144-32 76-128 136 58 136-58 76 128 144 32-14 148 98 112-98 112 14 148-144 32-76 128-136-58-136 58Zm34-102 102-44 104 44 56-96 110-26-10-112 74-84-74-86 10-112-110-24-58-96-102 44-104-44-56 96-110 24 10 112-74 86 74 84-10 114 110 24 58 96Zm102-318Zm-42 142 226-226-56-58-170 170-86-84-56 56 142 142Z'/></svg>
     </span>
     `
     // verifyButton.onclick = testVerify
@@ -85,9 +86,9 @@ const host = window.location.host
       verifyButton2.style.background = '#ffffff'
     }
     verifyButton2.innerHTML = `
-    <span class="l-btn-left l-btn-icon-left">
-      <span class="l-btn-text">验证</span>
-      <svg class="l-btn-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#bbbbbb"><path d="m344-60-76-128-144-32 14-148-98-112 98-112-14-148 144-32 76-128 136 58 136-58 76 128 144 32-14 148 98 112-98 112 14 148-144 32-76 128-136-58-136 58Zm34-102 102-44 104 44 56-96 110-26-10-112 74-84-74-86 10-112-110-24-58-96-102 44-104-44-56 96-110 24 10 112-74 86 74 84-10 114 110 24 58 96Zm102-318Zm-42 142 226-226-56-58-170 170-86-84-56 56 142 142Z"/></svg>
+    <span class='l-btn-left l-btn-icon-left'>
+      <span class='l-btn-text'>验证</span>
+      <svg class='l-btn-icon' xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 -960 960 960' width='24px' fill='#bbbbbb'><path d='m344-60-76-128-144-32 14-148-98-112 98-112-14-148 144-32 76-128 136 58 136-58 76 128 144 32-14 148 98 112-98 112 14 148-144 32-76 128-136-58-136 58Zm34-102 102-44 104 44 56-96 110-26-10-112 74-84-74-86 10-112-110-24-58-96-102 44-104-44-56 96-110 24 10 112-74 86 74 84-10 114 110 24 58 96Zm102-318Zm-42 142 226-226-56-58-170 170-86-84-56 56 142 142Z'/></svg>
     </span>
     `
     verifyButton2.onclick = lims_verify_inspect
@@ -195,7 +196,7 @@ async function checkAttachment() {
       is_965 = dataFromForm.inspectionItem1 == 1
     } else {
       dataFromForm = getFormData<SekData>(systemIdLowercase)
-      is_965 = dataFromForm.otherDescribe === "540"
+      is_965 = dataFromForm.otherDescribe === '540'
     }
     const attachmentInfo: AttachmentInfo = await getProjectAttachmentInfo(projectNo, is_965)
     if (!localConfig.enableLabelCheck) {
@@ -208,7 +209,7 @@ async function checkAttachment() {
     return checkSummary(dataFromForm, attachmentInfo, entrustData)
   } catch (e) {
     console.log(e)
-    return [{ ok: false, result: "附件解析失败" }]
+    return [{ ok: false, result: '附件解析失败' }]
   }
 }
 
@@ -243,7 +244,7 @@ async function checkAttchmentFile(
   const attchmentFilesText = await getAttchmentFiles(type, projectId)
   if (!attchmentFilesText)
     return [{ ok: false, result: attchmentFilesName + '未上传' }]
-  const rawFileName = attchmentFilesText.match(/"filename":"(.*?)\.pdf"/g)
+  const rawFileName = attchmentFilesText.match(/'filename':'(.*?)\.pdf'/g)
   if (!rawFileName?.length)
     return [{ ok: false, result: attchmentFilesName + '未上传' }]
   const fileName = rawFileName[0].slice(12, 29)
@@ -295,7 +296,7 @@ async function testVerify() {
         result = window.checkSekBtyType(currentData as SekData)
       }
       if (result.length) {
-        if (result.length === 1 && result[0].result.includes("请忽略")) {
+        if (result.length === 1 && result[0].result.includes('请忽略')) {
         } else {
           console.log(result)
         }
@@ -308,7 +309,7 @@ async function testVerify() {
 
 
 function getFormData<T>(systemId: 'pek' | 'sek'): T {
-  const form = document.querySelector("#batteryInspectForm") as HTMLFormElement;
+  const form = document.querySelector('#batteryInspectForm') as HTMLFormElement;
   // 获取表单数据
   const formData = new FormData(form);
   const data: Partial<T> = {};
@@ -385,8 +386,8 @@ function parseEntrust(entrustData: string | null): EntrustModelDocx {
   const parser = new DOMParser();
   const doc = parser.parseFromString(entrustData, 'text/html');
   if (!doc) return res
-  const consignor = doc.querySelector("body > div.main-content > div:nth-child(3) > div:nth-child(2) > div > div > div")
-  const manufacturer = doc.querySelector("body > div.main-content > div:nth-child(7) > div:nth-child(1) > div > div > div")
+  const consignor = doc.querySelector('body > div.main-content > div:nth-child(3) > div:nth-child(2) > div > div > div')
+  const manufacturer = doc.querySelector('body > div.main-content > div:nth-child(7) > div:nth-child(1) > div > div > div')
   if (!consignor || !manufacturer) return res
   return {
     consignor: consignor.innerHTML.trim(),
@@ -523,7 +524,7 @@ async function llmChecker(summaryFromLLM: SummaryFromLLM) {
     is_965 = dataFromForm.inspectionItem1 == 1
   } else {
     dataFromForm = getFormData<SekData>(systemIdLowercase)
-    is_965 = dataFromForm.otherDescribe === "540"
+    is_965 = dataFromForm.otherDescribe === '540'
   }
   const attachmentInfo: AttachmentInfo = await getProjectAttachmentInfo(projectNo, is_965)
   let summaryInfo = attachmentInfo.summary;
@@ -548,9 +549,9 @@ document.ondrop = dropEvent
 
 function carteLabelCheck() {
   if (!localConfig.enableLabelCheckManual) return
-  const panel = document.querySelector("body > div.panel.easyui-fluid > div.easyui-panel.panel-body > div") as HTMLDivElement
+  const panel = document.querySelector('body > div.panel.easyui-fluid > div.easyui-panel.panel-body > div') as HTMLDivElement
   if (!panel) return
-  let imagePosition = document.querySelector("#batteryInspectForm > div > div:nth-child(5) > table")
+  let imagePosition = document.querySelector('#batteryInspectForm > div > div:nth-child(5) > table')
   if (!imagePosition) return
   const container = document.createElement('div');
   Object.assign(container.style, {
@@ -613,7 +614,7 @@ function getSelectedImages() {
   let labels = []
   for (let img of selectedImages) {
     if (img.dataset.id) {
-      labels.push(img.dataset.id.replace("lims-verify-label-", ""))
+      labels.push(img.dataset.id.replace('lims-verify-label-', ''))
     }
   }
   console.log(labels)

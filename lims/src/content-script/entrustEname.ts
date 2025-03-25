@@ -1,3 +1,5 @@
+import { sleep } from './utils'
+
 interface Customer {
   createdBy: string
   createdDate: string
@@ -74,7 +76,7 @@ async function insertEntrustEname(customerList: Customer[]) {
     const matchingEname = customerMap.get(cnameElement.innerHTML)
     if (matchingEname !== undefined) {
       let realEnameElement = document.createElement('td')
-      realEnameElement.innerHTML = `<div class="datagrid-cell" style="width: 400px;">${matchingEname || '/'}</div>`
+      realEnameElement.innerHTML = `<div class='datagrid-cell' style='width: 400px;'>${matchingEname || '/'}</div>`
       realEnameElement.setAttribute('field', 'customerEName')
       parentElement.appendChild(realEnameElement)
     }
@@ -84,21 +86,21 @@ async function insertEntrustEname(customerList: Customer[]) {
 function expandTable(width: number, height: number) {
   const selectors = {
     width: [
-      "body > div:nth-child(10)",
-      "body > div:nth-child(10) > div",
-      "body > div:nth-child(10) > div > div",
-      "body > div:nth-child(10) > div > div > div",
-      "body > div:nth-child(10) > div > div > div > div.datagrid-view",
-      "body > div:nth-child(10) > div > div > div > div.datagrid-view > div.datagrid-view2",
-      "body > div:nth-child(10) > div > div > div > div.datagrid-view > div.datagrid-view2 > div.datagrid-body",
-      "body > div:nth-child(10) > div > div > div > div.datagrid-view > div.datagrid-view2 > div.datagrid-body > table",
-      "body > div:nth-child(10) > div > div > div > div.datagrid-view > div.datagrid-view2 > div.datagrid-body > table > tbody",
+      'body > div:nth-child(10)',
+      'body > div:nth-child(10) > div',
+      'body > div:nth-child(10) > div > div',
+      'body > div:nth-child(10) > div > div > div',
+      'body > div:nth-child(10) > div > div > div > div.datagrid-view',
+      'body > div:nth-child(10) > div > div > div > div.datagrid-view > div.datagrid-view2',
+      'body > div:nth-child(10) > div > div > div > div.datagrid-view > div.datagrid-view2 > div.datagrid-body',
+      'body > div:nth-child(10) > div > div > div > div.datagrid-view > div.datagrid-view2 > div.datagrid-body > table',
+      'body > div:nth-child(10) > div > div > div > div.datagrid-view > div.datagrid-view2 > div.datagrid-body > table > tbody',
     ],
     height: {
-      "body > div:nth-child(10) > div": 450,
-      "body > div:nth-child(10) > div > div > div": 450,
-      "body > div:nth-child(10) > div > div > div > div.datagrid-view": 420,
-      "body > div:nth-child(10) > div > div > div > div.datagrid-view > div.datagrid-view2 > div.datagrid-body": 390
+      'body > div:nth-child(10) > div': 450,
+      'body > div:nth-child(10) > div > div > div': 450,
+      'body > div:nth-child(10) > div > div > div > div.datagrid-view': 420,
+      'body > div:nth-child(10) > div > div > div > div.datagrid-view > div.datagrid-view2 > div.datagrid-body': 390
     }
   };
 
@@ -126,10 +128,10 @@ function expandTable(width: number, height: number) {
 }
 
 function addEnameColumn() {
-  const headerRow = document.querySelector("body > div:nth-child(10) > div > div > div > div.datagrid-view > div.datagrid-view2 > div.datagrid-header > div > table > tbody > tr");
+  const headerRow = document.querySelector('body > div:nth-child(10) > div > div > div > div.datagrid-view > div.datagrid-view2 > div.datagrid-header > div > table > tbody > tr');
   if (headerRow) {
     const newHeader = document.createElement('td');
-    newHeader.innerHTML = `<div class="datagrid-cell" style="width: 400px;"><span>客户英文名称</span></div>`;
+    newHeader.innerHTML = `<div class='datagrid-cell' style='width: 400px;'><span>客户英文名称</span></div>`;
     headerRow.appendChild(newHeader);
   }
 
@@ -137,14 +139,14 @@ function addEnameColumn() {
     const row = document.querySelector(`#datagrid-row-r1-2-${i}`);
     if (row) {
       const newCell = document.createElement('td');
-      newCell.innerHTML = `<div class="datagrid-cell" style="width: 400px;"></div>`;
+      newCell.innerHTML = `<div class='datagrid-cell' style='width: 400px;'></div>`;
       row.appendChild(newCell);
     }
   }
 }
 
 function debounceInput(delay: number = 500) {
-  const input = document.querySelector<HTMLInputElement>("#entrustEditForm > table > tbody > tr:nth-child(2) > td:nth-child(2) > div:nth-child(4) > span > input.textbox-text.validatebox-text");
+  const input = document.querySelector<HTMLInputElement>('#entrustEditForm > table > tbody > tr:nth-child(2) > td:nth-child(2) > div:nth-child(4) > span > input.textbox-text.validatebox-text');
   if (!input) {
     console.warn('未找到输入元素');
     return;
@@ -173,7 +175,7 @@ function debounceInput(delay: number = 500) {
 }
 
 function setPage() {
-  let nextPage = document.querySelector("body > div:nth-child(10) > div > div > div > div.datagrid-pager.pagination > table > tbody > tr > td:nth-child(10) > a") as HTMLAnchorElement
+  let nextPage = document.querySelector('body > div:nth-child(10) > div > div > div > div.datagrid-pager.pagination > table > tbody > tr > td:nth-child(10) > a') as HTMLAnchorElement
   if (nextPage) {
     nextPage.addEventListener('click', async () => {
       expandTable(700, 400);
@@ -184,23 +186,12 @@ function setPage() {
   }
 }
 
-async function sleepEntrustEname(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
-function replaceTableHeaderName() {
-  let header = document.querySelector("body > div:nth-child(10) > div > div > div > div.datagrid-view > div.datagrid-view2 > div.datagrid-header > div > table > tbody > tr > td:nth-child(2) > div > span:nth-child(1)")
-  if (header) {
-    header.innerHTML = '客户英文名称'
-  }
-}
-
 (async () => {
   chrome.storage.sync.get('enableDisplayEntrustEName', async (data) => {
     if (data.enableDisplayEntrustEName === false) return
-    console.log("启用委托方英文名称显示")
+    console.log('启用委托方英文名称显示')
     try {
-      await sleepEntrustEname(500);
+      await sleep(500);
       addEnameColumn();
       debounceInput();
       setPage();

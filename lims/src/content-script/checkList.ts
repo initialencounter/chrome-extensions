@@ -1,42 +1,43 @@
-console.log("检查清单脚本注入成功！", systemId);
-let isListening = false
-  ; (async function () {
-    await sleep(400)
-    if (!document.getElementById('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')) return
-    const headerBar = document.querySelector("body > div.panel.easyui-fluid > div.panel-header")
-    if (!headerBar) return
-    headerBar.addEventListener('click', () => {
-      setFormDataToClipBoard()
-    })
-    const targetChild = document.getElementById('openDocumentsBtn0')
-    if (!targetChild) return
-    const targetParent = targetChild.parentElement
-    if (!targetParent) return
-    const checkListButton = document.createElement('a')
-    checkListButton.id = 'lims-checkListButton'
-    checkListButton.href = 'javascript:void(0);'
-    checkListButton.className = 'easyui-linkbutton l-btn l-btn-small'
+import { sleep, systemId } from './utils';
+
+console.log('检查清单脚本注入成功！', systemId);
+; (async function () {
+  await sleep(400)
+  if (!document.getElementById('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')) return
+  const headerBar = document.querySelector('body > div.panel.easyui-fluid > div.panel-header')
+  if (!headerBar) return
+  headerBar.addEventListener('click', () => {
+    setFormDataToClipBoard()
+  })
+  const targetChild = document.getElementById('openDocumentsBtn0')
+  if (!targetChild) return
+  const targetParent = targetChild.parentElement
+  if (!targetParent) return
+  const checkListButton = document.createElement('a')
+  checkListButton.id = 'lims-checkListButton'
+  checkListButton.href = 'javascript:void(0);'
+  checkListButton.className = 'easyui-linkbutton l-btn l-btn-small'
+  checkListButton.style.background = '#ffffff'
+  // hover
+  checkListButton.onmouseover = function () {
+    checkListButton.style.background = '#54a124'
+  }
+  checkListButton.onmouseout = function () {
     checkListButton.style.background = '#ffffff'
-    // hover
-    checkListButton.onmouseover = function () {
-      checkListButton.style.background = '#54a124'
-    }
-    checkListButton.onmouseout = function () {
-      checkListButton.style.background = '#ffffff'
-    }
-    checkListButton.innerHTML = `
-    <span class="l-btn-left l-btn-icon-left">
-      <span class="l-btn-text">对比</span>
-      <svg class="l-btn-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#bbbbbb"><path d="M500-520h80v-80h80v-80h-80v-80h-80v80h-80v80h80v80Zm-80 160h240v-80H420v80ZM320-200q-33 0-56.5-23.5T240-280v-560q0-33 23.5-56.5T320-920h280l240 240v400q0 33-23.5 56.5T760-200H320Zm0-80h440v-360L560-840H320v560ZM160-40q-33 0-56.5-23.5T80-120v-560h80v560h440v80H160Zm160-240v-560 560Z"/></svg>
+  }
+  checkListButton.innerHTML = `
+    <span class='l-btn-left l-btn-icon-left'>
+      <span class='l-btn-text'>对比</span>
+      <svg class='l-btn-icon' xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 -960 960 960' width='24px' fill='#bbbbbb'><path d='M500-520h80v-80h80v-80h-80v-80h-80v80h-80v80h80v80Zm-80 160h240v-80H420v80ZM320-200q-33 0-56.5-23.5T240-280v-560q0-33 23.5-56.5T320-920h280l240 240v400q0 33-23.5 56.5T760-200H320Zm0-80h440v-360L560-840H320v560ZM160-40q-33 0-56.5-23.5T80-120v-560h80v560h440v80H160Zm160-240v-560 560Z'/></svg>
     </span>
     `
-    checkListButton.onclick = handleDiffClick
-    targetParent.appendChild(checkListButton)
-    console.log('对比按钮插入成功')
-  })()
+  checkListButton.onclick = handleDiffClick
+  targetParent.appendChild(checkListButton)
+  console.log('对比按钮插入成功')
+})()
 
 function getFormDataJSON() {
-  const form = document.querySelector("#batteryInspectForm") as HTMLFormElement;
+  const form = document.querySelector('#batteryInspectForm') as HTMLFormElement;
   // 获取表单数据
   let data = {} as FormJSONData
   const formData = new FormData(form);
@@ -47,8 +48,8 @@ function getFormDataJSON() {
       data[name as keyof FormJSONData] = value as FormJSONData[keyof FormJSONData];
     }
   })
-  data["comment"] = data["comment"].slice(1)
-  data["remarks"] = data["remarks"].slice(1)
+  data['comment'] = data['comment'].slice(1)
+  data['remarks'] = data['remarks'].slice(1)
   return data
 }
 
@@ -63,7 +64,7 @@ function setFormDataToClipBoard() {
 async function handleDiffClick() {
   try {
     const jsonText = await navigator.clipboard.readText()
-    const itemCName = document.querySelector("#itemCName") as HTMLInputElement
+    const itemCName = document.querySelector('#itemCName') as HTMLInputElement
     if (!itemCName) return ''
     const data = JSON.parse(jsonText)
     const diffDataKeys = compareFormData(data)
@@ -95,11 +96,11 @@ function compareFormData(data: FormJSONData) {
 }
 
 const ignoreList = [
-  "projectId",
-  "checkLocation",
-  "taskId",
-  "according",
-  "commentExtra"
+  'projectId',
+  'checkLocation',
+  'taskId',
+  'according',
+  'commentExtra'
 ]
 
 /**

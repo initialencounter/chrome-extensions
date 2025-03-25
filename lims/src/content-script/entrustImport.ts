@@ -1,3 +1,5 @@
+import { getClipboardText, sleep } from './utils'
+
 ; (async () => {
   chrome.storage.sync.get(['autoImport'], async function (result) {
     if (result.autoImport === false) {
@@ -16,16 +18,16 @@ async function autoImport() {
     console.log('没有项目编号，退出脚本')
     return
   }
-  const projectNoInput = document.querySelector("#projectNo") as HTMLInputElement
+  const projectNoInput = document.querySelector('#projectNo') as HTMLInputElement
   if (projectNoInput) {
     projectNoInput.value = projectNo
   }
-  const searchBtn = document.querySelector("#toolbar > p:nth-child(2) > a:nth-child(5)") as HTMLAnchorElement
+  const searchBtn = document.querySelector('#toolbar > p:nth-child(2) > a:nth-child(5)') as HTMLAnchorElement
   if (searchBtn) {
     searchBtn.click()
   }
   let handle = setInterval(() => {
-    const row1 = document.querySelector("body > div > div > div > div > div.datagrid-view > div.datagrid-view2 > div.datagrid-body > table > tbody > tr:nth-child(1)")
+    const row1 = document.querySelector('body > div > div > div > div > div.datagrid-view > div.datagrid-view2 > div.datagrid-body > table > tbody > tr:nth-child(1)')
     if (row1) {
       row1.dispatchEvent(new MouseEvent('dblclick', { bubbles: true }))
       clearInterval(handle)

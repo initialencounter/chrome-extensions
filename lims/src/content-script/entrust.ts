@@ -1,3 +1,5 @@
+import { parseDate, sleep } from './utils'
+
 interface Task {
   assignee: string
   attchmentFiles: string[]
@@ -183,16 +185,13 @@ async function assignSelectId(uid: string) {
   doFreshEntrustList()
 }
 
-async function entrustSleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
 
 async function ReceiveSubmit(
   ids: string[],
   task: 'receive' | 'submit'
 ): Promise<string[]> {
   if (!ids.length) return []
-  await entrustSleep(50)
+  await sleep(50)
   const response = await fetch(
     `https://${window.location.host}/rest/sales/entrust/entrusts/${task}`,
     {
@@ -214,7 +213,7 @@ async function ReceiveSubmit(
 
 async function getTaskIds(ids: string[]): Promise<string[]> {
   if (!ids.length) return []
-  await entrustSleep(50)
+  await sleep(50)
   const currentDate = new Date()
   const date = currentDate.toISOString().split('T')[0]
   currentDate.setMonth(currentDate.getMonth() - 1)
@@ -275,7 +274,7 @@ async function assignTask(taskIds: string[], uid: string) {
 }
 
 async function insertElement(uid: string) {
-  await entrustSleep(200)
+  await sleep(200)
   const targetParent = document.getElementById('toolbar')
   if (!targetParent) return
   const div = document.createElement('div')
@@ -288,8 +287,8 @@ async function insertElement(uid: string) {
   assignButton.dataset.options = 'width:120'
   assignButton.style.width = '118.4px'
   assignButton.innerHTML = `
-  <span class="l-btn-left" style="margin-top: 0px;">
-    <span class="l-btn-text">一键分配给：</span>
+  <span class='l-btn-left' style='margin-top: 0px;'>
+    <span class='l-btn-text'>一键分配给：</span>
   </span>
   `
   assignButton.onclick = lims_onekey_assign_click
@@ -330,10 +329,6 @@ async function lims_onekey_assign_click() {
     globalAssignUser = selectUid
   }
   await assignSelectId(selectUid)
-}
-
-async function sleepEntrust(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 function removeOrange(nextYearColor: string, nextYearBgColor: string) {
@@ -399,7 +394,7 @@ async function insertInspectFormLink(length1: number) {
 }
 
 function updateGlobalItemNumberList1(): string[] {
-  const dataGridRow1 = document.querySelector("#datagrid-row-r1-1-0")
+  const dataGridRow1 = document.querySelector('#datagrid-row-r1-1-0')
   if (!dataGridRow1) return []
   const gridElement = dataGridRow1.parentElement
   if (!gridElement) return []
@@ -435,7 +430,7 @@ async function listenFreshHotkeyEntrustList() {
 }
 
 function doFreshEntrustList() {
-  const refreshButton = document.querySelector("body > div.panel.easyui-fluid > div.easyui-panel.panel-body.panel-noscroll > div > div > div.datagrid-pager.pagination > table > tbody > tr > td:nth-child(13) > a") as HTMLAnchorElement
+  const refreshButton = document.querySelector('body > div.panel.easyui-fluid > div.easyui-panel.panel-body.panel-noscroll > div > div > div.datagrid-pager.pagination > table > tbody > tr > td:nth-child(13) > a') as HTMLAnchorElement
   if (refreshButton) refreshButton.click()
 }
 
@@ -465,7 +460,7 @@ interface LinkParams {
 async function getCategory(projectNo: string): Promise<LinkParams | undefined> {
   if (!projectNo) return undefined
   try {
-    const [startDate, endDate] = parseDateEntrust(projectNo)
+    const [startDate, endDate] = parseDate(projectNo)
     const response = await fetch(
       `https://${window.location.host}/rest/inspect/query?projectNo=${projectNo}&startDate=${startDate}&endDate=${endDate}&page=1&rows=10`,
       {
@@ -549,21 +544,4 @@ async function openWindow(projectNo: string) {
   let link = `/${linkParams.systemId}/inspect?${params.toString()}`
   console.log(link)
   window.open(link, '_blank')
-}
-
-function parseDateEntrust(dateText: string) {
-  dateText = dateText.replace(/[^0-9]/g, '')
-  if (dateText.length < 9) {
-    return ['', '']
-  }
-  const year = dateText.slice(0, 4)
-  const month = dateText.slice(4, 6)
-  const day = dateText.slice(6, 8)
-  if (month.length < 2) {
-    return [`${year}-01-01`, `${year}-12-31`]
-  }
-  if (day.length < 2) {
-    return [`${year}-${month}-01`, `${year}-${month}-31`]
-  }
-  return [`${year}-${month}-${day}`, `${year}-${month}-${day}`]
 }

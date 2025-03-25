@@ -16,6 +16,9 @@ type CreateProperties = chrome.contextMenus.CreateProperties
 type ExtendedCreateProperties = CreateProperties & {
   child?: ExtendedCreateProperties[]
 }
+
+const IFRAME_RECT_MAP: Record<number, DOMRect> = {}
+
 // A generic onclick callback function.
 chrome.contextMenus.onClicked.addListener(genericOnClick)
 
@@ -138,6 +141,35 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     uploadLLMFiles(request.aircraftServer, request.files)
       .then(result => sendResponse(result))
       .catch(error => sendResponse(error));
+    return true; // 保持消息通道开放，等待异步响应
+  }
+
+  // 截图
+  if (request.action === 'captureVisibleTab') {
+    chrome.tabs.captureVisibleTab(
+      { format: 'png', quality: 100 },
+      (dataUrl) => {
+        if (chrome.runtime.lastError) {
+          console.error('chrome.runtime.lastError', chrome.runtime.lastError.message);
+          sendResponse({ error: chrome.runtime.lastError.message });
+        } else {
+          console.log('dataUrl:', dataUrl);
+          sendResponse(dataUrl);
+        }
+      }
+    );
+    return true; // 保持异步响应
+  }
+
+  // 同步 iframe 的 rect
+  if (request.action === 'syncIframeRect') {
+    IFRAME_RECT_MAP[sender.tab!.id!] = request.rect;
+    sendResponse('ok');
+    return true; // 保持消息通道开放，等待异步响应
+  }
+
+  if (request.action === 'getIframeRect') {
+    sendResponse(IFRAME_RECT_MAP[sender.tab!.id!] || DOMRect.fromRect({ x: 0, y: 0, width: 0, height: 0 }));
     return true; // 保持消息通道开放，等待异步响应
   }
 });

@@ -56,12 +56,13 @@ const configKeys: Array<keyof typeof localConfig> = [
   'enableLabelCheckManual',
 ]
 chrome.storage.sync.get(configKeys, function (data) {
+  console.log(data)
   for (const key of Object.keys(data) as Array<keyof typeof localConfig>) {
-    console.log(key, data[key])
     // @ts-ignore
     localConfig[key] = data[key]
   }
 })
+
 if (!window) {
   checkDate([])
   parseDate('')
@@ -141,4 +142,9 @@ function getMonthsAgoProjectNo() {
   const currentDate = new Date()
   currentDate.setMonth(currentDate.getMonth() - 1)
   return systemId + currentDate.toISOString().slice(0, 7).replace('-', '')
+}
+
+export {
+  localConfig, category, systemId, checkDate, parseDate, sleep,
+  setProjectNoToClipText, getClipboardText, checkProjectNo, getMonthsAgoProjectNo
 }

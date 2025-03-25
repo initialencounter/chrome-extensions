@@ -1,3 +1,5 @@
+import { checkDate, getClipboardText, localConfig, parseDate, sleep } from './utils'
+
 ;(async function () {
   await sleep(500)
   if (localConfig.enableSetQueryProjectNo === false) {

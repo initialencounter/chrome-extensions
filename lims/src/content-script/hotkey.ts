@@ -1,3 +1,5 @@
+import { category, getClipboardText, getMonthsAgoProjectNo, localConfig, setProjectNoToClipText, sleep, systemId } from './utils'
+
 console.log('快捷键脚本运行中...')
 const fromQuery = new URLSearchParams(window.location.search).get('from') === 'query' ? true : false
 let changed = false
@@ -35,7 +37,7 @@ let lastCPressTime = 0
     btySizeSek.parentElement?.style.setProperty('width', '428px')
   }
 
-  const otherDescribeCAddition = document.getElementById("otherDescribeCAddition") as HTMLInputElement
+  const otherDescribeCAddition = document.getElementById('otherDescribeCAddition') as HTMLInputElement
   if (otherDescribeCAddition && systemId !== 'PEKGZ') {
     otherDescribeCAddition.style.setProperty('width', '750px')
     otherDescribeCAddition.parentElement?.style.setProperty('width', '758px')
@@ -238,12 +240,12 @@ async function classification() {
   let currentProjectNo = qProjectNo.value
   if (projectNo.startsWith(systemId) && projectNo.length === 17 && currentProjectNo !== projectNo) {
     qProjectNo.value = projectNo
-    const searchButton = document.getElementById("searchBtn") as HTMLButtonElement
+    const searchButton = document.getElementById('searchBtn') as HTMLButtonElement
     if (searchButton) {
       await sleep(100)
       searchButton.click()
       await sleep(200)
-      const reslutRow1 = document.querySelector("#datagrid-row-r10-2-0") as HTMLElement
+      const reslutRow1 = document.querySelector('#datagrid-row-r10-2-0') as HTMLElement
       if (reslutRow1) {
         reslutRow1.click()
       } else {
