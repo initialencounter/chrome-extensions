@@ -1,3 +1,4 @@
+import { addShotListener, startSyncInterval } from './screenshot'
 import { localConfig, sleep } from './utils'
 
 interface Task {
@@ -92,6 +93,8 @@ let globalCheckAssignUser = true
     setAmountListener()
     insertReloadButton()
     startFollow()
+    addShotListener()
+    startSyncInterval()
     chrome.storage.sync.get(['assignUser', 'saveAndAssign', 'checkAssignUser'], async function (data) {
       const assignUser = data.assignUser as string
       globalAssignUser = assignUser
