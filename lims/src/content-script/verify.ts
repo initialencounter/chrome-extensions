@@ -163,7 +163,7 @@ async function lims_verify_inspect() {
     result = window.checkSekBtyType(dataFromForm)
   }
   result.push(
-    ...(await checkAttchmentFiles(projectNo, currentProjectId))
+    ...(await checkAttachmentFiles(projectNo, currentProjectId))
   )
 
   result.push(...(await checkAttachment()))
@@ -217,7 +217,7 @@ async function verifySleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-async function getAttchmentFiles(
+async function getAttachmentFiles(
   type: 'goodsfile' | 'batteryfile',
   projectId: string
 ) {
@@ -235,31 +235,31 @@ async function getAttchmentFiles(
   return res
 }
 
-async function checkAttchmentFile(
+async function checkAttachmentFile(
   type: 'goodsfile' | 'batteryfile',
   projectNo: string,
   projectId: string
 ) {
-  const attchmentFilesName = type === 'goodsfile' ? '图片' : '概要'
-  const attchmentFilesText = await getAttchmentFiles(type, projectId)
-  if (!attchmentFilesText)
-    return [{ ok: false, result: attchmentFilesName + '未上传' }]
-  const rawFileName = attchmentFilesText.match(/'filename':'(.*?)\.pdf'/g)
+  const AttachmentFilesName = type === 'goodsfile' ? '图片' : '概要'
+  const AttachmentFilesText = await getAttachmentFiles(type, projectId)
+  if (!AttachmentFilesText)
+    return [{ ok: false, result: AttachmentFilesName + '未上传' }]
+  const rawFileName = AttachmentFilesText.match(/"filename":"(.*?)\.pdf"/g)
   if (!rawFileName?.length)
-    return [{ ok: false, result: attchmentFilesName + '未上传' }]
+    return [{ ok: false, result: AttachmentFilesName + '未上传' }]
   const fileName = rawFileName[0].slice(12, 29)
   if (fileName !== projectNo)
-    return [{ ok: false, result: attchmentFilesName + '上传错误' }]
+    return [{ ok: false, result: AttachmentFilesName + '上传错误' }]
   return []
 }
 
-async function checkAttchmentFiles(projectNo: string, projectId: string) {
-  const check1 = await checkAttchmentFile('goodsfile', projectNo, projectId)
-  const check2 = await checkAttchmentFile('batteryfile', projectNo, projectId)
+async function checkAttachmentFiles(projectNo: string, projectId: string) {
+  const check1 = await checkAttachmentFile('goodsfile', projectNo, projectId)
+  const check2 = await checkAttachmentFile('batteryfile', projectNo, projectId)
   return [...check1, ...check2]
 }
 // 验证资料上传
-// (async () => {console.log(await checkAttchmentFiles('SEKGZ202410245479','2c9180839267761d0192bd77b32f1091'))})()
+// (async () => {console.log(await checkAttachmentFiles('SEKGZ202410245479','2c9180839267761d0192bd77b32f1091'))})()
 
 
 // tests
