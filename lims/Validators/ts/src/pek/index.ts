@@ -143,7 +143,9 @@ function checkPekBtyType(currentData: PekData): CheckResult[] {
     voltage,
     capacity,
     wattHour,
-    wattHourFromName))
+    wattHourFromName,
+    inspectionItem1,
+  ))
   // 电池净重限重
   result.push(...netWeighLimit(netWeight, pkgInfoSubType))
   // 荷电状态≤30%

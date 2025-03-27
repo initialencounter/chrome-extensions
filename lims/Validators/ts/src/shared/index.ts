@@ -8,6 +8,7 @@ import { itemNameModel } from './itemNameModel'
 import { voltageBtyType } from './voltageBtyType'
 import { wattHourCalculate } from './wattHourCalculate'
 import { checkDevice } from './checkDevice'
+import { bytNumsCalculate } from './bytNumsCalculate'
 
 /**
  * 基础检测
@@ -44,7 +45,8 @@ export function baseCheck(btySize: string,
   voltage: number,
   capacity: number,
   wattHour: number,
-  wattHourFromName: number
+  wattHourFromName: number,
+  inspectionItem1: '0' | '1' | '2'
 ): CheckResult[] {
   let result: CheckResult[] = []
   // 尺寸或形状
@@ -64,5 +66,7 @@ export function baseCheck(btySize: string,
   result.push(...wattHourCalculate(capacity, voltage, wattHour, wattHourFromName))
   // 设备名称、型号、商标验证
   result.push(...checkDevice(itemCName, itemEName, otherDescribeCAddition))
+  // 电池数量验证
+  result.push(...bytNumsCalculate(btyCount, otherDescribeCAddition, inspectionItem1))
   return result
 }

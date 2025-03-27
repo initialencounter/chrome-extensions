@@ -29,3 +29,24 @@ export function matchTestManual(testManual: string) {
   if (!results.length) return ''
   return result
 }
+
+export function match967BatteryNumber(sourceText: string): number {
+  const batteryNumRegex = /内置\s*(\d+)\s*块电池/;
+  const batteryMatch = sourceText.match(batteryNumRegex);
+  const batteryNumber = batteryMatch ? parseInt(batteryMatch[1], 10) : 0;
+  return batteryNumber
+}
+
+export function match966BatteryNumber(sourceText: string): number {
+  const batteryNumRegex = /与\s*(\d+)\s*块电池包装在一起/;
+  const batteryMatch = sourceText.match(batteryNumRegex);
+  const batteryNumber = batteryMatch ? parseInt(batteryMatch[1], 10) : 0;
+  return batteryNumber
+}
+
+export function matchDeviceNumber(sourceText: string): number {
+  const deviceNumRegex = /内含\s*(\d+)\s*台设备/;
+  const deviceMatch = sourceText.match(deviceNumRegex);
+  const deviceNumber = deviceMatch ? parseInt(deviceMatch[1], 10) : 0;
+  return deviceNumber
+}

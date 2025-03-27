@@ -131,6 +131,7 @@ function checkSekBtyType(currentData: SekData): CheckResult[] {
     capacity,
     wattHour,
     wattHourFromName,
+    inspectionItem1,
   ))
   // 包装与其他描述验证
   result.push(...packetOrContain(otherDescribe, otherDescribeCAddition, isChargeBoxOrRelated))
