@@ -32,8 +32,8 @@ jobs:
           npm install -g web-ext
       - name: Build
         run: |
-          npm run build:v
           npm run build
+          npm run build:v
       
       - name: Build docs
         run: |
