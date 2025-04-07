@@ -58,8 +58,12 @@ export function conclusionsCheck(
     }
     const UNNO = getUNNO(pkgInfoByPackCargo, isIon)
     const isCargoOnly = getIsCargoOnly(pkgInfo, netWeight)
-    if (isCargoOnly && packPassengerCargo !== 'Forbidden') {
-      result.push({ ok: false, result: '结论错误，客货机禁止运输' })
+    if (isCargoOnly) {
+      if (packPassengerCargo !== 'Forbidden')
+        result.push({ ok: false, result: '结论错误，客货机禁止运输' })
+    } else {
+      if (packPassengerCargo === 'Forbidden')
+        result.push({ ok: false, result: '结论错误，客货机不应为 Forbidden' })
     }
     if (unno !== UNNO) {
       result.push({ ok: false, result: '结论错误，UN编号应为' + UNNO })
