@@ -1,29 +1,42 @@
-export function matchDeviceName(projectName: string) {
-  let matches = [...projectName.matchAll(/设备[:：](.*?)[。;；]/g)]
-  let results = matches.map((match) => match[1])
-  let result = results[results.length - 1]
-  if (!results.length) return ''
-  return result
+export function matchDeviceName(otherDescribe: string) {
+  return fetchLastRegexMatch(otherDescribe,/设备[:：](.*?)[。;；]/g)
 }
 
-export function matchDeviceModel(projectName: string) {
-  let matches = [...projectName.matchAll(/设备[:：].*?[;；]型号[:：](.*?)[。；;]/g)]
-  let results = matches.map((match) => match[1])
-  let result = results[results.length - 1]
-  if (!results.length) return ''
-  return result
+export function matchDeviceModel(otherDescribe: string) {
+  return fetchLastRegexMatch(otherDescribe, /设备[:：].*?[;；]型号[:：](.*?)[。；;]/g)
 }
 
-export function matchDeviceTrademark(projectName: string) {
-  let matches = [...projectName.matchAll(/设备[:：].*?[;；]型号[:：].*?[；;]商标[:：](.*?)[。;；]/g)]
-  let results = matches.map((match) => match[1])
-  let result = results[results.length - 1]
-  if (!results.length) return ''
-  return result
+export function matchDeviceTrademark(otherDescribe: string) {
+  return fetchLastRegexMatch(otherDescribe, /设备[:：].*?[;；]型号[:：].*?[；;]商标[:：](.*?)[。;；]/g)
 }
 
-export function matchTestManual(testManual: string) {
-  let matches = [...testManual.matchAll(/[\(（]?(第.*?)[\)）]?\s?[第]?38.3节/g)]
+export function matchTestManual(rawTestManual: string) {
+  let revision = fetchLastRegexMatch(rawTestManual, /[Rr][Ee][Vv]\.?\s?(\d)/g)
+  if (!revision) {
+    revision = ''
+  }
+  let amend = matchAmend(rawTestManual)
+  return '第' + revision + '版' + amend
+}
+
+function matchAmend(rawTestManual: string) {
+  let amendList = rawTestManual.match(/[Aa][Mm][Ee][Nn][Dd]/g);
+  if (amendList === null) {
+    return ''
+  } else if (amendList.length === 2) {
+    return '修订1和修订2'
+  } else {
+    let amend = fetchLastRegexMatch(rawTestManual, /[Aa][Mm][Ee][Nn][Dd]\.?\s?(\d)/g)
+    if (amend === '') {
+      return ''
+    } else {
+      return '修订' + amend
+    }
+  }
+}
+
+function fetchLastRegexMatch(rawText: string, reg: RegExp) {
+  let matches = [...rawText.matchAll(reg)]
   let results = matches.map((match) => match[1])
   let result = results[results.length - 1]
   if (!results.length) return ''
