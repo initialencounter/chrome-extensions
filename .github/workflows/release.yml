@@ -65,6 +65,6 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            lims/lims-${{ steps.get_version.outputs.VERSION }}.chrome.zip
-            lims/lims-${{ steps.get_version.outputs.VERSION }}.firefox.xpi
+            lims-${{ steps.get_version.outputs.VERSION }}.chrome.zip
+            lims-${{ steps.get_version.outputs.VERSION }}.firefox.xpi
           name: 'Lims ${{ steps.get_version.outputs.VERSION }}'
