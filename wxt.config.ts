@@ -21,7 +21,7 @@ export default defineConfig({
   manifest: {
     name: 'lims',
     version: '2.0.0',
-    description: 'tools for own use',
+    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
     icons: {
       '48': 'icon/lims.png'
   },
