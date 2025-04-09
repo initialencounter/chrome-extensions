@@ -5,7 +5,7 @@ layout: home
 hero:
   name: "Lims"
   text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-  tagline: v1.8.13
+  tagline: v2.0.0-beta
   actions:
     - theme: brand
       text: 快速开始
