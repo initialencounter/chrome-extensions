@@ -1,9 +1,9 @@
 import { defineConfig } from 'wxt';
 import yaml from '@maikolib/vite-plugin-yaml';
-import { fileURLToPath } from 'node:url';
 
 // See https://wxt.dev/api/config.html
 export default defineConfig({
+  manifestVersion: 3,
   vite: () => ({
     css: {
       preprocessorOptions: {
@@ -22,9 +22,14 @@ export default defineConfig({
     name: 'lims',
     version: '2.0.0',
     description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
+    browser_specific_settings: {
+      gecko: {
+        id: '{3f8b9a12-a64d-48d8-bb5c-8d9f4e9322b2}',
+      }
+    },
     icons: {
       '48': 'icon/lims.png'
-  },
+    },
     permissions: [
       'activeTab',
       'clipboardWrite',
