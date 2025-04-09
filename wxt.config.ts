@@ -20,7 +20,7 @@ export default defineConfig({
   entrypointsDir: './entrypoints',
   manifest: {
     name: 'lims',
-    version: '2.0.0',
+    version: '2.0.0-beta.1',
     description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
     browser_specific_settings: {
       gecko: {
