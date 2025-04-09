@@ -531,9 +531,18 @@ async function entrypoint() {
     const attachmentInfo: AttachmentInfo = await getProjectAttachmentInfo(projectNo, is_965)
     let summaryInfo = attachmentInfo.summary;
     let result = window.checkSummaryFromLLM(summaryFromLLM, summaryInfo);
+    let panelTitle = document.querySelector("body > div.panel.easyui-fluid > div.panel-header > div.panel-title") as HTMLDivElement
     if (!result.length) {
       Qmsg.success('LLM验证通过', { timeout: 500 })
+      if (panelTitle) {
+        panelTitle.innerText = 'LLM验证通过'
+        panelTitle.style.color = "#238636"
+      }
       return
+    }
+    if (panelTitle) {
+      panelTitle.innerText = 'LLM验证未通过'
+      panelTitle.style.color = "#fa5e55"
     }
     Qmsg.warning('LLM验证未通过' + JSON.stringify(result, null, 2), {
       showClose: true,
