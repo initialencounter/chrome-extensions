@@ -40,7 +40,6 @@ async function entrypoint() {
   const isInspect = new URLSearchParams(window.location.search).get('from') === null;
   const category = getCategory()
   const localConfig = getLocalConfig()
-  console.log('localConfig', localConfig)
   const systemIdLowercase = window.location.pathname.startsWith('/pek')
     ? 'pek'
     : 'sek'
@@ -57,7 +56,6 @@ async function entrypoint() {
     return
   }
   const targetChild = document.getElementById('openDocumentsBtn0')
-  console.log('启用验证，继续脚本', targetChild)
 
   if (!targetChild) return
   const targetParent = targetChild.parentElement
@@ -117,7 +115,7 @@ async function entrypoint() {
   }
   createMask()
   carteLabelCheck()
-  console.log('验证按钮插入成功')
+  console.log('验证按钮插入成功！')
   async function getData(projectId: string): Promise<SekData | PekData | null> {
     const response = await fetch(
       `https://${host}/rest/${systemIdLowercase}/inspect/battery/${projectId}`,

@@ -49,7 +49,7 @@ async function entrypoint() {
     `
   checkListButton.onclick = handleDiffClick
   targetParent.appendChild(checkListButton)
-  console.log('对比按钮插入成功')
+  console.log('对比按钮插入成功！')
   function getFormDataJSON() {
     const form = document.querySelector('#batteryInspectForm') as HTMLFormElement;
     // 获取表单数据
