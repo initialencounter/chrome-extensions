@@ -54,7 +54,7 @@ jobs:
       - name: zip chrome extension
         if: startsWith(github.ref, 'refs/tags/')
         run: |
-          zip -q -r lims-${{ steps.get_version.outputs.VERSION }}.chrome.zip .output/chrome-mv3-dev
+          zip -q -r lims-${{ steps.get_version.outputs.VERSION }}.chrome.zip .output/chrome-mv3
       - name: zip firefox extension
         if: startsWith(github.ref, 'refs/tags/')
         run: |
