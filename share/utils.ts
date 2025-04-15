@@ -124,13 +124,14 @@ function getMonthsAgoProjectNo() {
   return getSystemId() + currentDate.toISOString().slice(0, 7).replace('-', '')
 }
 
-function getLocalConfig() {
-  chrome.storage.sync.get(configKeys, function (data) {
+async function getLocalConfig() {
+  chrome.storage.local.get(configKeys, function (data) {
     for (const key of Object.keys(data) as Array<keyof typeof LocalConfig>) {
       // @ts-ignore
       LocalConfig[key] = data[key]
     }
   })
+  sleep(100)
   return LocalConfig
 }
 

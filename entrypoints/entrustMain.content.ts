@@ -96,7 +96,7 @@ async function entrypoint() {
   let globalAssignUser = ''
   let globalCheckAssignUser = true
   const Qmsg = getQmsg()
-  const localConfig = getLocalConfig()
+  const localConfig = await getLocalConfig()
   await sleep(500)
   if (localConfig.enableSetEntrust === false) {
     console.log('未启用设置委托单，退出脚本')
@@ -111,7 +111,7 @@ async function entrypoint() {
   startFollow()
   addShotListener(Qmsg)
   startSyncInterval()
-  chrome.storage.sync.get(['assignUser', 'saveAndAssign', 'checkAssignUser'], async function (data) {
+  chrome.storage.local.get(['assignUser', 'saveAndAssign', 'checkAssignUser'], async function (data) {
     const assignUser = data.assignUser as string
     globalAssignUser = assignUser
     globalCheckAssignUser = data.checkAssignUser === false ? false : true
@@ -323,7 +323,7 @@ async function entrypoint() {
         return
       }
       if (globalAssignUser !== selectUid) {
-        chrome.storage.sync.set({ assignUser: selectUid })
+        chrome.storage.local.set({ assignUser: selectUid })
         globalAssignUser = selectUid
       }
       let data: EntrustFormData | undefined = getEntrustFormData()

@@ -27,7 +27,7 @@ async function entrypoint() {
   let cPressCount = 0
   let lastCPressTime = 0
   const category = getCategory()
-  const localConfig = getLocalConfig()
+  const localConfig = await getLocalConfig()
   const systemId = getSystemId()
   const Qmsg = getQmsg()
   await sleep(500)

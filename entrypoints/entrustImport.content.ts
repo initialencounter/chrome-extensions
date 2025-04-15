@@ -11,7 +11,7 @@ export default defineContentScript({
 });
 
 async function entrypoint() {
-  chrome.storage.sync.get(['autoImport'], async function (result) {
+  chrome.storage.local.get(['autoImport'], async function (result) {
     if (result.autoImport === false) {
       console.log('未启用导入委托单，退出脚本')
       return

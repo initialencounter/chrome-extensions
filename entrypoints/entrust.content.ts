@@ -132,7 +132,7 @@ async function entrypoint() {
   let globalCheckAssignUser = true
   let hiddenTimeEntrustList: number | null = null;
 
-  chrome.storage.sync.get(['assignUser', 'nextYearColor', 'nextYearBgColor', 'onekeyAssign', 'checkAssignUser', 'showInspectFormLink', 'freshHotkey', 'autoRefreshDuration'], async function (data) {
+  chrome.storage.local.get(['assignUser', 'nextYearColor', 'nextYearBgColor', 'onekeyAssign', 'checkAssignUser', 'showInspectFormLink', 'freshHotkey', 'autoRefreshDuration'], async function (data) {
     if (!(data.freshHotkey === false)) {
       listenFreshHotkeyEntrustList()
       listenVisibilityChangeEntrustList(data?.autoRefreshDuration ?? 10000)
@@ -338,7 +338,7 @@ async function entrypoint() {
     const selectUid = select.value
     if (!selectUid) return
     if (globalAssignUser !== selectUid) {
-      chrome.storage.sync.set({ assignUser: selectUid })
+      chrome.storage.local.set({ assignUser: selectUid })
       globalAssignUser = selectUid
     }
     await assignSelectId(selectUid)

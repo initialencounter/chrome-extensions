@@ -44,9 +44,9 @@ export default defineContentScript({
     window.checkSekAttachment = checkSekAttachment
     window.checkSummaryFromLLM = checkSummaryFromLLM
 
-    // 读取本地配置，需要手动等待
-    const localConfig = getLocalConfig()
-    await sleep(500)
+    // 读取本地配置
+    const localConfig = await getLocalConfig()
+    await sleep(200)
 
     // 获取系统信息
     const Qmsg = getNotification()

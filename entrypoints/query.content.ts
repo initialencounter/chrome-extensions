@@ -13,8 +13,8 @@ export default defineContentScript({
 
 
 async function entrypoint(){
-  const localConfig = getLocalConfig()
-  await sleep(500)
+  const localConfig = await getLocalConfig()
+  await sleep(400)
   if (localConfig.enableSetQueryProjectNo === false) {
     console.log('未启用设置查询项目编号，退出脚本')
     return

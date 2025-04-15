@@ -47,7 +47,7 @@ const importText = ref('')
 const saveConfig = () => {
   try {
     const tmpConfig = new Config(config.value)
-    chrome.storage.sync.set(tmpConfig)
+    chrome.storage.local.set(tmpConfig)
     ElMessage({
       message: '保存成功',
       type: 'success',
@@ -66,7 +66,7 @@ const saveConfig = () => {
 const config = ref<Config>({})
 const initial = ref<Config>({})
 
-chrome.storage.sync.get((Object.keys(new Config())) as (keyof Config)[], (data: Config) => {
+chrome.storage.local.get((Object.keys(new Config())) as (keyof Config)[], (data: Config) => {
   initial.value = JSON.parse(JSON.stringify(data))
   config.value = JSON.parse(JSON.stringify(data))
 })

@@ -16,7 +16,7 @@ export default defineContentScript({
 async function entrypoint() {
   const Qmsg = getQmsg()
   let hiddenTimeInspectList: number | null = null;
-  chrome.storage.sync.get(['onekeyRollback', 'nextYearColor', 'nextYearBgColor', 'freshHotkey', 'autoRefreshDuration'], async function (result) {
+  chrome.storage.local.get(['onekeyRollback', 'nextYearColor', 'nextYearBgColor', 'freshHotkey', 'autoRefreshDuration'], async function (result) {
     if (!(result.freshHotkey === false)) {
       listenFreshHotkeyInspectList()
       listenVisibilityChangeInspectList(result?.autoRefreshDuration ?? 10000)

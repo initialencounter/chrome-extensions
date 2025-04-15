@@ -40,7 +40,7 @@ export default defineContentScript({
 async function entrypoint() {
   await sleep(500)
   let searchText = ''
-  chrome.storage.sync.get('enableDisplayEntrustEName', async (data) => {
+  chrome.storage.local.get('enableDisplayEntrustEName', async (data) => {
     if (data.enableDisplayEntrustEName === false) return
     console.log('启用委托方英文名称显示')
     try {
