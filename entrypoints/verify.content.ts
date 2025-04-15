@@ -479,9 +479,11 @@ async function entrypoint() {
   async function dropEvent(event: DragEvent) {
     event.stopPropagation();
     event.preventDefault();
-    showMask();
     const fileList = event.dataTransfer!.files;
-
+    if (fileList.length === 0) {
+      return;
+    }
+    showMask();
     const filesData: FileData[] = [];
 
     // 遍历 FileList 并将每个文件转换为 ArrayBuffer
