@@ -1,3 +1,50 @@
+interface QmsgInstance {
+  id: number;
+  config: string;
+  inst: MsgInstance;
+}
+
+interface QmsgType {
+  version: string;
+  instanceCount: number;
+  oMsgs: Record<number, QmsgInstance>;
+  maxNums: number;
+  config: (cfg: Partial<MsgSettings>) => void;
+  info: (txt: string | Partial<MsgSettings>, config?: Partial<MsgSettings>) => MsgInstance;
+  warning: (txt: string | Partial<MsgSettings>, config?: Partial<MsgSettings>) => MsgInstance;
+  success: (txt: string | Partial<MsgSettings>, config?: Partial<MsgSettings>) => MsgInstance;
+  error: (txt: string | Partial<MsgSettings>, config?: Partial<MsgSettings>) => MsgInstance;
+  loading: (txt: string | Partial<MsgSettings>, config?: Partial<MsgSettings>) => MsgInstance;
+  remove: (id: number) => void;
+  closeAll: () => void;
+}
+
+interface MsgSettings {
+  position: string;
+  type: string;
+  showClose: boolean;
+  timeout: number;
+  animation: boolean;
+  autoClose: boolean;
+  content: string;
+  onClose: Function | null;
+  maxNums: number;
+  html: boolean;
+}
+
+interface MsgInstance {
+  id: number;
+  settings: MsgSettings;
+  timeout: number;
+  timer: any;
+  $elem: HTMLElement;
+  $wrapper: HTMLElement;
+  state: string;
+  count?: number;
+  close: () => void;
+  destroy: () => void;
+}
+
 function getQmsg() {
   /**
 
@@ -146,31 +193,7 @@ function getQmsg() {
     return res;
   }
 
-  interface MsgSettings {
-    position: string;
-    type: string;
-    showClose: boolean;
-    timeout: number;
-    animation: boolean;
-    autoClose: boolean;
-    content: string;
-    onClose: Function | null;
-    maxNums: number;
-    html: boolean;
-  }
-
-  interface MsgInstance {
-    id: number;
-    settings: MsgSettings;
-    timeout: number;
-    timer: any;
-    $elem: HTMLElement;
-    $wrapper: HTMLElement;
-    state: string;
-    count?: number;
-    close: () => void;
-    destroy: () => void;
-  }
+  
 
   /**
    * 每条消息的构造函数
@@ -328,26 +351,7 @@ function getQmsg() {
     return opts;
   }
 
-  interface QmsgInstance {
-    id: number;
-    config: string;
-    inst: MsgInstance;
-  }
-
-  interface QmsgType {
-    version: string;
-    instanceCount: number;
-    oMsgs: Record<number, QmsgInstance>;
-    maxNums: number;
-    config: (cfg: Partial<MsgSettings>) => void;
-    info: (txt: string | Partial<MsgSettings>, config?: Partial<MsgSettings>) => MsgInstance;
-    warning: (txt: string | Partial<MsgSettings>, config?: Partial<MsgSettings>) => MsgInstance;
-    success: (txt: string | Partial<MsgSettings>, config?: Partial<MsgSettings>) => MsgInstance;
-    error: (txt: string | Partial<MsgSettings>, config?: Partial<MsgSettings>) => MsgInstance;
-    loading: (txt: string | Partial<MsgSettings>, config?: Partial<MsgSettings>) => MsgInstance;
-    remove: (id: number) => void;
-    closeAll: () => void;
-  }
+  
 
   /**
    * 通过配置信息 来判断是否为同一条消息,并返回消息实例
@@ -409,4 +413,4 @@ function getQmsg() {
 }
 
 
-export { getQmsg }
+export { getQmsg, QmsgType, MsgSettings, MsgInstance};

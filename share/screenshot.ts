@@ -1,4 +1,6 @@
-async function getNameScreenShot() {
+import type { QmsgType } from './qmsg'
+
+async function getNameScreenShot(Qmsg: QmsgType) {
   try {
     // 发送截图请求
     const dataUrl = await chrome.runtime.sendMessage({ action: 'captureVisibleTab' });
@@ -12,10 +14,8 @@ async function getNameScreenShot() {
 
     // 复制到剪贴板
     await copyCanvasToClipboard(canvas);
-    // @ts-expect-error: use Qmsg from assets
     Qmsg['success']('截图已复制到剪贴板!')
   } catch (error) {
-    // @ts-expect-error: use Qmsg from assets
     Qmsg['error'](`截图失败: ${error instanceof Error ? error.message : error}`)
   }
 }
@@ -124,10 +124,11 @@ function startSyncInterval() {
   setInterval(syncIframeRect, 1000)
 }
 
-function addShotListener() {
+function addShotListener(Qmsg: QmsgType) {
   let itemCName = document.querySelector("#entrustEditForm")
+  console.log(itemCName, 'itemCName')
   if (!itemCName) return
-  itemCName.addEventListener('dblclick', getNameScreenShot)
+  itemCName.addEventListener('dblclick', () => {getNameScreenShot(Qmsg)})
 }
 
 export { addShotListener, syncIframeRect, getIframeRect, startSyncInterval };

@@ -109,7 +109,7 @@ async function entrypoint() {
   setAmountListener()
   insertReloadButton()
   startFollow()
-  addShotListener()
+  addShotListener(Qmsg)
   startSyncInterval()
   chrome.storage.sync.get(['assignUser', 'saveAndAssign', 'checkAssignUser'], async function (data) {
     const assignUser = data.assignUser as string
