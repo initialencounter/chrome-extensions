@@ -5,6 +5,7 @@ import type { LocalConfig } from '@/share/utils'
  * 创建标签选择UI
  */
 export function createLabelSelectionUI(localConfig: typeof LocalConfig): void {
+  console.log('localConfig3', JSON.stringify(localConfig, null, 2))
   console.log('localConfig:', localConfig, 'localConfig.enableLabelCheckManual',localConfig.enableLabelCheckManual)
   if (!(localConfig.enableLabelCheckManual)) return
   const LABELS = ['lims-verify-label-9', 'lims-verify-label-9A', 'lims-verify-label-CAO', 'lims-verify-label-bty']
