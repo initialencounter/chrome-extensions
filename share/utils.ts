@@ -26,7 +26,7 @@ const LocalConfig = {
   enableLabelCheckManual: false,
 }
 
-const configKeys: Array<keyof typeof LocalConfig> = [
+export const configKeys: Array<keyof typeof LocalConfig> = [
   'customIcon',
   'enableSetEntrust',
   'enableCopyProjectNo',
