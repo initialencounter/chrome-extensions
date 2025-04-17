@@ -17,7 +17,7 @@ export default defineContentScript({
 });
 
 async function entrypoint() {
-  await sleep(400)
+  await sleep(200)
   const Qmsg = getQmsg()
   if (!document.getElementById('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')) return
   const headerBar = document.querySelector('body > div.panel.easyui-fluid > div.panel-header')
